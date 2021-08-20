@@ -1,8 +1,18 @@
-import { download } from "../deps.ts";
+import { download, DownlodedFile, ensureDirSync } from "../deps.ts";
+import { DEFAULT_DATAFILES_PATH } from "./consts.ts";
 
-const url =
-  "https://raw.githubusercontent.com/denolib/high-res-deno-logo/master/deno_hr.png";
-const fileName = "deno.png";
-const dir = ".";
-
-await download(url, { file: fileName, dir });
+export class Downloader {
+  async download(url: URL): Promise<DownlodedFile> {
+    const splitedURLPath = url.pathname.split("/");
+    const joinedDirPath = splitedURLPath
+      .slice(0, splitedURLPath.length - 1)
+      .join("/");
+    const dir = `${DEFAULT_DATAFILES_PATH}/${url.hostname}${joinedDirPath}`
+    const file = splitedURLPath[splitedURLPath.length - 1]
+    ensureDirSync(dir);
+    return download(url, {
+      file,
+      dir,
+    });
+  }
+}

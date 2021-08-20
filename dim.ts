@@ -9,6 +9,7 @@ import {
   InitAction,
   InstallAction,
   UninstallAction,
+  ListAction,
   UpdateAction
 } from "./libs/actions.ts";
 import { NAME, VERSION } from "./libs/consts.ts"
@@ -37,6 +38,12 @@ const { options, args } = await new Command()
       .description("Uninstall the data.")
       .help("Specify the data name or data url.")
       .action(new UninstallAction().execute),
+  )
+  .command(
+    "list",
+    new Command()
+      .description("Show the data list.")
+      .action(new ListAction().execute),
   )
   .command(
     "update [name:string]",
