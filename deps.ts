@@ -9,6 +9,6 @@ export { CompletionsCommand } from "https://deno.land/x/cliffy@v0.19.5/command/c
 export { HelpCommand } from "https://deno.land/x/cliffy@v0.19.5/command/help/mod.ts";
 
 export {
-  ensureDirSync,
-  ensureFileSync
+  ensureDir,
+  ensureFile
 } from "https://deno.land/std@0.78.0/fs/mod.ts";

@@ -1,4 +1,4 @@
-import { ensureDirSync, ensureFileSync } from "../deps.ts";
+import { ensureDir, ensureFile } from "../deps.ts";
 import {
   DEFAULT_DATAFILES_PATH,
   DEFAULT_DIM_FILE_PATH,
@@ -9,17 +9,16 @@ interface Action {
 }
 
 export class InitAction implements Action {
-  static createDataFiles() {
-    ensureDirSync(DEFAULT_DATAFILES_PATH);
+  static async createDataFiles() {
+    ensureDir(DEFAULT_DATAFILES_PATH);
   }
-  static createDimJson() {
-    ensureFileSync(DEFAULT_DIM_FILE_PATH);
-    ensureFileSync(DEFAULT_DIM_LOCK_FILE_PATH);
+  static async createDimJson() {
+    ensureFile(DEFAULT_DIM_FILE_PATH);
+    ensureFile(DEFAULT_DIM_LOCK_FILE_PATH);
   }
-  execute(options: any): void {
+  async execute(options: any) {
     console.log(options);
-    InitAction.createDataFiles();
-    InitAction.createDimJson();
+    await Promise.all([InitAction.createDataFiles(), InitAction.createDimJson()])
   }
 }
 

@@ -11,7 +11,7 @@ import {
   UninstallAction,
   UpdateAction
 } from "./libs/actions.ts";
-import { NAME, VERSION,} from "./libs/consts.ts"
+import { NAME, VERSION } from "./libs/consts.ts"
 
 const { options, args } = await new Command()
   .name(NAME)
