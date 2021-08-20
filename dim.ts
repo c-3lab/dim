@@ -1,31 +1,17 @@
-import { Command } from "./deps.ts";
-interface Action {
-}
-
-class InitAction implements Action {
-  execute(options: any): void {
-    console.log(options);
-  }
-}
-
-class InstallAction implements Action {
-  execute(options: any, url: string): void {
-    console.log(options, url);
-  }
-}
-
-class UninstallAction implements Action {
-  execute(options: any, name: string): void {
-    console.log(options, name);
-  }
-}
-class UpdateAction implements Action {
-  execute(options: any, name: string): void {
-    console.log(options, name);
-  }
-}
-const NAME = "dim";
-const VERSION = "0.1";
+import {
+  Command,
+  CompletionsCommand,
+  DenoLandProvider,
+  HelpCommand,
+  UpgradeCommand,
+} from "./deps.ts";
+import {
+  InitAction,
+  InstallAction,
+  UninstallAction,
+  UpdateAction
+} from "./libs/actions.ts";
+import { NAME, VERSION,} from "./libs/consts.ts"
 
 const { options, args } = await new Command()
   .name(NAME)
@@ -33,27 +19,37 @@ const { options, args } = await new Command()
   .command(
     "init",
     new Command()
-      .description("Init the project")
+      .description("Init the project.")
       .action(new InitAction().execute),
   )
   .command(
-    "install <url:string>",
+    "install [url:string]",
     new Command()
-      .description("Install the data")
-      .help("Specify the url of data")
+      .description("Install the data.")
+      .help(
+        "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",
+      )
       .action(new InstallAction().execute),
   )
   .command(
     "uninstall <name:string>",
     new Command()
-      .description("Uninstall the data")
-      .help("Specify the data name or data url")
+      .description("Uninstall the data.")
+      .help("Specify the data name or data url.")
       .action(new UninstallAction().execute),
   )
   .command(
-    "update <name:string>",
+    "update [name:string]",
     new Command()
-      .description("Uninstall the data")
-      .action(new UninstallAction().execute),
+      .description("Update the data.")
+      .action(new UpdateAction().execute),
   )
+  .command(
+    "upgrade",
+    new UpgradeCommand({
+      provider: [new DenoLandProvider({ name: "dim" })],
+    }),
+  )
+  .command("help", new HelpCommand())
+  .command("complete", new CompletionsCommand())
   .parse(Deno.args);

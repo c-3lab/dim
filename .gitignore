@@ -1,1 +1,4 @@
 .vscode
+data_files
+dim.json
+dim-lock.json
