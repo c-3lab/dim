@@ -12,7 +12,8 @@ export { HelpCommand } from "https://deno.land/x/cliffy@v0.19.5/command/help/mod
 export {
   ensureDir,
   ensureDirSync,
-  ensureFile
-} from "https://deno.land/std@0.78.0/fs/mod.ts";
+  ensureFile,
+  existsSync,
+} from "https://deno.land/std@0.105.0/fs/mod.ts";
 
 export * as Colors from "https://deno.land/std/fmt/colors.ts"

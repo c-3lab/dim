@@ -6,6 +6,7 @@ import {
   DIM_LOCK_VERSION,
 } from "./consts.ts";
 import { Downloader } from "./downloader.ts";
+import { DimFileAccessor } from "./accessor.ts";
 import { DimJSON, DimLockJSON } from "./types.ts";
 
 interface Action {
@@ -17,19 +18,19 @@ export class InitAction implements Action {
   }
   static async createDimJson() {
     const dimFilePromise = new Promise(async () => {
-      const dimData: DimJSON = { data: [] };
+      const dimData: DimJSON = { contents: [] };
       await ensureFile(DEFAULT_DIM_FILE_PATH);
-      Deno.writeTextFile(DEFAULT_DIM_FILE_PATH, JSON.stringify(dimData));
+      Deno.writeTextFile(DEFAULT_DIM_FILE_PATH, JSON.stringify(dimData, null , 2));
     });
     const dimLockFilePromise = new Promise(async () => {
       const dimLockData: DimLockJSON = {
         lockFileVersion: DIM_LOCK_VERSION,
-        data: [],
+        contents: [],
       };
       await ensureFile(DEFAULT_DIM_LOCK_FILE_PATH);
       Deno.writeTextFile(
         DEFAULT_DIM_LOCK_FILE_PATH,
-        JSON.stringify(dimLockData),
+        JSON.stringify(dimLockData, null , 2),
       );
     });
     Promise.all([dimFilePromise, dimLockFilePromise]);
@@ -45,8 +46,16 @@ export class InitAction implements Action {
 
 export class InstallAction implements Action {
   async execute(options: any, url: string) {
-    await new Downloader().download(new URL(url));
-    console.log(Colors.green(`Installed ${url}`));
+    Promise.all([
+      new Downloader().download(new URL(url)),
+      new DimFileAccessor().addContent(url, url, []),
+    ]).then((results) => {
+      console.log(
+        Colors.green(`Installed ${url}`),
+        `\nFile path:`,
+        Colors.yellow(results[0].fullPath),
+      );
+    });
   }
 }
 

@@ -1,15 +1,20 @@
-interface DimJSON {
-  data: [{ url: string; name: string; preprocess: [string] | [] }] | [];
+export interface Content {
+  url: string;
+  name: string;
+  preprocesses: string[] | [];
 }
-interface DimLockJSON {
+export interface LockContent {
+  url: string;
+  path: string;
+  name: string;
+  preprocesses: string[] | [];
+  lastUpdated: Date;
+}
+
+export interface DimJSON {
+  contents: Content[] | [];
+}
+export interface DimLockJSON {
   lockFileVersion: number;
-  data: [
-    {
-      url: string;
-      path: string;
-      name: string;
-      preprocess: [string] | [];
-      lastUpdated: Date;
-    },
-  ] | [];
+  contents: LockContent[] | [];
 }
