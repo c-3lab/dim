@@ -61,17 +61,10 @@ export class DimLockFileAccessor {
       JSON.stringify(json, null, 2),
     );
   }
-  async addContent(
-    url: string,
-    path: string,
-    name: string,
-    preprocesses: string[],
-  ) {
+  async addContent(content: LockContent) {
     if (this.dimLockJSON === undefined) {
       return;
     }
-    const lastUpdated: Date = new Date();
-    const content: LockContent = { url, path, name, preprocesses, lastUpdated };
     // Override the existing content.
     const currentContents = this.dimLockJSON.contents.filter((c) =>
       c.url !== content.url
@@ -80,6 +73,25 @@ export class DimLockFileAccessor {
     await this.writeToDimLockFile({
       lockFileVersion: DIM_LOCK_VERSION,
       contents: contents,
+    });
+  }
+  async addContents(contents: LockContent[]) {
+    if (this.dimLockJSON === undefined) {
+      return;
+    }
+    // Override the existing content.
+    const currentContents = this.dimLockJSON.contents.filter((c) =>
+      !contents.map((newContent) => newContent.url).includes(
+        c.url,
+      )
+    );
+    const resultContents = new Array<LockContent>(
+      ...currentContents,
+      ...contents,
+    );
+    await this.writeToDimLockFile({
+      lockFileVersion: DIM_LOCK_VERSION,
+      contents: resultContents,
     });
   }
   getContents(): LockContent[] {
