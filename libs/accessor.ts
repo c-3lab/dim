@@ -17,7 +17,10 @@ export class DimFileAccessor {
     }
   }
   private async writeToDimFile(json: DimJSON) {
-    Deno.writeTextFile(DEFAULT_DIM_FILE_PATH, JSON.stringify(json, null, 2));
+    await Deno.writeTextFile(
+      DEFAULT_DIM_FILE_PATH,
+      JSON.stringify(json, null, 2),
+    );
   }
   async addContent(url: string, name: string, preprocesses: string[]) {
     if (this.dimJSON === undefined) {
@@ -29,7 +32,7 @@ export class DimFileAccessor {
       c.url !== content.url
     );
     const contents = new Array<Content>(...currentContents, content);
-    this.writeToDimFile({ contents: contents });
+    await this.writeToDimFile({ contents: contents });
   }
   getContents(): Content[] {
     if (this.dimJSON !== undefined) {
@@ -53,7 +56,7 @@ export class DimLockFileAccessor {
     }
   }
   private async writeToDimLockFile(json: DimLockJSON) {
-    Deno.writeTextFile(
+    await Deno.writeTextFile(
       DEFAULT_DIM_LOCK_FILE_PATH,
       JSON.stringify(json, null, 2),
     );
@@ -74,7 +77,7 @@ export class DimLockFileAccessor {
       c.url !== content.url
     );
     const contents = new Array<LockContent>(...currentContents, content);
-    this.writeToDimLockFile({
+    await this.writeToDimLockFile({
       lockFileVersion: DIM_LOCK_VERSION,
       contents: contents,
     });

@@ -16,4 +16,4 @@ export {
   existsSync,
 } from "https://deno.land/std@0.105.0/fs/mod.ts";
 
-export * as Colors from "https://deno.land/std/fmt/colors.ts"
+export * as Colors from "https://deno.land/std/fmt/colors.ts";

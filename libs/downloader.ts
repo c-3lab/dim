@@ -7,10 +7,10 @@ export class Downloader {
     const joinedDirPath = splitedURLPath
       .slice(0, splitedURLPath.length - 1)
       .join("/");
-    const dir = `${DEFAULT_DATAFILES_PATH}/${url.hostname}${joinedDirPath}`
-    const file = splitedURLPath[splitedURLPath.length - 1]
+    const dir = `${DEFAULT_DATAFILES_PATH}/${url.hostname}${joinedDirPath}`;
+    const file = splitedURLPath[splitedURLPath.length - 1];
     ensureDirSync(dir);
-    return download(url, {
+    return await download(url, {
       file,
       dir,
     });

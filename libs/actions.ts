@@ -30,15 +30,12 @@ const initDimLockFile = async () => {
   );
 };
 
-interface Action {
-}
-
-export class InitAction implements Action {
+export class InitAction {
   static async createDataFilesDir() {
-    ensureDir(DEFAULT_DATAFILES_PATH);
+    await ensureDir(DEFAULT_DATAFILES_PATH);
   }
   static async createDimJson() {
-    Promise.all([initDimFile, initDimLockFile]);
+    await Promise.all([initDimFile, initDimLockFile]);
   }
   async execute(options: any) {
     await Promise.all([
@@ -49,7 +46,7 @@ export class InitAction implements Action {
   }
 }
 
-export class InstallAction implements Action {
+export class InstallAction {
   async execute(options: any, url: string | undefined) {
     await InitAction.createDataFilesDir();
     if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
@@ -71,7 +68,7 @@ export class InstallAction implements Action {
       console.log("The url have already been installed.");
       Deno.exit(0);
     }
-    Promise.all([
+    await Promise.all([
       new Downloader().download(new URL(url)),
       new DimFileAccessor().addContent(url, url, []),
     ]).then((results) => {
@@ -96,21 +93,22 @@ export class InstallAction implements Action {
         lockContent.url !== content.url
       );
     const downloadList = contents.filter(isNotInstalled).map((content) => {
-      return new Promise<string>(async (resolve) => {
-        const result = await new Downloader().download(new URL(content.url));
-        await dimLockFileAccessor.addContent(
-          content.url,
-          result.fullPath,
-          content.url,
-          [],
-        );
-        console.log(
-          Colors.green(`Installed ${content.url}`),
-          `\nFile path:`,
-          Colors.yellow(result.fullPath),
-        );
-        console.log();
-        resolve(result.fullPath);
+      return new Promise<string>((resolve) => {
+        new Downloader().download(new URL(content.url)).then((result) => {
+          dimLockFileAccessor.addContent(
+            content.url,
+            result.fullPath,
+            content.url,
+            [],
+          );
+          console.log(
+            Colors.green(`Installed ${content.url}`),
+            `\nFile path:`,
+            Colors.yellow(result.fullPath),
+          );
+          console.log();
+          resolve(result.fullPath);
+        });
       });
     });
     const results = await Promise.all(downloadList);
@@ -124,19 +122,19 @@ export class InstallAction implements Action {
   }
 }
 
-export class UninstallAction implements Action {
+export class UninstallAction {
   execute(options: any, name: string): void {
     console.log(options, name);
   }
 }
 
-export class ListAction implements Action {
+export class ListAction {
   execute(options: any): void {
     console.log(options);
   }
 }
 
-export class UpdateAction implements Action {
+export class UpdateAction {
   execute(options: any, name: string): void {
     console.log(options, name);
   }
