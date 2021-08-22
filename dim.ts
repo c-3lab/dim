@@ -34,7 +34,7 @@ await new Command()
       .action(new InstallAction().execute),
   )
   .command(
-    "uninstall <name:string>",
+    "uninstall <url:string>",
     new Command()
       .description("Uninstall the data.")
       .help("Specify the data name or data url.")
@@ -47,7 +47,7 @@ await new Command()
       .action(new ListAction().execute),
   )
   .command(
-    "update [name:string]",
+    "update [url:string]",
     new Command()
       .description("Update the data.")
       .action(new UpdateAction().execute),
