@@ -1,4 +1,5 @@
 .vscode
+.DS_Store
 data_files
 dim.json
 dim-lock.json
