@@ -157,7 +157,21 @@ export class UninstallAction {
 
 export class ListAction {
   execute(options: any): void {
-    console.log(options);
+    const contents = new DimLockFileAccessor().getContents();
+    contents.forEach((content) => {
+      console.log(
+        content.name,
+      );
+      console.log(
+        "  - URL:      ",
+        Colors.green(content.url),
+      );
+      console.log(
+        "  - File path:",
+        Colors.green(content.path),
+      );
+      console.log();
+    });
   }
 }
 
