@@ -27,6 +27,11 @@ await new Command()
   .command(
     "install [url:string]",
     new Command()
+      .option(
+        "-p, --preprocess <preprocess>",
+        "Specify pre-processing when installing.",
+        { collect: true },
+      )
       .description("Install the data.")
       .help(
         "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",
@@ -49,6 +54,11 @@ await new Command()
   .command(
     "update [url:string]",
     new Command()
+      .option(
+        "-p, --preprocess <preprocess>",
+        "Specify pre-processing when installing.",
+        { collect: true },
+      )
       .description("Update the data.")
       .action(new UpdateAction().execute),
   )
