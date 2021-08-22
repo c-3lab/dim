@@ -17,6 +17,7 @@ import { NAME, VERSION } from "./libs/consts.ts";
 await new Command()
   .name(NAME)
   .version(VERSION)
+  .default("help")
   .command(
     "init",
     new Command()
