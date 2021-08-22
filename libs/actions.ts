@@ -106,9 +106,6 @@ const executePreprocess = (preprocess: string[], targetPath: string) => {
     if (p === "unzip") {
       const splitedPath = targetPath.split("/");
       const targetDir = splitedPath.slice(0, splitedPath.length - 1).join("/");
-      //decompress(targetPath, targetDir).then(() => {
-      //  console.log(`Unzip ${targetPath} to ${targetDir}`);
-      //});
       if (Deno.build.os === "darwin") {
         const process = Deno.run({
           cmd: ["ditto", "-xk", "--sequesterRsrc", targetPath, targetDir],
@@ -117,6 +114,7 @@ const executePreprocess = (preprocess: string[], targetPath: string) => {
         });
         process.output().then((rawOutput) => {
           Deno.stdout.write(rawOutput);
+          console.log(`Unzip ${targetPath} to ${targetDir}`);
         });
       } else {
         decompress(targetPath).then(() => {
