@@ -1,10 +1,4 @@
-import {
-  Colors,
-  decompress,
-  ensureDir,
-  ensureFile,
-  existsSync,
-} from "../deps.ts";
+import { Colors, ensureDir, ensureFile, existsSync } from "../deps.ts";
 import {
   DEFAULT_DATAFILES_PATH,
   DEFAULT_DIM_FILE_PATH,
@@ -14,7 +8,8 @@ import {
 import { Downloader } from "./downloader.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { Content, DimJSON, DimLockJSON, LockContent } from "./types.ts";
-import { Encoder } from "./encoder.ts";
+import { Encoder } from "./preprocess/encoder.ts";
+import { Unzipper } from "./preprocess/unzipper.ts";
 
 const initDimFile = async () => {
   const dimData: DimJSON = { contents: [] };
@@ -101,26 +96,10 @@ const executePreprocess = (preprocess: string[], targetPath: string) => {
     if (p.startsWith("encoding-")) {
       const encodingTo = p.replace("encoding-", "").toUpperCase();
       new Encoder().encodeFile(targetPath, encodingTo);
-      console.log("Converted encoding to", encodingTo);
-    }
-    if (p === "unzip") {
-      const splitedPath = targetPath.split("/");
-      const targetDir = splitedPath.slice(0, splitedPath.length - 1).join("/");
-      if (Deno.build.os === "darwin") {
-        const process = Deno.run({
-          cmd: ["ditto", "-xk", "--sequesterRsrc", targetPath, targetDir],
-          stdout: "piped",
-          stderr: "piped",
-        });
-        process.output().then((rawOutput) => {
-          Deno.stdout.write(rawOutput);
-          console.log(`Unzip ${targetPath} to ${targetDir}`);
-        });
-      } else {
-        decompress(targetPath).then(() => {
-          console.log(`Unzip ${targetPath} to ${targetDir}`);
-        });
-      }
+    } else if (p === "unzip") {
+      new Unzipper().unzip(targetPath);
+    } else {
+      console.log(`No support a preprocess '${p}'.`);
     }
   });
 };
@@ -164,7 +143,6 @@ export class InstallAction {
         preprocesses: options.preprocess || [],
         lastUpdated: new Date(),
       };
-      // Encoding as a preprocess.
       if (options.preprocess !== undefined) {
         executePreprocess(options.preprocess, fullPath);
       }
@@ -208,7 +186,7 @@ export class UninstallAction {
         Colors.red("Faild to remove. Not Found a content in the dim.json."),
       );
     }
-    const dimLockFileAccessor = await new DimLockFileAccessor();
+    const dimLockFileAccessor = new DimLockFileAccessor();
     const targetContent = dimLockFileAccessor.getContents().find((c) =>
       c.url === url
     );
@@ -281,7 +259,6 @@ export class UpdateAction {
         preprocesses: options.preprocess || [],
         lastUpdated: new Date(),
       };
-      // Encoding as a preprocess.
       if (options.preprocess !== undefined) {
         executePreprocess(options.preprocess, fullPath);
       }

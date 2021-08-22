@@ -1,4 +1,4 @@
-import { encoding } from "./../deps.ts";
+import { encoding } from "./../../deps.ts";
 export class Encoder {
   encodeFile(filePath: string, to: string, from = "AUTO") {
     const byteArray = Deno.readFileSync(filePath);
@@ -10,5 +10,6 @@ export class Encoder {
       filePath,
       Uint8Array.from(encodedByteArray),
     );
+    console.log("Converted encoding to", to);
   }
 }
