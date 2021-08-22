@@ -104,32 +104,46 @@ export class InstallAction {
     }
 
     if (url !== undefined) {
-      const results = await installFromURL(url);
-      const fullPath = results[0].fullPath;
-      const lockContent: LockContent = {
-        url: url,
-        path: fullPath,
-        name: url,
-        preprocesses: [],
-        lastUpdated: new Date(),
-      };
-      await new DimLockFileAccessor().addContent(lockContent);
-      console.log(
-        Colors.green(`Installed ${url}.`),
-        `\nFile path:`,
-        Colors.yellow(fullPath),
-      );
-    } else {
-      const lockContentList = await installFromDimFile(true);
-      if (lockContentList != undefined) {
-        await new DimLockFileAccessor().addContents(lockContentList);
-      }
-      if (lockContentList?.length != 0) {
-        console.log(
-          Colors.green(`Successfully installed.`),
+      const results = await installFromURL(url).catch((error) => {
+        console.error(
+          Colors.red("Failed to install."),
+          Colors.red(error.message),
         );
-      } else {
-        console.log("All contents have already been installed.");
+        Deno.exit(0);
+      });
+      if (results !== undefined) {
+        const fullPath = results[0].fullPath;
+        const lockContent: LockContent = {
+          url: url,
+          path: fullPath,
+          name: url,
+          preprocesses: [],
+          lastUpdated: new Date(),
+        };
+        await new DimLockFileAccessor().addContent(lockContent);
+        console.log(
+          Colors.green(`Installed ${url}.`),
+          `\nFile path:`,
+          Colors.yellow(fullPath),
+        );
+      }
+    } else {
+      const lockContentList = await installFromDimFile().catch((error) => {
+        console.error(
+          Colors.red("Failed to install."),
+          Colors.red(error.message),
+        );
+        Deno.exit(0);
+      });
+      if (lockContentList !== undefined) {
+        await new DimLockFileAccessor().addContents(lockContentList);
+        if (lockContentList.length != 0) {
+          console.log(
+            Colors.green(`Successfully installed.`),
+          );
+        } else {
+          console.log("All contents have already been installed.");
+        }
       }
     }
   }
@@ -155,7 +169,13 @@ export class UpdateAction {
     }
 
     if (url !== undefined) {
-      const results = await installFromURL(url, true);
+      const results = await installFromURL(url, true).catch((error) => {
+        console.error(
+          Colors.red("Failed to update."),
+          Colors.red(error.message),
+        );
+        Deno.exit(0);
+      });
       const fullPath = results[0].fullPath;
       const lockContent: LockContent = {
         url: url,
@@ -171,8 +191,14 @@ export class UpdateAction {
         Colors.yellow(fullPath),
       );
     } else {
-      const lockContentList = await installFromDimFile(true);
-      if (lockContentList != undefined) {
+      const lockContentList = await installFromDimFile(true).catch((error) => {
+        console.error(
+          Colors.red("Failed to update."),
+          Colors.red(error.message),
+        );
+        Deno.exit(0);
+      });
+      if (lockContentList !== undefined) {
         await new DimLockFileAccessor().addContents(lockContentList);
       }
       console.log(
