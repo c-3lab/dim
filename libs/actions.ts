@@ -71,6 +71,7 @@ const installFromDimFile = async (isUpdate = false) => {
   const downloadList = contents.map((content) => {
     return new Promise<LockContent>((resolve) => {
       new Downloader().download(new URL(content.url)).then((result) => {
+        executePreprocess(content.preprocesses, result.fullPath);
         console.log(
           Colors.green(`Installed ${content.url}`),
           `\nFile path:`,
