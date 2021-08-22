@@ -19,3 +19,5 @@ export {
 export * as Colors from "https://deno.land/std/fmt/colors.ts";
 
 export * as encoding from "https://cdn.skypack.dev/encoding-japanese";
+
+export { decompress } from "https://deno.land/x/zip@v1.2.0/mod.ts";

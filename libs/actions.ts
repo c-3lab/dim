@@ -1,4 +1,10 @@
-import { Colors, ensureDir, ensureFile, existsSync } from "../deps.ts";
+import {
+  Colors,
+  decompress,
+  ensureDir,
+  ensureFile,
+  existsSync,
+} from "../deps.ts";
 import {
   DEFAULT_DATAFILES_PATH,
   DEFAULT_DIM_FILE_PATH,
@@ -96,6 +102,27 @@ const executePreprocess = (preprocess: string[], targetPath: string) => {
       const encodingTo = p.replace("encoding-", "").toUpperCase();
       new Encoder().encodeFile(targetPath, encodingTo);
       console.log("Converted encoding to", encodingTo);
+    }
+    if (p === "unzip") {
+      const splitedPath = targetPath.split("/");
+      const targetDir = splitedPath.slice(0, splitedPath.length - 1).join("/");
+      //decompress(targetPath, targetDir).then(() => {
+      //  console.log(`Unzip ${targetPath} to ${targetDir}`);
+      //});
+      if (Deno.build.os === "darwin") {
+        const process = Deno.run({
+          cmd: ["ditto", "-xk", "--sequesterRsrc", targetPath, targetDir],
+          stdout: "piped",
+          stderr: "piped",
+        });
+        process.output().then((rawOutput) => {
+          Deno.stdout.write(rawOutput);
+        });
+      } else {
+        decompress(targetPath).then(() => {
+          console.log(`Unzip ${targetPath} to ${targetDir}`);
+        });
+      }
     }
   });
 };
