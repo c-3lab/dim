@@ -34,6 +34,14 @@ export class DimFileAccessor {
     const contents = new Array<Content>(...currentContents, content);
     await this.writeToDimFile({ contents: contents });
   }
+  async removeContent(url: string) {
+    if (this.dimJSON === undefined) {
+      return;
+    }
+    const contents = this.dimJSON.contents.filter((c) => c.url !== url);
+    await this.writeToDimFile({ contents: contents });
+    return this.dimJSON.contents.length != contents.length;
+  }
   getContents(): Content[] {
     if (this.dimJSON !== undefined) {
       return this.dimJSON.contents;
@@ -93,6 +101,17 @@ export class DimLockFileAccessor {
       lockFileVersion: DIM_LOCK_VERSION,
       contents: resultContents,
     });
+  }
+  async removeContent(url: string) {
+    if (this.dimLockJSON === undefined) {
+      return;
+    }
+    const contents = this.dimLockJSON.contents.filter((c) => c.url !== url);
+    await this.writeToDimLockFile({
+      lockFileVersion: DIM_LOCK_VERSION,
+      contents: contents,
+    });
+    return this.dimLockJSON.contents.length != contents.length;
   }
   getContents(): LockContent[] {
     if (this.dimLockJSON !== undefined) {

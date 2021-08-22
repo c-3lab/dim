@@ -150,8 +150,42 @@ export class InstallAction {
 }
 
 export class UninstallAction {
-  execute(options: any, name: string): void {
-    console.log(options, name);
+  async execute(options: any, url: string) {
+    const isRemovedDimFile = await new DimFileAccessor().removeContent(url);
+    if (isRemovedDimFile) {
+      console.log(
+        Colors.green("Removed a content from the dim.json."),
+      );
+    } else {
+      console.log(
+        Colors.red("Faild to remove. Not Found a content in the dim.json."),
+      );
+    }
+    const dimLockFileAccessor = await new DimLockFileAccessor();
+    const targetContent = dimLockFileAccessor.getContents().find((c) =>
+      c.url === url
+    );
+    const isRemovedDimLockFile = await dimLockFileAccessor.removeContent(url);
+    if (isRemovedDimLockFile) {
+      console.log(
+        Colors.green("Removed a content from the dim-lock.json."),
+      );
+    } else {
+      console.log(
+        Colors.red(
+          "Faild to remove. Not Found a content in the dim-lock.json.",
+        ),
+      );
+    }
+    if (targetContent !== undefined) {
+      if (existsSync(targetContent.path)) {
+        await Deno.remove(targetContent.path);
+        console.log(
+          Colors.green(`Removed a file '${targetContent.path}'.`),
+        );
+      }
+      // TODO: Remove an empty direcotory
+    }
   }
 }
 
