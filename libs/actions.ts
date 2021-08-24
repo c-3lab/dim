@@ -10,6 +10,7 @@ import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { Content, DimJSON, DimLockJSON, LockContent } from "./types.ts";
 import { Encoder } from "./preprocess/encoder.ts";
 import { Unzipper } from "./preprocess/unzipper.ts";
+import { XLSXConverter } from "./preprocess/xlsx_converter.ts";
 
 const initDimFile = async () => {
   const dimData: DimJSON = { contents: [] };
@@ -98,6 +99,8 @@ const executePreprocess = (preprocess: string[], targetPath: string) => {
       new Encoder().encodeFile(targetPath, encodingTo);
     } else if (p === "unzip") {
       new Unzipper().unzip(targetPath);
+    } else if (p === "xlsx-to-csv") {
+      new XLSXConverter().convertToCSV(targetPath);
     } else {
       console.log(`No support a preprocess '${p}'.`);
     }

@@ -1,7 +1,7 @@
 import { decompress } from "../../deps.ts";
 
 export class Unzipper {
-  unzip(targetPath: string) {
+  async unzip(targetPath: string) {
     const splitedPath = targetPath.split("/");
     const targetDir = splitedPath.slice(0, splitedPath.length - 1).join("/");
     if (Deno.build.os === "darwin") {
@@ -10,14 +10,11 @@ export class Unzipper {
         stdout: "piped",
         stderr: "piped",
       });
-      process.output().then((rawOutput) => {
-        Deno.stdout.write(rawOutput);
-        console.log(`Unzip ${targetPath} to ${targetDir}`);
-      });
+      const rawOutput = await process.output();
+      Deno.stdout.write(rawOutput);
     } else {
-      decompress(targetPath).then(() => {
-        console.log(`Unzip ${targetPath} to ${targetDir}`);
-      });
+      await decompress(targetPath);
+      console.log(`Unzip ${targetPath} to ${targetDir}`);
     }
   }
 }
