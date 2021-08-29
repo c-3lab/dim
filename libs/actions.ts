@@ -6,6 +6,7 @@ import {
   DIM_LOCK_VERSION,
 } from "./consts.ts";
 import { Downloader } from "./downloader.ts";
+import { ConsoleAnimation } from "./console_animation.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { Content, DimJSON, DimLockJSON, LockContent } from "./types.ts";
 import { Encoder } from "./preprocess/encoder.ts";
@@ -72,12 +73,16 @@ const installFromDimFile = async (isUpdate = false) => {
   }
   const downloadList = contents.map((content) => {
     return new Promise<LockContent>((resolve) => {
+      const consoleAnimation = new ConsoleAnimation(
+        ["\\", "|", "/", "-"],
+        `Installing ${content.url} ...`,
+      );
+      consoleAnimation.start(250);
       new Downloader().download(new URL(content.url)).then(async (result) => {
+        consoleAnimation.stop();
         await executePreprocess(content.preprocesses, result.fullPath);
         console.log(
-          Colors.green(`Installed ${content.url}`),
-          `\nFile path:`,
-          Colors.yellow(result.fullPath),
+          Colors.green(`Installed to ${result.fullPath}`),
         );
         console.log();
         resolve({
@@ -100,10 +105,10 @@ const executePreprocess = async (preprocess: string[], targetPath: string) => {
       console.log("Converted encoding to", encodingTo);
     } else if (p === "unzip") {
       const targetDir = await new Unzipper().unzip(targetPath);
-      console.log(`Unzip ${targetPath} to ${targetDir}`);
+      console.log(`Unzip the file to ${targetDir}`);
     } else if (p === "xlsx-to-csv") {
       await new XLSXConverter().convertToCSV(targetPath);
-      console.log(`Convert ${targetPath} to csv.`);
+      console.log(`Convert xlsx to csv.`);
     } else {
       console.log(`No support a preprocess '${p}'.`);
     }
@@ -154,9 +159,7 @@ export class InstallAction {
       }
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(
-        Colors.green(`Installed ${url}.`),
-        `\nFile path:`,
-        Colors.yellow(fullPath),
+        Colors.green(`Installed to ${fullPath}`),
       );
     } else {
       const lockContentList = await installFromDimFile().catch((error) => {
