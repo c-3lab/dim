@@ -74,10 +74,10 @@ const installFromDimFile = async (isUpdate = false) => {
   const downloadList = contents.map((content) => {
     return new Promise<LockContent>((resolve) => {
       const consoleAnimation = new ConsoleAnimation(
-        ["\\", "|", "/", "-"],
+        ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
         `Installing ${content.url} ...`,
       );
-      consoleAnimation.start(250);
+      consoleAnimation.start(100);
       new Downloader().download(new URL(content.url)).then(async (result) => {
         consoleAnimation.stop();
         await executePreprocess(content.preprocesses, result.fullPath);
