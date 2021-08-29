@@ -10,6 +10,5 @@ export class Encoder {
       filePath,
       Uint8Array.from(encodedByteArray),
     );
-    console.log("Converted encoding to", to);
   }
 }

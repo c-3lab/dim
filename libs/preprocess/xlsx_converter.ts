@@ -5,6 +5,5 @@ export class XLSXConverter {
     const sheetData = workbook.Sheets[workbook.SheetNames[0]];
     const csv = xlsx.utils.sheet_to_csv(sheetData);
     Deno.writeTextFileSync(targetPath, csv);
-    console.log("Convert a xlsx to csv.");
   }
 }

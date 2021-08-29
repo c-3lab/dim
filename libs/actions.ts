@@ -72,8 +72,8 @@ const installFromDimFile = async (isUpdate = false) => {
   }
   const downloadList = contents.map((content) => {
     return new Promise<LockContent>((resolve) => {
-      new Downloader().download(new URL(content.url)).then((result) => {
-        executePreprocess(content.preprocesses, result.fullPath);
+      new Downloader().download(new URL(content.url)).then(async (result) => {
+        await executePreprocess(content.preprocesses, result.fullPath);
         console.log(
           Colors.green(`Installed ${content.url}`),
           `\nFile path:`,
@@ -92,19 +92,22 @@ const installFromDimFile = async (isUpdate = false) => {
   });
   return await Promise.all(downloadList);
 };
-const executePreprocess = (preprocess: string[], targetPath: string) => {
-  preprocess.forEach((p) => {
+const executePreprocess = async (preprocess: string[], targetPath: string) => {
+  for (const p of preprocess) {
     if (p.startsWith("encoding-")) {
       const encodingTo = p.replace("encoding-", "").toUpperCase();
-      new Encoder().encodeFile(targetPath, encodingTo);
+      await new Encoder().encodeFile(targetPath, encodingTo);
+      console.log("Converted encoding to", encodingTo);
     } else if (p === "unzip") {
-      new Unzipper().unzip(targetPath);
+      const targetDir = await new Unzipper().unzip(targetPath);
+      console.log(`Unzip ${targetPath} to ${targetDir}`);
     } else if (p === "xlsx-to-csv") {
-      new XLSXConverter().convertToCSV(targetPath);
+      await new XLSXConverter().convertToCSV(targetPath);
+      console.log(`Convert ${targetPath} to csv.`);
     } else {
       console.log(`No support a preprocess '${p}'.`);
     }
-  });
+  }
 };
 
 export class InitAction {
@@ -147,7 +150,7 @@ export class InstallAction {
         lastUpdated: new Date(),
       };
       if (options.preprocess !== undefined) {
-        executePreprocess(options.preprocess, fullPath);
+        await executePreprocess(options.preprocess, fullPath);
       }
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(
@@ -263,7 +266,7 @@ export class UpdateAction {
         lastUpdated: new Date(),
       };
       if (options.preprocess !== undefined) {
-        executePreprocess(options.preprocess, fullPath);
+        await executePreprocess(options.preprocess, fullPath);
       }
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(

@@ -14,7 +14,7 @@ export class Unzipper {
       Deno.stdout.write(rawOutput);
     } else {
       await decompress(targetPath);
-      console.log(`Unzip ${targetPath} to ${targetDir}`);
     }
+    return targetDir;
   }
 }
