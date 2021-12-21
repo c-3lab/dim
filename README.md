@@ -26,6 +26,24 @@ dim init
 dim install [open data url] -n [name]
 ```
 
+### Preprocess unzip
+
+```
+dim install [open data url] -p unzip
+```
+
+### Preprocess encoding-
+
+```
+dim install [open data url] -p encoding-utf-8
+```
+
+### Preprocess xlsx-to-csv
+```
+dim install [open data url] -p xlsx-to-csv
+
+
+
 ## Uninstall
 
 ```
