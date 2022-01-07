@@ -1,6 +1,8 @@
 # dim
 Data Installation Manager: Manage the open data etc. in your project like a package manager.
 
+![8bket-vzuiv](https://user-images.githubusercontent.com/6661165/148486923-a29f6ea5-ecbc-4d69-9f40-66bed34e3f99.gif)
+
 
 # Usage
 
