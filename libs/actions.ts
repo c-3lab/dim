@@ -118,11 +118,9 @@ const executePreprocess = async (preprocess: string[], targetPath: string) => {
 
 export class InitAction {
   async execute(options: any) {
-    await Promise.all([
-      createDataFilesDir,
-      initDimFile,
-      initDimLockFile,
-    ]);
+    await createDataFilesDir();
+    await initDimFile();
+    await initDimLockFile();
     console.log(Colors.green("Initialized the project for the dim."));
   }
 }
