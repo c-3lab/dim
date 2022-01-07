@@ -3,6 +3,11 @@ Data Installation Manager: Manage the open data etc. in your project like a pack
 
 ![8bket-vzuiv](https://user-images.githubusercontent.com/6661165/148486923-a29f6ea5-ecbc-4d69-9f40-66bed34e3f99.gif)
 
+Complete all required installations by sharing dim.json.
+
+![r30y7-wcbx7](https://user-images.githubusercontent.com/6661165/148490980-c1ae8195-a3fd-430f-aa10-c11c7cf1fd64.gif)
+
+
 
 # Usage
 
