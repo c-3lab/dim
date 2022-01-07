@@ -38,7 +38,9 @@ export class DimFileAccessor {
     if (this.dimJSON === undefined) {
       return;
     }
-    const contents = this.dimJSON.contents.filter((c) => c.url !== url);
+    const contents = this.dimJSON.contents.filter((c) =>
+      c.url !== url && c.name !== url
+    );
     await this.writeToDimFile({ contents: contents });
     return this.dimJSON.contents.length != contents.length;
   }
@@ -106,7 +108,9 @@ export class DimLockFileAccessor {
     if (this.dimLockJSON === undefined) {
       return;
     }
-    const contents = this.dimLockJSON.contents.filter((c) => c.url !== url);
+    const contents = this.dimLockJSON.contents.filter((c) =>
+      c.url !== url && c.name !== url
+    );
     await this.writeToDimLockFile({
       lockFileVersion: DIM_LOCK_VERSION,
       contents: contents,

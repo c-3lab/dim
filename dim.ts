@@ -32,6 +32,10 @@ await new Command()
         "Specify pre-processing when installing.",
         { collect: true },
       )
+      .option(
+        "-n, --name [name]",
+        "Specify the name.",
+      )
       .description("Install the data.")
       .help(
         "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",

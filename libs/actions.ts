@@ -41,6 +41,7 @@ const createDataFilesDir = async () => {
 const installFromURL = async (
   url: string,
   preprocess?: string[],
+  name?: string,
   isUpdate = false,
 ) => {
   const dimLockFileAccessor = new DimLockFileAccessor();
@@ -53,7 +54,7 @@ const installFromURL = async (
   }
   return await Promise.all([
     new Downloader().download(new URL(url)),
-    new DimFileAccessor().addContent(url, url, preprocess || []),
+    new DimFileAccessor().addContent(url, name || url, preprocess || []),
   ]);
 };
 
@@ -128,7 +129,7 @@ export class InitAction {
 
 export class InstallAction {
   async execute(
-    options: { preprocess?: [string] },
+    options: { preprocess?: [string]; name?: string },
     url: string | undefined,
   ) {
     await createDataFilesDir();
@@ -137,7 +138,18 @@ export class InstallAction {
     }
 
     if (url !== undefined) {
-      const results = await installFromURL(url, options.preprocess).catch(
+      const targetContent = new DimFileAccessor().getContents().find((c) =>
+        c.url === url || c.name === options.name
+      );
+      if (targetContent !== undefined) {
+        console.log("The name already exists.");
+        Deno.exit(0);
+      }
+      const results = await installFromURL(
+        url,
+        options.preprocess,
+        options.name,
+      ).catch(
         (error) => {
           console.error(
             Colors.red("Failed to install."),
@@ -150,7 +162,7 @@ export class InstallAction {
       const lockContent: LockContent = {
         url: url,
         path: fullPath,
-        name: url,
+        name: options.name || url,
         preprocesses: options.preprocess || [],
         lastUpdated: new Date(),
       };
@@ -197,7 +209,7 @@ export class UninstallAction {
     }
     const dimLockFileAccessor = new DimLockFileAccessor();
     const targetContent = dimLockFileAccessor.getContents().find((c) =>
-      c.url === url
+      c.url === url || c.name === url
     );
     const isRemovedDimLockFile = await dimLockFileAccessor.removeContent(url);
     if (isRemovedDimLockFile) {
@@ -244,14 +256,22 @@ export class ListAction {
 }
 
 export class UpdateAction {
-  async execute(options: { preprocess?: string[] }, url: string | undefined) {
+  async execute(
+    options: { preprocess?: string[]; name?: string },
+    url: string | undefined,
+  ) {
     await createDataFilesDir();
     if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
       await initDimLockFile();
     }
 
     if (url !== undefined) {
-      const results = await installFromURL(url, options.preprocess, true).catch(
+      const results = await installFromURL(
+        url,
+        options.preprocess,
+        options.name,
+        true,
+      ).catch(
         (error) => {
           console.error(
             Colors.red("Failed to update."),
