@@ -241,12 +241,20 @@ export class ListAction {
         content.name,
       );
       console.log(
-        "  - URL:      ",
+        "  - URL       :",
         Colors.green(content.url),
       );
       console.log(
-        "  - File path:",
+        "  - Name      :",
+        Colors.green(content.name),
+      );
+      console.log(
+        "  - File path :",
         Colors.green(content.path),
+      );
+      console.log(
+        "  - Preprocess:",
+        Colors.green(content.preprocesses.join(", ")),
       );
       console.log();
     });
