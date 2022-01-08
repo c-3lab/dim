@@ -25,7 +25,7 @@ Donwload the dim from binary files.
 or
 
 ```
-deno install dim.ts
+deno install --unstable --allow-read --allow-write --allow-net dim.ts
 ```
 
 ## Setup the project
