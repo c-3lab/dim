@@ -36,17 +36,19 @@ await new Command()
         "-n, --name [name]",
         "Specify the name.",
       )
-      .description("Install the data.")
-      .help(
-        "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",
+      .description(
+        "Install the data.\n" +
+          "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",
       )
       .action(new InstallAction().execute),
   )
   .command(
     "uninstall <url:string>",
     new Command()
-      .description("Uninstall the data.")
-      .help("Specify the data name or data url.")
+      .description(
+        "Uninstall the data.\n" +
+          "Specify the data name or data url.",
+      )
       .action(new UninstallAction().execute),
   )
   .command(
