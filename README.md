@@ -37,7 +37,7 @@ dim init
 ## Install a data
 
 ```
-dim install [open data url] -n [name]
+dim install [url] -n [name]
 ```
 
 # Commands
@@ -51,30 +51,30 @@ dim init
 ## Install
 
 ```
-dim install [open data url] -n [name]
+dim install [url] -n [name]
 ```
 
 ### Preprocess unzip
 
 ```
-dim install [open data url] -p unzip
+dim install [url] -p unzip
 ```
 
 ### Preprocess encoding-
 
 ```
-dim install [open data url] -p encoding-utf-8
+dim install [url] -p encoding-utf-8
 ```
 
 ### Preprocess xlsx-to-csv
 ```
-dim install [open data url] -p xlsx-to-csv
+dim install [url] -p xlsx-to-csv
 ```
 
 ## Uninstall
 
 ```
-dim uninstall [name or url]
+dim uninstall [url]
 ```
 
 ## List
