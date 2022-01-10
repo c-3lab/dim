@@ -3,7 +3,8 @@ import {
   DEFAULT_DATAFILES_PATH,
   DEFAULT_DIM_FILE_PATH,
   DEFAULT_DIM_LOCK_FILE_PATH,
-  DIM_LOCK_VERSION,
+  DIM_FILE_VERSION,
+  DIM_LOCK_FILE_VERSION,
 } from "./consts.ts";
 import { Downloader } from "./downloader.ts";
 import { ConsoleAnimation } from "./console_animation.ts";
@@ -14,7 +15,7 @@ import { Unzipper } from "./preprocess/unzipper.ts";
 import { XLSXConverter } from "./preprocess/xlsx_converter.ts";
 
 const initDimFile = async () => {
-  const dimData: DimJSON = { contents: [] };
+  const dimData: DimJSON = { fileVersion: DIM_FILE_VERSION, contents: [] };
   await ensureFile(DEFAULT_DIM_FILE_PATH);
   return await Deno.writeTextFile(
     DEFAULT_DIM_FILE_PATH,
@@ -24,7 +25,7 @@ const initDimFile = async () => {
 
 const initDimLockFile = async () => {
   const dimLockData: DimLockJSON = {
-    lockFileVersion: DIM_LOCK_VERSION,
+    lockFileVersion: DIM_LOCK_FILE_VERSION,
     contents: [],
   };
   await ensureFile(DEFAULT_DIM_LOCK_FILE_PATH);

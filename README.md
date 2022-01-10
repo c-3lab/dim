@@ -1,5 +1,7 @@
 # dim
-Data Installation Manager: Manage the open data in your project like a package manager.
+
+Data Installation Manager: Manage the open data in your project like a package
+manager.
 
 ![8bket-vzuiv](https://user-images.githubusercontent.com/6661165/148486923-a29f6ea5-ecbc-4d69-9f40-66bed34e3f99.gif)
 
@@ -7,14 +9,13 @@ Execute all required installations by sharing dim.json.
 
 ![r30y7-wcbx7](https://user-images.githubusercontent.com/6661165/148490980-c1ae8195-a3fd-430f-aa10-c11c7cf1fd64.gif)
 
-
-
 # Usage
 
 ## Install the dim
 
-
 Donwload the dim from binary files.
+
+[aarch64-apple-darwin](https://github.com/ryo-ma/dim/raw/main/bin/aarch64-apple-darwin/dim)
 
 [x86_64-apple-darwin](https://github.com/ryo-ma/dim/raw/main/bin/x86_64-apple-darwin/dim)
 
@@ -67,6 +68,7 @@ dim install [url] -p encoding-utf-8
 ```
 
 ### Preprocess xlsx-to-csv
+
 ```
 dim install [url] -p xlsx-to-csv
 ```

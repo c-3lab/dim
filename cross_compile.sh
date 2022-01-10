@@ -1,3 +1,4 @@
 deno compile --unstable --allow-run --allow-read --allow-net --allow-write --target x86_64-unknown-linux-gnu --output  bin/x86_64-unknown-linux-gnu/dim dim.ts
+deno compile --unstable --allow-run --allow-read --allow-net --allow-write --target aarch64-apple-darwin --output  bin/aarch64-apple-darwin/dim dim.ts
 deno compile --unstable --allow-run --allow-read --allow-net --allow-write --target x86_64-apple-darwin --output  bin/x86_64-apple-darwin/dim dim.ts 
 deno compile --unstable --allow-run --allow-read --allow-net --allow-write --target x86_64-pc-windows-msvc --output  bin/x86_64-pc-windows-msvc/dim dim.ts

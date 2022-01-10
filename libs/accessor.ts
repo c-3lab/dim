@@ -3,7 +3,8 @@ import { Content, DimJSON, DimLockJSON, LockContent } from "./types.ts";
 import {
   DEFAULT_DIM_FILE_PATH,
   DEFAULT_DIM_LOCK_FILE_PATH,
-  DIM_LOCK_VERSION,
+  DIM_FILE_VERSION,
+  DIM_LOCK_FILE_VERSION,
 } from "./consts.ts";
 
 export class DimFileAccessor {
@@ -32,7 +33,10 @@ export class DimFileAccessor {
       c.url !== content.url
     );
     const contents = new Array<Content>(...currentContents, content);
-    await this.writeToDimFile({ contents: contents });
+    await this.writeToDimFile({
+      fileVersion: DIM_FILE_VERSION,
+      contents: contents,
+    });
   }
   async removeContent(url: string) {
     if (this.dimJSON === undefined) {
@@ -41,7 +45,10 @@ export class DimFileAccessor {
     const contents = this.dimJSON.contents.filter((c) =>
       c.url !== url && c.name !== url
     );
-    await this.writeToDimFile({ contents: contents });
+    await this.writeToDimFile({
+      fileVersion: DIM_FILE_VERSION,
+      contents: contents,
+    });
     return this.dimJSON.contents.length != contents.length;
   }
   getContents(): Content[] {
@@ -81,7 +88,7 @@ export class DimLockFileAccessor {
     );
     const contents = new Array<LockContent>(...currentContents, content);
     await this.writeToDimLockFile({
-      lockFileVersion: DIM_LOCK_VERSION,
+      lockFileVersion: DIM_LOCK_FILE_VERSION,
       contents: contents,
     });
   }
@@ -100,7 +107,7 @@ export class DimLockFileAccessor {
       ...contents,
     );
     await this.writeToDimLockFile({
-      lockFileVersion: DIM_LOCK_VERSION,
+      lockFileVersion: DIM_LOCK_FILE_VERSION,
       contents: resultContents,
     });
   }
@@ -112,7 +119,7 @@ export class DimLockFileAccessor {
       c.url !== url && c.name !== url
     );
     await this.writeToDimLockFile({
-      lockFileVersion: DIM_LOCK_VERSION,
+      lockFileVersion: DIM_LOCK_FILE_VERSION,
       contents: contents,
     });
     return this.dimLockJSON.contents.length != contents.length;
