@@ -2,6 +2,7 @@ import {
   Command,
   CompletionsCommand,
   DenoLandProvider,
+  GithubProvider,
   HelpCommand,
   UpgradeCommand,
 } from "./deps.ts";
@@ -71,7 +72,9 @@ await new Command()
   .command(
     "upgrade",
     new UpgradeCommand({
-      provider: [new DenoLandProvider({ name: "dim" })],
+      provider: [
+        new GithubProvider({ repository: "ryo-ma/dim" }),
+      ],
     }),
   )
   .command("help", new HelpCommand())

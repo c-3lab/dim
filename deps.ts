@@ -3,6 +3,7 @@ export type { DownlodedFile } from "https://deno.land/x/download@v1.0.1/mod.ts";
 export { Command } from "https://deno.land/x/cliffy@v0.19.5/command/mod.ts";
 export {
   DenoLandProvider,
+  GithubProvider,
   UpgradeCommand,
 } from "https://deno.land/x/cliffy@v0.19.5/command/upgrade/mod.ts";
 
