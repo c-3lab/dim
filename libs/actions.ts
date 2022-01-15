@@ -235,29 +235,40 @@ export class UninstallAction {
 }
 
 export class ListAction {
-  execute(options: any): void {
+  execute(
+    options: { simple: boolean }
+  ): void {
     const contents = new DimLockFileAccessor().getContents();
     contents.forEach((content) => {
-      console.log(
-        content.name,
-      );
-      console.log(
-        "  - URL       :",
-        Colors.green(content.url),
-      );
-      console.log(
-        "  - Name      :",
-        Colors.green(content.name),
-      );
-      console.log(
-        "  - File path :",
-        Colors.green(content.path),
-      );
-      console.log(
-        "  - Preprocess:",
-        Colors.green(content.preprocesses.join(", ")),
-      );
-      console.log();
+      if (options.simple == true) {
+        console.log(
+          content.name,
+          content.url,
+          content.path,
+          content.preprocesses.join(",")
+        );
+      } else {
+        console.log(
+          content.name,
+        );
+        console.log(
+          "  - URL       :",
+          Colors.green(content.url),
+        );
+        console.log(
+          "  - Name      :",
+          Colors.green(content.name),
+        );
+        console.log(
+          "  - File path :",
+          Colors.green(content.path),
+        );
+        console.log(
+          "  - Preprocess:",
+          Colors.green(content.preprocesses.join(", ")),
+        );
+        console.log();
+      }
     });
   }
 }
