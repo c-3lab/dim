@@ -97,7 +97,7 @@ dim list -s
 dim update [name or url]
 ```
 
-## Upgrade
+## Upgrade the dim version
 
 ```
 dim upgrade
