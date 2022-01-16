@@ -85,6 +85,12 @@ dim uninstall [url]
 dim list
 ```
 
+### Simple List
+
+```
+dim list -s
+```
+
 ## Update
 
 ```
