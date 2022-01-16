@@ -55,6 +55,10 @@ await new Command()
   .command(
     "list",
     new Command()
+      .option(
+        "-s, --simple",
+        "Simple format.",
+      )
       .description("Show the data list.")
       .action(new ListAction().execute),
   )
