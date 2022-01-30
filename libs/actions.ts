@@ -13,6 +13,7 @@ import { Content, DimJSON, DimLockJSON, LockContent } from "./types.ts";
 import { Encoder } from "./preprocess/encoder.ts";
 import { Unzipper } from "./preprocess/unzipper.ts";
 import { XLSXConverter } from "./preprocess/xlsx_converter.ts";
+import { Command } from "./preprocess/command.ts";
 
 const initDimFile = async () => {
   const dimData: DimJSON = { fileVersion: DIM_FILE_VERSION, contents: [] };
@@ -111,6 +112,10 @@ const executePreprocess = async (preprocess: string[], targetPath: string) => {
     } else if (p === "xlsx-to-csv") {
       await new XLSXConverter().convertToCSV(targetPath);
       console.log(`Convert xlsx to csv.`);
+    } else if (p.startsWith("CMD:")) {
+      const script = p.replace("CMD:", "");
+      await new Command().execute(script, targetPath);
+      console.log("Execute Command: ", script, targetPath);
     } else {
       console.log(`No support a preprocess '${p}'.`);
     }
@@ -236,7 +241,7 @@ export class UninstallAction {
 
 export class ListAction {
   execute(
-    options: { simple: boolean }
+    options: { simple: boolean },
   ): void {
     const contents = new DimLockFileAccessor().getContents();
     contents.forEach((content) => {
@@ -245,7 +250,7 @@ export class ListAction {
           content.name,
           content.url,
           content.path,
-          content.preprocesses.join(",")
+          content.preprocesses.join(","),
         );
       } else {
         console.log(
