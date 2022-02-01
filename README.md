@@ -29,11 +29,7 @@ or
 deno install --unstable --allow-read --allow-write --allow-run --allow-net dim.ts
 ```
 
-## Upgrade the dim version
 
-```
-dim upgrade
-```
 
 ## Setup the project
 
@@ -45,6 +41,12 @@ dim init
 
 ```
 dim install [url] -n [name]
+```
+
+## Upgrade the dim version
+
+```
+dim upgrade
 ```
 
 # Commands
@@ -91,7 +93,7 @@ dim install [url] -p CMD:******
 The file path will be passed as an argument at the end of the specified command.
 
 ```
-dim install [url] -p CMD:python ./tests/test_custom_command.py
+dim install [url] -p "CMD:python ./tests/test_custom_command.py"
 ```
 
 Command to be executed during preprocessing.
