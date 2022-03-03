@@ -49,7 +49,7 @@ curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/x86_64-unknown-linux-
 
 ```
 curl -fsSL https://deno.land/install.sh | sh
-echo 'export DENO_INSTALL="/root/.deno"' >> ~/.bashrc
+echo 'export DENO_INSTALL="~/.deno"' >> ~/.bashrc
 echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
