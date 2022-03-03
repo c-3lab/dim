@@ -5,7 +5,7 @@ manager.
 
 ![8bket-vzuiv](https://user-images.githubusercontent.com/6661165/148486923-a29f6ea5-ecbc-4d69-9f40-66bed34e3f99.gif)
 
-Execute all required installations by sharing dim.json.
+Execute all required installations by sharing your dim.json.
 
 ![r30y7-wcbx7](https://user-images.githubusercontent.com/6661165/148490980-c1ae8195-a3fd-430f-aa10-c11c7cf1fd64.gif)
 
