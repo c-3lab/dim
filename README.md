@@ -13,34 +13,59 @@ Execute all required installations by sharing dim.json.
 
 ## Install the dim
 
+[Install the dim from binary files](#install-the-dim-from-binary-files) or [Install the dim from Deno install](#install-the-dim-from-deno-install)
+
+### Install the dim from binary files
+
 Donwload the dim from binary files.
 
 [aarch64-apple-darwin](https://github.com/ryo-ma/dim/raw/main/bin/aarch64-apple-darwin/dim)
 
+```
+curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/aarch64-apple-darwin/dim -o /usr/local/bin/dim
+```
+
 [x86_64-apple-darwin](https://github.com/ryo-ma/dim/raw/main/bin/x86_64-apple-darwin/dim)
+
+```
+curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/x86_64-apple-darwin/dim -o /usr/local/bin/dim
+```
 
 [x86_64-pc-windows-msvc](https://github.com/ryo-ma/dim/raw/main/bin/x86_64-pc-windows-msvc/dim.exe)
 
+```
+curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/x86_64-pc-windows-msvc/dim.exe -o C:\Users\user-name\dim.exe
+```
+
 [x86_64-unknown-linux-gnu](https://github.com/ryo-ma/dim/raw/main/bin/x86_64-unknown-linux-gnu/dim)
 
-or
+```
+curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/x86_64-unknown-linux-gnu/dim -o /usr/local/bin/dim
+```
+
+### Install the dim from Deno install
+
+1. Install Deno
 
 ```
+curl -fsSL https://deno.land/install.sh | sh
+echo 'export DENO_INSTALL="/root/.deno"' >> ~/.bashrc
+echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+2. Clone the repository
+
+```
+git clone https://github.com/ryo-ma/dim.git
+```
+
+3. Install dim
+
+```
+cd dim
+
 deno install --unstable --allow-read --allow-write --allow-run --allow-net dim.ts
-```
-
-
-
-## Setup the project
-
-```
-dim init
-```
-
-## Install a data
-
-```
-dim install [url] -n [name]
 ```
 
 ## Upgrade the dim version
@@ -48,6 +73,22 @@ dim install [url] -n [name]
 ```
 dim upgrade
 ```
+
+## Quick Start
+
+### Setup the project
+
+```
+dim init
+```
+
+### Install a data
+
+```
+dim install [url] -n [name]
+```
+
+
 
 # Commands
 
