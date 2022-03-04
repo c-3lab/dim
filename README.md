@@ -5,9 +5,6 @@ manager.
 
 ![8bket-vzuiv](https://user-images.githubusercontent.com/6661165/148486923-a29f6ea5-ecbc-4d69-9f40-66bed34e3f99.gif)
 
-Execute all required installations by sharing your dim.json.
-
-![r30y7-wcbx7](https://user-images.githubusercontent.com/6661165/148490980-c1ae8195-a3fd-430f-aa10-c11c7cf1fd64.gif)
 
 # Usage
 
@@ -48,16 +45,16 @@ curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/x86_64-unknown-linux-
 1. Install Deno
 
 ```
-curl -fsSL https://deno.land/install.sh | sh
-echo 'export DENO_INSTALL="~/.deno"' >> ~/.bashrc
-echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+$ curl -fsSL https://deno.land/install.sh | sh
+$ echo 'export DENO_INSTALL="~/.deno"' >> ~/.bashrc
+$ echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
+$ source ~/.bashrc
 ```
 
 2. Clone the repository
 
 ```
-git clone https://github.com/ryo-ma/dim.git
+$ git clone https://github.com/ryo-ma/dim.git
 ```
 
 3. Install dim
@@ -65,29 +62,50 @@ git clone https://github.com/ryo-ma/dim.git
 ```
 cd dim
 
-deno install --unstable --allow-read --allow-write --allow-run --allow-net dim.ts
+$ deno install --unstable --allow-read --allow-write --allow-run --allow-net dim.ts
 ```
 
 ## Upgrade the dim version
 
 ```
-dim upgrade
+$ dim upgrade
 ```
 
 ## Quick Start
 
-### Setup the project
+### New Project
+
+1. init the project
 
 ```
-dim init
+$ dim init
 ```
 
-### Install a data
+2. Install a data
 
 ```
-dim install [url] -n [name]
+$ dim install [url] -n [name]
 ```
 
+### Install all data using the dim.json
+
+Install all data written in your dim.json.
+
+![r30y7-wcbx7](https://user-images.githubusercontent.com/6661165/148490980-c1ae8195-a3fd-430f-aa10-c11c7cf1fd64.gif)
+
+1. Make sure existing the dim.json
+
+```
+$ ls ./
+
+dim.json  ....
+```
+
+2. Install all data written in dim.json
+
+```
+$ dim install
+```
 
 
 # Commands
@@ -95,31 +113,31 @@ dim install [url] -n [name]
 ## Init
 
 ```
-dim init
+$ dim init
 ```
 
 ## Install
 
 ```
-dim install [url] -n [name]
+$ dim install [url] -n [name]
 ```
 
 ### Preprocess unzip
 
 ```
-dim install [url] -p unzip
+$ dim install [url] -p unzip
 ```
 
 ### Preprocess encoding-
 
 ```
-dim install [url] -p encoding-utf-8
+$ dim install [url] -p encoding-utf-8
 ```
 
 ### Preprocess xlsx-to-csv
 
 ```
-dim install [url] -p xlsx-to-csv
+$ dim install [url] -p xlsx-to-csv
 ```
 
 ### Preprocess custom command 
@@ -128,44 +146,44 @@ You can specify a custom command after **"CMD:"**.
 
 
 ```
-dim install [url] -p CMD:******
+$ dim install [url] -p CMD:******
 ```
 
 The file path will be passed as an argument at the end of the specified command.
 
 ```
-dim install [url] -p "CMD:python ./tests/test_custom_command.py"
+$ dim install [url] -p "CMD:python ./tests/test_custom_command.py"
 ```
 
 Command to be executed during preprocessing.
 
 ```
-python ./tests/test_custom_command.py ./data_files/***/***.xx
+$ python ./tests/test_custom_command.py ./data_files/***/***.xx
 ```
 
 
 ## Uninstall
 
 ```
-dim uninstall [url]
+$ dim uninstall [url]
 ```
 
 ## List
 
 ```
-dim list
+$ dim list
 ```
 
 ### Simple List
 
 ```
-dim list -s
+$ dim list -s
 ```
 
 ## Update
 
 ```
-dim update [name or url]
+$ dim update [name or url]
 ```
 
 
@@ -173,5 +191,5 @@ dim update [name or url]
 ## Help
 
 ```
-dim help
+$ dim help
 ```
