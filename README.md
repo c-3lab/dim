@@ -93,7 +93,7 @@ This command stores information about installed data in `dim.json` and `dim-lock
 $ dim install [url] -n [name]
 ```
 
-Installed data is saved in `data_files`.
+3. Installed data is saved in `data_files`.
 
 ```
 $ ls ./data_files 
@@ -119,6 +119,11 @@ dim.json  ....
 $ dim install
 ```
 
+3. Installed data is saved in `data_files`.
+
+```
+$ ls ./data_files 
+```
 
 # Commands
 
