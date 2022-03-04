@@ -105,7 +105,7 @@ Install all data written to `dim.json` shared by members.
 
 ![r30y7-wcbx7](https://user-images.githubusercontent.com/6661165/148490980-c1ae8195-a3fd-430f-aa10-c11c7cf1fd64.gif)
 
-1. Make sure existing the dim.json
+1. Make sure existing the dim.json in current directory
 
 ```
 $ ls ./
