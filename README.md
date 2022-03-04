@@ -77,19 +77,29 @@ $ dim upgrade
 
 1. init the project
 
+Generate `dim.json`, `dim-lock.json` and `./data_files` by init command.
+
 ```
 $ dim init
 ```
 
 2. Install a data
 
+This command stores information about installed data in dim.json and dim-lock.json.
+
 ```
 $ dim install [url] -n [name]
 ```
 
-### Install all data using the dim.json
+Installed data is saved in data_files.
 
-Install all data written in your dim.json.
+```
+$ ls ./data_files 
+```
+
+### Install all data written to dim.json shared by members
+
+Install all data written to dim.json shared by members.
 
 ![r30y7-wcbx7](https://user-images.githubusercontent.com/6661165/148490980-c1ae8195-a3fd-430f-aa10-c11c7cf1fd64.gif)
 
@@ -101,7 +111,7 @@ $ ls ./
 dim.json  ....
 ```
 
-2. Install all data written in dim.json
+2. Install all data written in the dim.json
 
 ```
 $ dim install
