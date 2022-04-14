@@ -210,3 +210,13 @@ $ dim update [name or url]
 ```
 $ dim help
 ```
+
+# Contributers
+<a href="https://github.com/ryo-ma/dim/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=ryo-ma/dim" />
+</a>
+
+Made with [contributors-img](https://contributors-img.web.app).
+
+# LICENSE
+[MIT LICENSE](./LICENSE)
