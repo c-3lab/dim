@@ -40,6 +40,12 @@ curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/x86_64-pc-windows-msv
 curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/x86_64-unknown-linux-gnu/dim -o /usr/local/bin/dim
 ```
 
+#### Grant user execution permission
+
+```
+chmod u+x /usr/local/bin/dim
+```
+
 ### Install the dim from Deno install
 
 1. Install Deno
