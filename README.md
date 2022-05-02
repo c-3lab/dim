@@ -141,6 +141,14 @@ $ dim init
 
 ## Install
 
+Install the all data.
+
+```
+$ dim install
+```
+
+Install the specified data.
+
 ```
 $ dim install [url] -n [name]
 ```
@@ -204,6 +212,14 @@ $ dim list -s
 ```
 
 ## Update
+
+Update the all data.
+
+```
+$ dim update
+```
+
+Update the specified data.
 
 ```
 $ dim update [name or url]
