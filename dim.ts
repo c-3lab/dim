@@ -77,7 +77,7 @@ await new Command()
     "upgrade",
     new UpgradeCommand({
       provider: [
-        new GithubProvider({ repository: "ryo-ma/dim" }),
+        new GithubProvider({ repository: "c-3lab/dim" }),
       ],
     }),
   )
