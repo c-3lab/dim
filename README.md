@@ -16,28 +16,28 @@ manager.
 
 Donwload the dim from binary files.
 
-[aarch64-apple-darwin](https://github.com/ryo-ma/dim/raw/main/bin/aarch64-apple-darwin/dim)
+[aarch64-apple-darwin](https://github.com/c-3lab/dim/raw/main/bin/aarch64-apple-darwin/dim)
 
 ```
-curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/aarch64-apple-darwin/dim -o /usr/local/bin/dim
+curl https://raw.githubusercontent.com/c-3lab/dim/main/bin/aarch64-apple-darwin/dim -o /usr/local/bin/dim
 ```
 
-[x86_64-apple-darwin](https://github.com/ryo-ma/dim/raw/main/bin/x86_64-apple-darwin/dim)
+[x86_64-apple-darwin](https://github.com/c-3lab/dim/raw/main/bin/x86_64-apple-darwin/dim)
 
 ```
-curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/x86_64-apple-darwin/dim -o /usr/local/bin/dim
+curl https://raw.githubusercontent.com/c-3lab/dim/main/bin/x86_64-apple-darwin/dim -o /usr/local/bin/dim
 ```
 
-[x86_64-pc-windows-msvc](https://github.com/ryo-ma/dim/raw/main/bin/x86_64-pc-windows-msvc/dim.exe)
+[x86_64-pc-windows-msvc](https://github.com/c-3lab/dim/raw/main/bin/x86_64-pc-windows-msvc/dim.exe)
 
 ```
-curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/x86_64-pc-windows-msvc/dim.exe -o C:\Users\user-name\dim.exe
+curl https://raw.githubusercontent.com/c-3lab/dim/main/bin/x86_64-pc-windows-msvc/dim.exe -o C:\Users\user-name\dim.exe
 ```
 
-[x86_64-unknown-linux-gnu](https://github.com/ryo-ma/dim/raw/main/bin/x86_64-unknown-linux-gnu/dim)
+[x86_64-unknown-linux-gnu](https://github.com/c-3lab/dim/raw/main/bin/x86_64-unknown-linux-gnu/dim)
 
 ```
-curl https://raw.githubusercontent.com/ryo-ma/dim/main/bin/x86_64-unknown-linux-gnu/dim -o /usr/local/bin/dim
+curl https://raw.githubusercontent.com/c-3lab/dim/main/bin/x86_64-unknown-linux-gnu/dim -o /usr/local/bin/dim
 ```
 
 #### Grant user execution permission
@@ -60,7 +60,7 @@ $ source ~/.bashrc
 2. Clone the repository
 
 ```
-$ git clone https://github.com/ryo-ma/dim.git
+$ git clone https://github.com/c-3lab/dim.git
 ```
 
 ```
@@ -234,8 +234,8 @@ $ dim help
 ```
 
 # Contributers
-<a href="https://github.com/ryo-ma/dim/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=ryo-ma/dim" />
+<a href="https://github.com/c-3lab/dim/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=c-3lab/dim" />
 </a>
 
 Made with [contributors-img](https://contributors-img.web.app).
