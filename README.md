@@ -7,7 +7,7 @@ manager.
 
 # Feature
 
-* 📀 Record the source and post-processing of downloaded open-data.
+* 📀 Record the source and post-processing of downloaded open-data
 * 🔧 Prepare all open data in one command by using files recorded by someone else
 * 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
 * 🔍 Search open-data from CKAN
