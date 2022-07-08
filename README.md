@@ -5,9 +5,9 @@ manager.
 
 ![8bket-vzuiv](https://user-images.githubusercontent.com/6661165/148486923-a29f6ea5-ecbc-4d69-9f40-66bed34e3f99.gif)
 
-# Feature
+# Features
 
-* 📀 Record the source and post-processing of downloaded open-data
+* 📀 Record the source url and post-processing, etc., of downloaded open-data
 * 🔧 Prepare all open data in one command by using files recorded by someone else
 * 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
 * 🔍 Search open-data from CKAN
