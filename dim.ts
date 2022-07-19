@@ -26,15 +26,16 @@ await new Command()
       .action(new InitAction().execute),
   )
   .command(
-    "install [url:string]",
+    "install",
     new Command()
+      .arguments("[url:string]")
       .option(
         "-p, --preprocess <preprocess>",
         "Specify pre-processing when installing.",
         { collect: true },
       )
       .option(
-        "-n, --name [name]",
+        "-n, --name <name:string>",
         "Specify the name.",
       )
       .description(
@@ -44,8 +45,9 @@ await new Command()
       .action(new InstallAction().execute),
   )
   .command(
-    "uninstall <url:string>",
+    "uninstall",
     new Command()
+      .arguments("<url:string>")
       .description(
         "Uninstall the data.\n" +
           "Specify the data name or data url.",
@@ -63,8 +65,9 @@ await new Command()
       .action(new ListAction().execute),
   )
   .command(
-    "update [url:string]",
+    "update",
     new Command()
+      .arguments("[url:string]")
       .option(
         "-p, --preprocess <preprocess>",
         "Specify pre-processing when installing.",
