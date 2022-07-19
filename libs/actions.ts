@@ -133,7 +133,7 @@ export class InitAction {
 
 export class InstallAction {
   async execute(
-    options: { preprocess?: [string]; name?: string },
+    options: { preprocess?: string[]; name?: string },
     url: string | undefined,
   ) {
     await createDataFilesDir();
@@ -241,7 +241,7 @@ export class UninstallAction {
 
 export class ListAction {
   execute(
-    options: { simple: boolean },
+    options: { simple?: boolean },
   ): void {
     const contents = new DimLockFileAccessor().getContents();
     contents.forEach((content) => {
