@@ -262,27 +262,62 @@ export class ListAction {
           content.name,
           content.url,
           content.path,
+          content.catalogUrl,
+          content.catalogResourceId,
+          content.lastModified,
+          content.eTag,
+          content.lastDonwloaded,
+          content.integrity,
           content.postProcesses.join(","),
+          content.headers,
         );
       } else {
         console.log(
           content.name,
         );
         console.log(
-          "  - URL       :",
+          "  - URL               :",
           Colors.green(content.url),
         );
         console.log(
-          "  - Name      :",
+          "  - Name              :",
           Colors.green(content.name),
         );
         console.log(
-          "  - File path :",
+          "  - File path         :",
           Colors.green(content.path),
         );
         console.log(
-          "  - Post processes:",
+          "  - Catalog URL       :",
+          Colors.green(content.catalogUrl),
+        );
+        console.log(
+          "  - Catalog resourceid:",
+          Colors.green(content.catalogResourceId),
+        );
+        console.log(
+          "  - Last modified     :",
+          Colors.green(content.lastModified),
+        );
+        console.log(
+          "  - ETag              :",
+          Colors.green(content.eTag),
+        );
+        console.log(
+          "  - Last donwloaded   :",
+          Colors.green(content.lastDonwloaded.toString()),
+        );
+        console.log(
+          "  - Integrity         :",
+          Colors.green(content.integrity),
+        );
+        console.log(
+          "  - Post processes    :",
           Colors.green(content.postProcesses.join(", ")),
+        );
+        console.log(
+          "  - Headers           :",
+          Colors.green(JSON.stringify(content.headers)),
         );
         console.log();
       }
