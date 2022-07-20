@@ -83,17 +83,23 @@ const installFromDimFile = async (isUpdate = false) => {
       consoleAnimation.start(100);
       new Downloader().download(new URL(content.url)).then(async (result) => {
         consoleAnimation.stop();
-        await executePreprocess(content.preprocesses, result.fullPath);
+        await executePreprocess(content.postProcesses, result.fullPath);
         console.log(
           Colors.green(`Installed to ${result.fullPath}`),
         );
         console.log();
         resolve({
+          name: content.name,
           url: content.url,
           path: result.fullPath,
-          name: content.name,
-          preprocesses: content.preprocesses,
-          lastUpdated: new Date(),
+          catalogUrl: "",
+          catalogResourceId: "",
+          lastModified: "",
+          eTag: "",
+          lastDonwloaded: new Date(),
+          integrity: "",
+          postProcesses: content.postProcesses,
+          headers: {},
         });
       });
     });
@@ -133,7 +139,7 @@ export class InitAction {
 
 export class InstallAction {
   async execute(
-    options: { preprocess?: string[]; name?: string },
+    options: { postProcesses?: string[]; name?: string },
     url: string | undefined,
   ) {
     await createDataFilesDir();
@@ -151,7 +157,7 @@ export class InstallAction {
       }
       const results = await installFromURL(
         url,
-        options.preprocess,
+        options.postProcesses,
         options.name,
       ).catch(
         (error) => {
@@ -164,14 +170,20 @@ export class InstallAction {
       );
       const fullPath = results[0].fullPath;
       const lockContent: LockContent = {
+        name: options.name || url,
         url: url,
         path: fullPath,
-        name: options.name || url,
-        preprocesses: options.preprocess || [],
-        lastUpdated: new Date(),
+        catalogUrl: "",
+        catalogResourceId: "",
+        lastModified: "",
+        eTag: "",
+        lastDonwloaded: new Date(),
+        integrity: "",
+        postProcesses: options.postProcesses || [],
+        headers: {},
       };
-      if (options.preprocess !== undefined) {
-        await executePreprocess(options.preprocess, fullPath);
+      if (options.postProcesses !== undefined) {
+        await executePreprocess(options.postProcesses, fullPath);
       }
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(
@@ -250,7 +262,7 @@ export class ListAction {
           content.name,
           content.url,
           content.path,
-          content.preprocesses.join(","),
+          content.postProcesses.join(","),
         );
       } else {
         console.log(
@@ -269,8 +281,8 @@ export class ListAction {
           Colors.green(content.path),
         );
         console.log(
-          "  - Preprocess:",
-          Colors.green(content.preprocesses.join(", ")),
+          "  - Post processes:",
+          Colors.green(content.postProcesses.join(", ")),
         );
         console.log();
       }
@@ -280,7 +292,7 @@ export class ListAction {
 
 export class UpdateAction {
   async execute(
-    options: { preprocess?: string[]; name?: string },
+    options: { postProcesses?: string[]; name?: string },
     url: string | undefined,
   ) {
     await createDataFilesDir();
@@ -291,7 +303,7 @@ export class UpdateAction {
     if (url !== undefined) {
       const results = await installFromURL(
         url,
-        options.preprocess,
+        options.postProcesses,
         options.name,
         true,
       ).catch(
@@ -305,14 +317,20 @@ export class UpdateAction {
       );
       const fullPath = results[0].fullPath;
       const lockContent: LockContent = {
+        name: url,
         url: url,
         path: fullPath,
-        name: url,
-        preprocesses: options.preprocess || [],
-        lastUpdated: new Date(),
+        catalogUrl: "",
+        catalogResourceId: "",
+        lastModified: "",
+        eTag: "",
+        lastDonwloaded: new Date(),
+        integrity: "",
+        postProcesses: options.postProcesses || [],
+        headers: {},
       };
-      if (options.preprocess !== undefined) {
-        await executePreprocess(options.preprocess, fullPath);
+      if (options.postProcesses !== undefined) {
+        await executePreprocess(options.postProcesses, fullPath);
       }
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(
