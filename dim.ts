@@ -30,7 +30,7 @@ await new Command()
     new Command()
       .arguments("[url:string]")
       .option(
-        "-p, --preprocess <preprocess>",
+        "-p, --postProcesses <postProcesses>",
         "Specify pre-processing when installing.",
         { collect: true },
       )
@@ -69,7 +69,7 @@ await new Command()
     new Command()
       .arguments("[url:string]")
       .option(
-        "-p, --preprocess <preprocess>",
+        "-p, --postProcesses <postProcesses>",
         "Specify pre-processing when installing.",
         { collect: true },
       )

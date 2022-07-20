@@ -23,11 +23,18 @@ export class DimFileAccessor {
       JSON.stringify(json, null, 2),
     );
   }
-  async addContent(url: string, name: string, preprocesses: string[]) {
+  async addContent(url: string, name: string, postProcesses: string[]) {
     if (this.dimJSON === undefined) {
       return;
     }
-    const content: Content = { url, name, preprocesses };
+    const content: Content = { 
+      url, 
+      name, 
+      catalogUrl: "",
+      catalogResourceId: "",
+      postProcesses,
+      headers: {}
+    };
     // Override the existing content.
     const currentContents = this.dimJSON.contents.filter((c) =>
       c.url !== content.url
