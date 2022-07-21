@@ -10,10 +10,10 @@ import { Downloader } from "./downloader.ts";
 import { ConsoleAnimation } from "./console_animation.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { Content, DimJSON, DimLockJSON, LockContent } from "./types.ts";
-import { Encoder } from "./preprocess/encoder.ts";
-import { Unzipper } from "./preprocess/unzipper.ts";
-import { XLSXConverter } from "./preprocess/xlsx_converter.ts";
-import { Command } from "./preprocess/command.ts";
+import { Encoder } from "./postprocess/encoder.ts";
+import { Unzipper } from "./postprocess/unzipper.ts";
+import { XLSXConverter } from "./postprocess/xlsx_converter.ts";
+import { Command } from "./postprocess/command.ts";
 
 const initDimFile = async () => {
   const dimData: DimJSON = { fileVersion: DIM_FILE_VERSION, contents: [] };
@@ -42,7 +42,7 @@ const createDataFilesDir = async () => {
 
 const installFromURL = async (
   url: string,
-  preprocess?: string[],
+  postProcesses?: string[],
   name?: string,
   isUpdate = false,
 ) => {
@@ -56,7 +56,7 @@ const installFromURL = async (
   }
   return await Promise.all([
     new Downloader().download(new URL(url)),
-    new DimFileAccessor().addContent(url, name || url, preprocess || []),
+    new DimFileAccessor().addContent(url, name || url, postProcesses || []),
   ]);
 };
 
@@ -83,7 +83,7 @@ const installFromDimFile = async (isUpdate = false) => {
       consoleAnimation.start(100);
       new Downloader().download(new URL(content.url)).then(async (result) => {
         consoleAnimation.stop();
-        await executePreprocess(content.postProcesses, result.fullPath);
+        await executePostprocess(content.postProcesses, result.fullPath);
         console.log(
           Colors.green(`Installed to ${result.fullPath}`),
         );
@@ -106,8 +106,8 @@ const installFromDimFile = async (isUpdate = false) => {
   });
   return await Promise.all(downloadList);
 };
-const executePreprocess = async (preprocess: string[], targetPath: string) => {
-  for (const p of preprocess) {
+const executePostprocess = async (postProcesses: string[], targetPath: string) => {
+  for (const p of postProcesses) {
     if (p.startsWith("encoding-")) {
       const encodingTo = p.replace("encoding-", "").toUpperCase();
       await new Encoder().encodeFile(targetPath, encodingTo);
@@ -123,7 +123,7 @@ const executePreprocess = async (preprocess: string[], targetPath: string) => {
       await new Command().execute(script, targetPath);
       console.log("Execute Command: ", script, targetPath);
     } else {
-      console.log(`No support a preprocess '${p}'.`);
+      console.log(`No support a postprocess '${p}'.`);
     }
   }
 };
@@ -183,7 +183,7 @@ export class InstallAction {
         headers: {},
       };
       if (options.postProcesses !== undefined) {
-        await executePreprocess(options.postProcesses, fullPath);
+        await executePostprocess(options.postProcesses, fullPath);
       }
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(
@@ -365,7 +365,7 @@ export class UpdateAction {
         headers: {},
       };
       if (options.postProcesses !== undefined) {
-        await executePreprocess(options.postProcesses, fullPath);
+        await executePostprocess(options.postProcesses, fullPath);
       }
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(
