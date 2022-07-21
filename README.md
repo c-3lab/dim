@@ -160,25 +160,25 @@ Install the specified data.
 $ dim install [url] -n [name]
 ```
 
-### Preprocess unzip
+### Postprocess unzip
 
 ```
 $ dim install [url] -p unzip
 ```
 
-### Preprocess encoding-
+### Postprocess encoding-
 
 ```
 $ dim install [url] -p encoding-utf-8
 ```
 
-### Preprocess xlsx-to-csv
+### Postprocess xlsx-to-csv
 
 ```
 $ dim install [url] -p xlsx-to-csv
 ```
 
-### Preprocess custom command 
+### Postprocess custom command 
 
 You can specify a custom command after **"CMD:"**.
 
@@ -193,7 +193,7 @@ The file path will be passed as an argument at the end of the specified command.
 $ dim install [url] -p "CMD:python ./tests/test_custom_command.py"
 ```
 
-Command to be executed during preprocessing.
+Command to be executed during postprocessing.
 
 ```
 $ python ./tests/test_custom_command.py ./data_files/***/***.xx

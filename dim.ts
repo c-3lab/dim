@@ -31,7 +31,7 @@ await new Command()
       .arguments("[url:string]")
       .option(
         "-p, --postProcesses <postProcesses>",
-        "Specify pre-processing when installing.",
+        "Specify post-processing when installing.",
         { collect: true },
       )
       .option(
@@ -70,7 +70,7 @@ await new Command()
       .arguments("[url:string]")
       .option(
         "-p, --postProcesses <postProcesses>",
-        "Specify pre-processing when installing.",
+        "Specify post-processing when installing.",
         { collect: true },
       )
       .description("Update the data.")
