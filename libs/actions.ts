@@ -92,10 +92,10 @@ const installFromDimFile = async (isUpdate = false) => {
           name: content.name,
           url: content.url,
           path: result.fullPath,
-          catalogUrl: "",
-          catalogResourceId: "",
-          lastModified: "",
-          eTag: "",
+          catalogUrl: null,
+          catalogResourceId: null,
+          lastModified: null,
+          eTag: null,
           lastDonwloaded: new Date(),
           integrity: "",
           postProcesses: content.postProcesses,
@@ -176,10 +176,10 @@ export class InstallAction {
         name: options.name || url,
         url: url,
         path: fullPath,
-        catalogUrl: "",
-        catalogResourceId: "",
-        lastModified: "",
-        eTag: "",
+        catalogUrl: null,
+        catalogResourceId: null,
+        lastModified: null,
+        eTag: null,
         lastDonwloaded: new Date(),
         integrity: "",
         postProcesses: options.postProcesses || [],
@@ -292,19 +292,29 @@ export class ListAction {
         );
         console.log(
           "  - Catalog URL       :",
-          Colors.green(content.catalogUrl),
+          Colors.green(
+            content.catalogUrl === null ? "null" : content.catalogUrl,
+          ),
         );
         console.log(
           "  - Catalog resourceid:",
-          Colors.green(content.catalogResourceId),
+          Colors.green(
+            content.catalogResourceId === null
+              ? "null"
+              : content.catalogResourceId,
+          ),
         );
         console.log(
           "  - Last modified     :",
-          Colors.green(content.lastModified),
+          Colors.green(
+            content.lastModified === null
+              ? "null"
+              : content.lastDonwloaded.toString(),
+          ),
         );
         console.log(
           "  - ETag              :",
-          Colors.green(content.eTag),
+          Colors.green(content.eTag === null ? "null" : content.eTag),
         );
         console.log(
           "  - Last donwloaded   :",
@@ -358,10 +368,10 @@ export class UpdateAction {
         name: url,
         url: url,
         path: fullPath,
-        catalogUrl: "",
-        catalogResourceId: "",
-        lastModified: "",
-        eTag: "",
+        catalogUrl: null,
+        catalogResourceId: null,
+        lastModified: null,
+        eTag: null,
         lastDonwloaded: new Date(),
         integrity: "",
         postProcesses: options.postProcesses || [],

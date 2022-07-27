@@ -30,8 +30,8 @@ export class DimFileAccessor {
     const content: Content = {
       url,
       name,
-      catalogUrl: "",
-      catalogResourceId: "",
+      catalogUrl: null,
+      catalogResourceId: null,
       postProcesses,
       headers: {},
     };
