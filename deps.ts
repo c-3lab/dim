@@ -24,3 +24,6 @@ export * as encoding from "https://cdn.skypack.dev/encoding-japanese";
 export { decompress } from "https://deno.land/x/zip@v1.2.3/mod.ts";
 
 export { readXLSX, xlsx } from "https://deno.land/x/flat@0.0.14/mod.ts";
+
+import ky from "https://cdn.skypack.dev/ky@0.31.0?dts";
+export { ky };
