@@ -21,10 +21,10 @@ export interface LockContent {
 }
 
 export interface DimJSON {
-  fileVersion: number;
+  fileVersion: string;
   contents: Content[];
 }
 export interface DimLockJSON {
-  lockFileVersion: number;
+  lockFileVersion: string;
   contents: LockContent[];
 }
