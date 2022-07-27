@@ -38,6 +38,11 @@ await new Command()
         "-n, --name <name:string>",
         "Specify the name.",
       )
+      .option(
+        "-H, --headers <headers:string>",
+        "Specify the header. Can specify multiple times.",
+        { collect: true },
+      )
       .description(
         "Install the data.\n" +
           "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",
