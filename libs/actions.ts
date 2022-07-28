@@ -50,16 +50,7 @@ const createDataFilesDir = async () => {
 const installFromURL = async (
   url: string,
   headers?: Record<string, string>,
-  isUpdate = false,
 ) => {
-  const dimLockFileAccessor = new DimLockFileAccessor();
-  const isInstalled = dimLockFileAccessor.getContents().some((
-    lockContent,
-  ) => lockContent.url === url);
-  if (isInstalled && !isUpdate) {
-    console.log("The url have already been installed.");
-    Deno.exit(0);
-  }
   const result = await new Downloader().download(new URL(url), headers);
   return result.fullPath;
 };
@@ -167,14 +158,16 @@ export class InstallAction {
       await initDimLockFile();
     }
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
-    const dimFileAccessor = new DimFileAccessor();
     if (url !== undefined) {
-      const targetContent = dimFileAccessor.getContents().find((c) =>
-        c.url === url || c.name === options.name
+      if (options.name === undefined) {
+        options.name = url;
+      }
+      const targetContent = new DimFileAccessor().getContents().find((c) =>
+        c.name === options.name
       );
       if (targetContent !== undefined) {
         console.log("The name already exists.");
-        Deno.exit(0);
+        Deno.exit(1);
       }
       const fullPath = await installFromURL(
         url,
@@ -374,7 +367,6 @@ export class UpdateAction {
       const fullPath = await installFromURL(
         url,
         {},
-        true,
       ).catch(
         (error) => {
           console.error(
