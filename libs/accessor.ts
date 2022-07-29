@@ -9,9 +9,9 @@ import {
 
 export class DimFileAccessor {
   private dimJSON: DimJSON | undefined;
-  constructor() {
-    if (existsSync(DEFAULT_DIM_FILE_PATH)) {
-      this.dimJSON = JSON.parse(Deno.readTextFileSync(DEFAULT_DIM_FILE_PATH));
+  constructor(path = DEFAULT_DIM_FILE_PATH) {
+    if (existsSync(path)) {
+      this.dimJSON = JSON.parse(Deno.readTextFileSync(path));
     } else {
       console.log("Not found a dim.json. You should run a 'dim init'. ");
       Deno.exit(0);
