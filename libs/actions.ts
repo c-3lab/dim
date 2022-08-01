@@ -106,7 +106,10 @@ const installFromDimFile = async (isUpdate = false) => {
   });
   return await Promise.all(downloadList);
 };
-const executePostprocess = async (postProcesses: string[], targetPath: string) => {
+const executePostprocess = async (
+  postProcesses: string[],
+  targetPath: string,
+) => {
   for (const p of postProcesses) {
     if (p.startsWith("encoding-")) {
       const encodingTo = p.replace("encoding-", "").toUpperCase();

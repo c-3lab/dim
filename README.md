@@ -7,17 +7,18 @@ manager.
 
 # Features
 
-* 📀 Record the source url and post-processing, etc., of downloaded open-data
-* 🔧 Prepare all open data in one command by using files recorded by someone else
-* 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
-* 🔍 Search open-data from CKAN
-
+- 📀 Record the source url and post-processing, etc., of downloaded open-data
+- 🔧 Prepare all open data in one command by using files recorded by someone else
+- 🚀 General post-processing, such as unzip, encoding, etc., is available from
+  the start
+- 🔍 Search open-data from CKAN
 
 # Usage
 
 ## Install the dim
 
-[Install the dim from binary files](#install-the-dim-from-binary-files) or [Install the dim from Deno install](#install-the-dim-from-deno-install)
+[Install the dim from binary files](#install-the-dim-from-binary-files) or
+[Install the dim from Deno install](#install-the-dim-from-deno-install)
 
 ### Install the dim from binary files
 
@@ -100,7 +101,8 @@ $ dim init
 
 2. Install a data
 
-This command stores information about installed data in `dim.json` and `dim-lock.json`.
+This command stores information about installed data in `dim.json` and
+`dim-lock.json`.
 
 ```
 $ dim install [url] -n [name]
@@ -109,7 +111,7 @@ $ dim install [url] -n [name]
 3. Installed data is saved in `data_files`.
 
 ```
-$ ls ./data_files 
+$ ls ./data_files
 ```
 
 ### Install all data written to dim.json shared by members
@@ -135,7 +137,7 @@ $ dim install
 3. Installed data is saved in `data_files`.
 
 ```
-$ ls ./data_files 
+$ ls ./data_files
 ```
 
 # Commands
@@ -178,10 +180,9 @@ $ dim install [url] -p encoding-utf-8
 $ dim install [url] -p xlsx-to-csv
 ```
 
-### Postprocess custom command 
+### Postprocess custom command
 
 You can specify a custom command after **"CMD:"**.
-
 
 ```
 $ dim install [url] -p CMD:******
@@ -198,7 +199,6 @@ Command to be executed during postprocessing.
 ```
 $ python ./tests/test_custom_command.py ./data_files/***/***.xx
 ```
-
 
 ## Uninstall
 
@@ -232,8 +232,6 @@ Update the specified data.
 $ dim update [name or url]
 ```
 
-
-
 ## Help
 
 ```
@@ -241,6 +239,7 @@ $ dim help
 ```
 
 # Contributers
+
 <a href="https://github.com/c-3lab/dim/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=c-3lab/dim" />
 </a>
@@ -248,4 +247,5 @@ $ dim help
 Made with [contributors-img](https://contributors-img.web.app).
 
 # LICENSE
+
 [MIT LICENSE](./LICENSE)
