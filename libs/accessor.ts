@@ -27,13 +27,13 @@ export class DimFileAccessor {
     if (this.dimJSON === undefined) {
       return;
     }
-    const content: Content = { 
-      url, 
-      name, 
+    const content: Content = {
+      url,
+      name,
       catalogUrl: "",
       catalogResourceId: "",
       postProcesses,
-      headers: {}
+      headers: {},
     };
     // Override the existing content.
     const currentContents = this.dimJSON.contents.filter((c) =>
