@@ -50,12 +50,12 @@ export class DimFileAccessor {
       contents: contents,
     });
   }
-  async removeContent(url: string) {
+  async removeContent(name: string) {
     if (this.dimJSON === undefined) {
       return;
     }
     const contents = this.dimJSON.contents.filter((c) =>
-      c.url !== url && c.name !== url
+      c.name !== name
     );
     await this.writeToDimFile({
       fileVersion: DIM_FILE_VERSION,
@@ -123,12 +123,12 @@ export class DimLockFileAccessor {
       contents: resultContents,
     });
   }
-  async removeContent(url: string) {
+  async removeContent(name: string) {
     if (this.dimLockJSON === undefined) {
       return;
     }
     const contents = this.dimLockJSON.contents.filter((c) =>
-      c.url !== url && c.name !== url
+      c.name !== name
     );
     await this.writeToDimLockFile({
       lockFileVersion: DIM_LOCK_FILE_VERSION,

@@ -230,8 +230,8 @@ export class InstallAction {
 }
 
 export class UninstallAction {
-  async execute(options: any, url: string) {
-    const isRemovedDimFile = await new DimFileAccessor().removeContent(url);
+  async execute(options: any, name: string) {
+    const isRemovedDimFile = await new DimFileAccessor().removeContent(name);
     if (isRemovedDimFile) {
       console.log(
         Colors.green("Removed a content from the dim.json."),
@@ -243,9 +243,9 @@ export class UninstallAction {
     }
     const dimLockFileAccessor = new DimLockFileAccessor();
     const targetContent = dimLockFileAccessor.getContents().find((c) =>
-      c.url === url || c.name === url
+      c.name === name
     );
-    const isRemovedDimLockFile = await dimLockFileAccessor.removeContent(url);
+    const isRemovedDimLockFile = await dimLockFileAccessor.removeContent(name);
     if (isRemovedDimLockFile) {
       console.log(
         Colors.green("Removed a content from the dim-lock.json."),

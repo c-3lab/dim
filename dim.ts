@@ -53,10 +53,10 @@ await new Command()
   .command(
     "uninstall",
     new Command()
-      .arguments("<url:string>")
+      .arguments("<name:string>")
       .description(
         "Uninstall the data.\n" +
-          "Specify the data name or data url.",
+          "Specify the data name.",
       )
       .action(new UninstallAction().execute),
   )
