@@ -8,9 +8,9 @@ export class Downloader {
   ): Promise<DownlodedFile> {
     const splitedURLPath = url.pathname.split("/");
     const joinedDirPath = splitedURLPath
-      .slice(0, splitedURLPath.length - 1)
+      .slice(1, splitedURLPath.length - 1)
       .join("/");
-    const dir = `${DEFAULT_DATAFILES_PATH}/${url.hostname}${joinedDirPath}`;
+    const dir = `${DEFAULT_DATAFILES_PATH}/${name}/${joinedDirPath}`;
     const file = splitedURLPath[splitedURLPath.length - 1];
     ensureDirSync(dir);
     const reqInit: RequestInit = {

@@ -42,7 +42,7 @@ export class DimFileAccessor {
     };
     // Override the existing content.
     const currentContents = this.dimJSON.contents.filter((c) =>
-       c.name !== content.name
+      c.name !== content.name
     );
     const contents = new Array<Content>(...currentContents, content);
     await this.writeToDimFile({
@@ -54,9 +54,7 @@ export class DimFileAccessor {
     if (this.dimJSON === undefined) {
       return;
     }
-    const contents = this.dimJSON.contents.filter((c) =>
-      c.name !== name
-    );
+    const contents = this.dimJSON.contents.filter((c) => c.name !== name);
     await this.writeToDimFile({
       fileVersion: DIM_FILE_VERSION,
       contents: contents,
@@ -127,9 +125,7 @@ export class DimLockFileAccessor {
     if (this.dimLockJSON === undefined) {
       return;
     }
-    const contents = this.dimLockJSON.contents.filter((c) =>
-      c.name !== name
-    );
+    const contents = this.dimLockJSON.contents.filter((c) => c.name !== name);
     await this.writeToDimLockFile({
       lockFileVersion: DIM_LOCK_FILE_VERSION,
       contents: contents,

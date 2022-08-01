@@ -49,10 +49,14 @@ const createDataFilesDir = async () => {
 
 const installFromURL = async (
   url: string,
-  headers?: Record<string, string>,
+  name: string,
+  postProcesses?: string[],
+  isUpdate = false,
 ) => {
-  const result = await new Downloader().download(new URL(url), headers);
-  return result.fullPath;
+  return await Promise.all([
+    new Downloader().download(new URL(url), name),
+    new DimFileAccessor().addContent(url, name || url, postProcesses || []),
+  ]);
 };
 
 const installFromDimFile = async (isUpdate = false) => {
