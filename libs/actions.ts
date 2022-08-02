@@ -154,7 +154,11 @@ export class InitAction {
 
 export class InstallAction {
   async execute(
+<<<<<<< HEAD
     options: { postProcesses?: string[]; name?: string; headers?: string[] },
+=======
+    options: { postProcesses?: string[]; name: string },
+>>>>>>> Change name to required
     url: string | undefined,
   ) {
     await createDataFilesDir();
@@ -163,9 +167,6 @@ export class InstallAction {
     }
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
     if (url !== undefined) {
-      if (options.name === undefined) {
-        options.name = url;
-      }
       const targetContent = new DimFileAccessor().getContents().find((c) =>
         c.name === options.name
       );
