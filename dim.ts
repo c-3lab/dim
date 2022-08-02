@@ -73,7 +73,7 @@ await new Command()
   .command(
     "update",
     new Command()
-      .arguments("[url:string]")
+      .arguments("[name:string]")
       .option(
         "-p, --postProcesses <postProcesses>",
         "Specify post-processing when installing.",

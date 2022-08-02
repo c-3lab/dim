@@ -69,7 +69,7 @@ const installFromDimFile = async (isUpdate = false) => {
   if (!isUpdate) {
     const isNotInstalled = (content: Content) =>
       dimLockFileAccessor.getContents().every((lockContent) =>
-        lockContent.url !== content.url
+        lockContent.name !== content.name
       );
     contents = contents.filter(isNotInstalled);
   }
@@ -217,7 +217,7 @@ export class InstallAction {
           Colors.red("Failed to install."),
           Colors.red(error.message),
         );
-        Deno.exit(0);
+        Deno.exit(1);
       });
       if (lockContentList !== undefined) {
         await new DimLockFileAccessor().addContents(lockContentList);
@@ -359,30 +359,50 @@ export class ListAction {
 
 export class UpdateAction {
   async execute(
-    options: { postProcesses?: string[]; name?: string },
-    url: string | undefined,
+    options: { postProcesses?: string[] },
+    name: string | undefined,
   ) {
     await createDataFilesDir();
     if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
       await initDimLockFile();
     }
+<<<<<<< HEAD
 
     if (url !== undefined) {
       const fullPath = await installFromURL(
         url,
         {},
+=======
+    if (name !== undefined) {
+      const content = new DimLockFileAccessor().getContents().find((c) =>
+        c.name === name
+      );
+      if (content === undefined) {
+        console.error(
+          Colors.red(
+            "Faild to update. Not Found a content in the dim-lock.json. ",
+          ),
+        );
+        Deno.exit(1);
+      }
+      const results = await installFromURL(
+        content.url,
+        name,
+        options.postProcesses,
+        true,
+>>>>>>> Change updated <name>
       ).catch(
         (error) => {
           console.error(
             Colors.red("Failed to update."),
             Colors.red(error.message),
           );
-          Deno.exit(0);
+          Deno.exit(1);
         },
       );
       const lockContent: LockContent = {
-        name: url,
-        url: url,
+        name: name,
+        url: content.url,
         path: fullPath,
         catalogUrl: null,
         catalogResourceId: null,
@@ -398,7 +418,7 @@ export class UpdateAction {
       }
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(
-        Colors.green(`Updated ${url}.`),
+        Colors.green(`Updated ${content.name}.`),
         `\nFile path:`,
         Colors.yellow(fullPath),
       );
@@ -408,7 +428,7 @@ export class UpdateAction {
           Colors.red("Failed to update."),
           Colors.red(error.message),
         );
-        Deno.exit(0);
+        Deno.exit(1);
       });
       if (lockContentList !== undefined) {
         await new DimLockFileAccessor().addContents(lockContentList);
