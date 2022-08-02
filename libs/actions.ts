@@ -44,6 +44,7 @@ const installFromURL = async (
   url: string,
   postProcesses?: string[],
   name?: string,
+  headers?: Record<string, string>,
   isUpdate = false,
 ) => {
   const dimLockFileAccessor = new DimLockFileAccessor();
@@ -55,8 +56,13 @@ const installFromURL = async (
     Deno.exit(0);
   }
   return await Promise.all([
-    new Downloader().download(new URL(url)),
-    new DimFileAccessor().addContent(url, name || url, postProcesses || []),
+    new Downloader().download(new URL(url), headers),
+    new DimFileAccessor().addContent(
+      url,
+      name || url,
+      postProcesses || [],
+      headers || {},
+    ),
   ]);
 };
 
@@ -131,6 +137,19 @@ const executePostprocess = async (
   }
 };
 
+export const parseHeader = function (
+  headers: string[] | undefined,
+): Record<string, string> {
+  const parsedHeaders: Record<string, string> = {};
+  if (headers !== undefined) {
+    for (const header of headers) {
+      const [key, value] = header.split(/:\s*/);
+      parsedHeaders[key] = value;
+    }
+  }
+  return parsedHeaders;
+};
+
 export class InitAction {
   async execute(options: any) {
     await createDataFilesDir();
@@ -142,13 +161,15 @@ export class InitAction {
 
 export class InstallAction {
   async execute(
-    options: { postProcesses?: string[]; name?: string },
+    options: { postProcesses?: string[]; name?: string; headers?: string[] },
     url: string | undefined,
   ) {
     await createDataFilesDir();
     if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
       await initDimLockFile();
     }
+
+    const parsedHeaders: Record<string, string> = parseHeader(options.headers);
 
     if (url !== undefined) {
       const targetContent = new DimFileAccessor().getContents().find((c) =>
@@ -162,6 +183,7 @@ export class InstallAction {
         url,
         options.postProcesses,
         options.name,
+        parsedHeaders,
       ).catch(
         (error) => {
           console.error(
@@ -183,7 +205,7 @@ export class InstallAction {
         lastDonwloaded: new Date(),
         integrity: "",
         postProcesses: options.postProcesses || [],
-        headers: {},
+        headers: parsedHeaders,
       };
       if (options.postProcesses !== undefined) {
         await executePostprocess(options.postProcesses, fullPath);
@@ -343,6 +365,7 @@ export class UpdateAction {
         url,
         options.postProcesses,
         options.name,
+        {},
         true,
       ).catch(
         (error) => {

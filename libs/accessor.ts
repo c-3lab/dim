@@ -23,7 +23,12 @@ export class DimFileAccessor {
       JSON.stringify(json, null, 2),
     );
   }
-  async addContent(url: string, name: string, postProcesses: string[]) {
+  async addContent(
+    url: string,
+    name: string,
+    postProcesses: string[],
+    headers: Record<string, string>,
+  ) {
     if (this.dimJSON === undefined) {
       return;
     }
@@ -33,7 +38,7 @@ export class DimFileAccessor {
       catalogUrl: "",
       catalogResourceId: "",
       postProcesses,
-      headers: {},
+      headers: headers,
     };
     // Override the existing content.
     const currentContents = this.dimJSON.contents.filter((c) =>
