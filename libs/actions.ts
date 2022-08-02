@@ -83,15 +83,15 @@ const installFromDimFile = async (isUpdate = false) => {
         content.headers,
       ).then(async (result) => {
         consoleAnimation.stop();
-        await executePostprocess(content.postProcesses, result.fullPath);
+        await executePostprocess(content.postProcesses, fullPath);
         console.log(
-          Colors.green(`Installed to ${result.fullPath}`),
+          Colors.green(`Installed to ${fullPath}`),
         );
         console.log();
         resolve({
           name: content.name,
           url: content.url,
-          path: result.fullPath,
+          path: fullPath,
           catalogUrl: null,
           catalogResourceId: null,
           lastModified: null,
