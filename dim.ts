@@ -108,6 +108,10 @@ await new Command()
           default: 10,
         },
       )
+      .option(
+        "-i, --install",
+        "Interactive installation.",
+      )
       .arguments("<keyword:string>")
       .description("Search data from package_search CKAN API")
       .action(new SearchAction().execute),

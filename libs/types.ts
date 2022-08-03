@@ -32,6 +32,7 @@ export interface DimLockJSON {
 }
 
 export interface Resource {
+  id: string;
   name: string;
   url: string;
   description: string;
@@ -39,7 +40,7 @@ export interface Resource {
   format: string;
 }
 
-export interface Dataset {
+export interface Catalog {
   xckan_title: string;
   xckan_site_url: string;
   xckan_description: string;
@@ -49,10 +50,18 @@ export interface Dataset {
 
 export interface CkanApiResponse {
   result: {
-    results: Dataset[];
+    results: Catalog[];
   };
 }
 export interface DownlodedResult {
   fullPath: string;
   response: KyResponse;
+}
+
+export interface CatalogResource {
+  catalogTitle: string;
+  catalogUrl: string;
+  id: string;
+  name: string;
+  url: string;
 }
