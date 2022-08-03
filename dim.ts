@@ -44,6 +44,10 @@ await new Command()
         "Specify the header. Can specify multiple times.",
         { collect: true },
       )
+      .option(
+        "-F, --force",
+        "Force execution.",
+      )
       .description(
         "Install the data.\n" +
           "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",
