@@ -1,3 +1,5 @@
+import { KyResponse } from "../deps.ts";
+
 export interface Content {
   name: string;
   url: string;
@@ -49,4 +51,8 @@ export interface CkanApiResponse {
   result: {
     results: Dataset[];
   };
+}
+export interface DownlodedResult {
+  fullPath: string;
+  response: KyResponse;
 }
