@@ -1,15 +1,22 @@
-import { Colors, ensureDir, ensureFile, existsSync } from "../deps.ts";
+import { Colors, ensureDir, ensureFile, existsSync, ky } from "../deps.ts";
 import {
   DEFAULT_DATAFILES_PATH,
   DEFAULT_DIM_FILE_PATH,
   DEFAULT_DIM_LOCK_FILE_PATH,
+  DEFAULT_SEARCH_ENDPOINT,
   DIM_FILE_VERSION,
   DIM_LOCK_FILE_VERSION,
 } from "./consts.ts";
 import { Downloader } from "./downloader.ts";
 import { ConsoleAnimation } from "./console_animation.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
-import { Content, DimJSON, DimLockJSON, LockContent } from "./types.ts";
+import {
+  CkanApiResponse,
+  Content,
+  DimJSON,
+  DimLockJSON,
+  LockContent,
+} from "./types.ts";
 import { Encoder } from "./postprocess/encoder.ts";
 import { Unzipper } from "./postprocess/unzipper.ts";
 import { XLSXConverter } from "./postprocess/xlsx_converter.ts";
@@ -423,6 +430,102 @@ export class UpdateAction {
       console.log(
         Colors.green(`Successfully Updated.`),
       );
+    }
+  }
+}
+
+export class SearchAction {
+  async execute(
+    options: { number: number },
+    keyword: string,
+  ) {
+    if (options.number <= 0 || options.number > 100) {
+      console.error(
+        Colors.red("Failed to search."),
+        Colors.red("Please enter a number between 1 and 100"),
+      );
+      Deno.exit(1);
+    }
+
+    const keywords = keyword.trim().split(/\s+/);
+    let searchWord: string;
+    if (keywords.length === 1) {
+      searchWord = `*${keywords[0]}*`;
+    } else {
+      searchWord = "(" + keywords.map((keyword) =>
+        `*${keyword}*`
+      ).join(" AND ") + ")";
+    }
+
+    const searchParams = new URLSearchParams(
+      {
+        fq:
+          `xckan_title:${searchWord} OR tags:${searchWord} OR x_ckan_description:${searchWord}`,
+        rows: options.number.toString(),
+      },
+    );
+
+    let response: CkanApiResponse;
+    try {
+      response = await ky.get(
+        DEFAULT_SEARCH_ENDPOINT,
+        { searchParams },
+      ).json<CkanApiResponse>();
+    } catch (error) {
+      console.error(
+        Colors.red("Failed to search."),
+        Colors.red(error.message),
+      );
+      Deno.exit(1);
+    }
+    const datasets = response.result.results;
+
+    let i = 1;
+    for (const dataset of datasets) {
+      console.log(dataset.xckan_title);
+      console.log(
+        "  - Package URL        :",
+        Colors.green(dataset.xckan_site_url),
+      );
+      console.log(
+        "  - Package Description:",
+        Colors.green(
+          dataset.xckan_description == null
+            ? ""
+            : dataset.xckan_description.replace(/\r(?!\n)/g, "\n"),
+        ),
+      );
+      console.log(
+        "  - Package License    :",
+        Colors.green(
+          dataset.license_title == null ? "" : dataset.license_title,
+        ),
+      );
+      for (const resource of dataset.resources) {
+        console.log(`    ${i}.`, resource.name);
+        console.log(
+          "      * Resourse URL        :",
+          Colors.green(resource.url == null ? "" : resource.url),
+        );
+        console.log(
+          "      * Resource Description:",
+          Colors.green(
+            resource.description == null
+              ? ""
+              : resource.description.replace(/\r(?!\n)/g, "\n"),
+          ),
+        );
+        console.log(
+          "      * Created             :",
+          Colors.green(resource.created == null ? "" : resource.created),
+        );
+        console.log(
+          "      * Format              :",
+          Colors.green(resource.format == null ? "" : resource.format),
+        );
+        i++;
+      }
+      console.log();
     }
   }
 }

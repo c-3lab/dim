@@ -10,6 +10,7 @@ import {
   InitAction,
   InstallAction,
   ListAction,
+  SearchAction,
   UninstallAction,
   UpdateAction,
 } from "./libs/actions.ts";
@@ -88,6 +89,20 @@ await new Command()
         new GithubProvider({ repository: "c-3lab/dim" }),
       ],
     }),
+  )
+  .command(
+    "search",
+    new Command()
+      .option(
+        "-n, --number <number:integer>",
+        "Specify the number of data to get by option -n (default 10).",
+        {
+          default: 10,
+        },
+      )
+      .arguments("<keyword:string>")
+      .description("Search data from package_search CKAN API")
+      .action(new SearchAction().execute),
   )
   .command("help", new HelpCommand())
   .command("complete", new CompletionsCommand())
