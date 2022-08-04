@@ -49,8 +49,6 @@ const createDataFilesDir = async () => {
 
 const installFromURL = async (
   url: string,
-  postProcesses?: string[],
-  name?: string,
   headers?: Record<string, string>,
   isUpdate = false,
 ) => {
@@ -62,7 +60,7 @@ const installFromURL = async (
     console.log("The url have already been installed.");
     Deno.exit(0);
   }
-  const result = await new Downloader().download(new URL(url));
+  const result = await new Downloader().download(new URL(url), headers);
   return result.fullPath;
 };
 
@@ -180,8 +178,6 @@ export class InstallAction {
       }
       const fullPath = await installFromURL(
         url,
-        options.postProcesses,
-        options.name,
         parsedHeaders,
       ).catch(
         (error) => {
@@ -212,7 +208,7 @@ export class InstallAction {
         url,
         options.name || url,
         options.postProcesses || [],
-        options.headers || {},
+        parsedHeaders,
       );
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(
@@ -377,8 +373,6 @@ export class UpdateAction {
     if (url !== undefined) {
       const fullPath = await installFromURL(
         url,
-        options.postProcesses,
-        options.name,
         {},
         true,
       ).catch(
