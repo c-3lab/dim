@@ -4,6 +4,7 @@ import { DEFAULT_DATAFILES_PATH } from "./consts.ts";
 export class Downloader {
   async download(
     url: URL,
+    name: string,
     headers?: Record<string, string>,
   ): Promise<DownlodedFile> {
     const splitedURLPath = url.pathname.split("/");

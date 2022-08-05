@@ -50,13 +50,10 @@ const createDataFilesDir = async () => {
 const installFromURL = async (
   url: string,
   name: string,
-  postProcesses?: string[],
-  isUpdate = false,
+  headers?: Record<string, string>,
 ) => {
-  return await Promise.all([
-    new Downloader().download(new URL(url), name),
-    new DimFileAccessor().addContent(url, name || url, postProcesses || []),
-  ]);
+  const result = await new Downloader().download(new URL(url), name, headers);
+  return result.fullPath;
 };
 
 const installFromDimFile = async (isUpdate = false) => {
@@ -80,7 +77,11 @@ const installFromDimFile = async (isUpdate = false) => {
         `Installing ${content.url} ...`,
       );
       consoleAnimation.start(100);
-      new Downloader().download(new URL(content.url)).then(async (result) => {
+      new Downloader().download(
+        new URL(content.url),
+        content.name,
+        content.headers,
+      ).then(async (result) => {
         consoleAnimation.stop();
         await executePostprocess(content.postProcesses, result.fullPath);
         console.log(
@@ -154,11 +155,7 @@ export class InitAction {
 
 export class InstallAction {
   async execute(
-<<<<<<< HEAD
-    options: { postProcesses?: string[]; name?: string; headers?: string[] },
-=======
-    options: { postProcesses?: string[]; name: string },
->>>>>>> Change name to required
+    options: { postProcesses?: string[]; name: string; headers?: string[] },
     url: string | undefined,
   ) {
     await createDataFilesDir();
@@ -176,6 +173,7 @@ export class InstallAction {
       }
       const fullPath = await installFromURL(
         url,
+        options.name,
         parsedHeaders,
       ).catch(
         (error) => {
@@ -367,13 +365,6 @@ export class UpdateAction {
     if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
       await initDimLockFile();
     }
-<<<<<<< HEAD
-
-    if (url !== undefined) {
-      const fullPath = await installFromURL(
-        url,
-        {},
-=======
     if (name !== undefined) {
       const content = new DimLockFileAccessor().getContents().find((c) =>
         c.name === name
@@ -386,12 +377,9 @@ export class UpdateAction {
         );
         Deno.exit(1);
       }
-      const results = await installFromURL(
+      const fullPath = await installFromURL(
         content.url,
         name,
-        options.postProcesses,
-        true,
->>>>>>> Change updated <name>
       ).catch(
         (error) => {
           console.error(
