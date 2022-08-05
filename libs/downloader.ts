@@ -8,16 +8,8 @@ export class Downloader {
     headers?: Record<string, string>,
   ): Promise<string> {
     const splitedURLPath = url.pathname.split("/");
-<<<<<<< HEAD
     const dir = `${DEFAULT_DATAFILES_PATH}/${name}`;
-    const file = splitedURLPath[splitedURLPath.length - 1];
-=======
-    const joinedDirPath = splitedURLPath
-      .slice(0, splitedURLPath.length - 1)
-      .join("/");
-    const dir = `${DEFAULT_DATAFILES_PATH}/${url.hostname}${joinedDirPath}`;
     const fileName = splitedURLPath[splitedURLPath.length - 1];
->>>>>>> Change download to ky
     ensureDirSync(dir);
     const response = await ky.get(url, { headers: headers });
     const path = dir + "/" + fileName;
