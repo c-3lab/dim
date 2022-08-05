@@ -49,8 +49,6 @@ const createDataFilesDir = async () => {
 
 const installFromURL = async (
   url: string,
-  postProcesses?: string[],
-  name?: string,
   headers?: Record<string, string>,
   isUpdate = false,
 ) => {
@@ -62,15 +60,8 @@ const installFromURL = async (
     console.log("The url have already been installed.");
     Deno.exit(0);
   }
-  return await Promise.all([
-    new Downloader().download(new URL(url), headers),
-    new DimFileAccessor().addContent(
-      url,
-      name || url,
-      postProcesses || [],
-      headers || {},
-    ),
-  ]);
+  const result = await new Downloader().download(new URL(url), headers);
+  return result.fullPath;
 };
 
 const installFromDimFile = async (isUpdate = false) => {
@@ -175,21 +166,18 @@ export class InstallAction {
     if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
       await initDimLockFile();
     }
-
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
-
+    const dimFileAccessor = new DimFileAccessor();
     if (url !== undefined) {
-      const targetContent = new DimFileAccessor().getContents().find((c) =>
+      const targetContent = dimFileAccessor.getContents().find((c) =>
         c.url === url || c.name === options.name
       );
       if (targetContent !== undefined) {
         console.log("The name already exists.");
         Deno.exit(0);
       }
-      const results = await installFromURL(
+      const fullPath = await installFromURL(
         url,
-        options.postProcesses,
-        options.name,
         parsedHeaders,
       ).catch(
         (error) => {
@@ -197,10 +185,9 @@ export class InstallAction {
             Colors.red("Failed to install."),
             Colors.red(error.message),
           );
-          Deno.exit(0);
+          Deno.exit(1);
         },
       );
-      const fullPath = results[0].fullPath;
       const lockContent: LockContent = {
         name: options.name || url,
         url: url,
@@ -217,6 +204,12 @@ export class InstallAction {
       if (options.postProcesses !== undefined) {
         await executePostprocess(options.postProcesses, fullPath);
       }
+      await new DimFileAccessor().addContent(
+        url,
+        options.name || url,
+        options.postProcesses || [],
+        parsedHeaders,
+      );
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(
         Colors.green(`Installed to ${fullPath}`),
@@ -378,10 +371,8 @@ export class UpdateAction {
     }
 
     if (url !== undefined) {
-      const results = await installFromURL(
+      const fullPath = await installFromURL(
         url,
-        options.postProcesses,
-        options.name,
         {},
         true,
       ).catch(
@@ -393,7 +384,6 @@ export class UpdateAction {
           Deno.exit(0);
         },
       );
-      const fullPath = results[0].fullPath;
       const lockContent: LockContent = {
         name: url,
         url: url,
