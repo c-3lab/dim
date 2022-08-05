@@ -203,7 +203,7 @@ $ python ./tests/test_custom_command.py ./data_files/***/***.xx
 ## Uninstall
 
 ```
-$ dim uninstall [url]
+$ dim uninstall [name]
 ```
 
 ## List
@@ -229,7 +229,7 @@ $ dim update
 Update the specified data.
 
 ```
-$ dim update [name or url]
+$ dim update [name]
 ```
 
 ## Help

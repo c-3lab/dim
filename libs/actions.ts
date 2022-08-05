@@ -49,18 +49,10 @@ const createDataFilesDir = async () => {
 
 const installFromURL = async (
   url: string,
+  name: string,
   headers?: Record<string, string>,
-  isUpdate = false,
 ) => {
-  const dimLockFileAccessor = new DimLockFileAccessor();
-  const isInstalled = dimLockFileAccessor.getContents().some((
-    lockContent,
-  ) => lockContent.url === url);
-  if (isInstalled && !isUpdate) {
-    console.log("The url have already been installed.");
-    Deno.exit(0);
-  }
-  const result = await new Downloader().download(new URL(url), headers);
+  const result = await new Downloader().download(new URL(url), name, headers);
   return result.fullPath;
 };
 
@@ -74,7 +66,7 @@ const installFromDimFile = async (isUpdate = false) => {
   if (!isUpdate) {
     const isNotInstalled = (content: Content) =>
       dimLockFileAccessor.getContents().every((lockContent) =>
-        lockContent.url !== content.url
+        lockContent.name !== content.name
       );
     contents = contents.filter(isNotInstalled);
   }
@@ -85,7 +77,11 @@ const installFromDimFile = async (isUpdate = false) => {
         `Installing ${content.url} ...`,
       );
       consoleAnimation.start(100);
-      new Downloader().download(new URL(content.url)).then(async (result) => {
+      new Downloader().download(
+        new URL(content.url),
+        content.name,
+        content.headers,
+      ).then(async (result) => {
         consoleAnimation.stop();
         await executePostprocess(content.postProcesses, result.fullPath);
         console.log(
@@ -159,7 +155,7 @@ export class InitAction {
 
 export class InstallAction {
   async execute(
-    options: { postProcesses?: string[]; name?: string; headers?: string[] },
+    options: { postProcesses?: string[]; name: string; headers?: string[] },
     url: string | undefined,
   ) {
     await createDataFilesDir();
@@ -167,17 +163,17 @@ export class InstallAction {
       await initDimLockFile();
     }
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
-    const dimFileAccessor = new DimFileAccessor();
     if (url !== undefined) {
-      const targetContent = dimFileAccessor.getContents().find((c) =>
-        c.url === url || c.name === options.name
+      const targetContent = new DimFileAccessor().getContents().find((c) =>
+        c.name === options.name
       );
       if (targetContent !== undefined) {
         console.log("The name already exists.");
-        Deno.exit(0);
+        Deno.exit(1);
       }
       const fullPath = await installFromURL(
         url,
+        options.name,
         parsedHeaders,
       ).catch(
         (error) => {
@@ -220,7 +216,7 @@ export class InstallAction {
           Colors.red("Failed to install."),
           Colors.red(error.message),
         );
-        Deno.exit(0);
+        Deno.exit(1);
       });
       if (lockContentList !== undefined) {
         await new DimLockFileAccessor().addContents(lockContentList);
@@ -237,8 +233,8 @@ export class InstallAction {
 }
 
 export class UninstallAction {
-  async execute(options: any, url: string) {
-    const isRemovedDimFile = await new DimFileAccessor().removeContent(url);
+  async execute(options: any, name: string) {
+    const isRemovedDimFile = await new DimFileAccessor().removeContent(name);
     if (isRemovedDimFile) {
       console.log(
         Colors.green("Removed a content from the dim.json."),
@@ -250,9 +246,9 @@ export class UninstallAction {
     }
     const dimLockFileAccessor = new DimLockFileAccessor();
     const targetContent = dimLockFileAccessor.getContents().find((c) =>
-      c.url === url || c.name === url
+      c.name === name
     );
-    const isRemovedDimLockFile = await dimLockFileAccessor.removeContent(url);
+    const isRemovedDimLockFile = await dimLockFileAccessor.removeContent(name);
     if (isRemovedDimLockFile) {
       console.log(
         Colors.green("Removed a content from the dim-lock.json."),
@@ -362,31 +358,40 @@ export class ListAction {
 
 export class UpdateAction {
   async execute(
-    options: { postProcesses?: string[]; name?: string },
-    url: string | undefined,
+    options: { postProcesses?: string[] },
+    name: string | undefined,
   ) {
     await createDataFilesDir();
     if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
       await initDimLockFile();
     }
-
-    if (url !== undefined) {
+    if (name !== undefined) {
+      const content = new DimLockFileAccessor().getContents().find((c) =>
+        c.name === name
+      );
+      if (content === undefined) {
+        console.error(
+          Colors.red(
+            "Faild to update. Not Found a content in the dim-lock.json. ",
+          ),
+        );
+        Deno.exit(1);
+      }
       const fullPath = await installFromURL(
-        url,
-        {},
-        true,
+        content.url,
+        name,
       ).catch(
         (error) => {
           console.error(
             Colors.red("Failed to update."),
             Colors.red(error.message),
           );
-          Deno.exit(0);
+          Deno.exit(1);
         },
       );
       const lockContent: LockContent = {
-        name: url,
-        url: url,
+        name: name,
+        url: content.url,
         path: fullPath,
         catalogUrl: null,
         catalogResourceId: null,
@@ -402,7 +407,7 @@ export class UpdateAction {
       }
       await new DimLockFileAccessor().addContent(lockContent);
       console.log(
-        Colors.green(`Updated ${url}.`),
+        Colors.green(`Updated ${content.name}.`),
         `\nFile path:`,
         Colors.yellow(fullPath),
       );
@@ -412,7 +417,7 @@ export class UpdateAction {
           Colors.red("Failed to update."),
           Colors.red(error.message),
         );
-        Deno.exit(0);
+        Deno.exit(1);
       });
       if (lockContentList !== undefined) {
         await new DimLockFileAccessor().addContents(lockContentList);

@@ -37,7 +37,8 @@ await new Command()
       )
       .option(
         "-n, --name <name:string>",
-        "Specify the name.",
+        "Specify the name.This is required.",
+        { required: true },
       )
       .option(
         "-H, --headers <headers:string>",
@@ -53,10 +54,10 @@ await new Command()
   .command(
     "uninstall",
     new Command()
-      .arguments("<url:string>")
+      .arguments("<name:string>")
       .description(
         "Uninstall the data.\n" +
-          "Specify the data name or data url.",
+          "Specify the data name.",
       )
       .action(new UninstallAction().execute),
   )
@@ -73,7 +74,7 @@ await new Command()
   .command(
     "update",
     new Command()
-      .arguments("[url:string]")
+      .arguments("[name:string]")
       .option(
         "-p, --postProcesses <postProcesses>",
         "Specify post-processing when installing.",

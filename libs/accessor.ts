@@ -42,7 +42,7 @@ export class DimFileAccessor {
     };
     // Override the existing content.
     const currentContents = this.dimJSON.contents.filter((c) =>
-      c.url !== content.url
+      c.name !== content.name
     );
     const contents = new Array<Content>(...currentContents, content);
     await this.writeToDimFile({
@@ -50,13 +50,11 @@ export class DimFileAccessor {
       contents: contents,
     });
   }
-  async removeContent(url: string) {
+  async removeContent(name: string) {
     if (this.dimJSON === undefined) {
       return;
     }
-    const contents = this.dimJSON.contents.filter((c) =>
-      c.url !== url && c.name !== url
-    );
+    const contents = this.dimJSON.contents.filter((c) => c.name !== name);
     await this.writeToDimFile({
       fileVersion: DIM_FILE_VERSION,
       contents: contents,
@@ -96,7 +94,7 @@ export class DimLockFileAccessor {
     }
     // Override the existing content.
     const currentContents = this.dimLockJSON.contents.filter((c) =>
-      c.url !== content.url
+      c.name !== content.name
     );
     const contents = new Array<LockContent>(...currentContents, content);
     await this.writeToDimLockFile({
@@ -110,8 +108,8 @@ export class DimLockFileAccessor {
     }
     // Override the existing content.
     const currentContents = this.dimLockJSON.contents.filter((c) =>
-      !contents.map((newContent) => newContent.url).includes(
-        c.url,
+      !contents.map((newContent) => newContent.name).includes(
+        c.name,
       )
     );
     const resultContents = new Array<LockContent>(
@@ -123,13 +121,11 @@ export class DimLockFileAccessor {
       contents: resultContents,
     });
   }
-  async removeContent(url: string) {
+  async removeContent(name: string) {
     if (this.dimLockJSON === undefined) {
       return;
     }
-    const contents = this.dimLockJSON.contents.filter((c) =>
-      c.url !== url && c.name !== url
-    );
+    const contents = this.dimLockJSON.contents.filter((c) => c.name !== name);
     await this.writeToDimLockFile({
       lockFileVersion: DIM_LOCK_FILE_VERSION,
       contents: contents,
