@@ -1,5 +1,3 @@
-export { download } from "https://deno.land/x/download@v1.0.1/mod.ts";
-export type { DownlodedFile } from "https://deno.land/x/download@v1.0.1/mod.ts";
 export { Command } from "https://deno.land/x/cliffy@v0.24.2/command/mod.ts";
 export {
   DenoLandProvider,

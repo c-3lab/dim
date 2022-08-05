@@ -52,8 +52,8 @@ const installFromURL = async (
   name: string,
   headers?: Record<string, string>,
 ) => {
-  const result = await new Downloader().download(new URL(url), name, headers);
-  return result.fullPath;
+  const fullPath = await new Downloader().download(new URL(url), name, headers);
+  return fullPath;
 };
 
 const installFromDimFile = async (isUpdate = false) => {
@@ -81,17 +81,17 @@ const installFromDimFile = async (isUpdate = false) => {
         new URL(content.url),
         content.name,
         content.headers,
-      ).then(async (result) => {
+      ).then(async (fullPath) => {
         consoleAnimation.stop();
-        await executePostprocess(content.postProcesses, result.fullPath);
+        await executePostprocess(content.postProcesses, fullPath);
         console.log(
-          Colors.green(`Installed to ${result.fullPath}`),
+          Colors.green(`Installed to ${fullPath}`),
         );
         console.log();
         resolve({
           name: content.name,
           url: content.url,
-          path: result.fullPath,
+          path: fullPath,
           catalogUrl: null,
           catalogResourceId: null,
           lastModified: null,
