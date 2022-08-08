@@ -57,7 +57,15 @@ const installFromURL = async (
 };
 
 const installFromDimFile = async (path: string, isUpdate = false) => {
-  let contents = new DimFileAccessor(path).getContents();
+  let contents;
+  if (path.match(/^https?:\/\//)) {
+    const dimJson: DimJSON = await ky.get(
+      path,
+    ).json<DimJSON>();
+    contents = dimJson.contents;
+  } else {
+    contents = new DimFileAccessor(path).getContents();
+  }
 
   if (contents.length == 0) {
     console.log("No contents.\nYou should run a 'dim install <data url>'. ");
