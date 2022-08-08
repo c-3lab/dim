@@ -50,6 +50,25 @@ export class DimFileAccessor {
       contents: contents,
     });
   }
+  async addContents(contents: Content[]) {
+    if (this.dimJSON === undefined) {
+      return;
+    }
+    // Override the existing content.
+    const currentContents = this.dimJSON.contents.filter((c) =>
+      !contents.map((newContent) => newContent.name).includes(
+        c.name,
+      )
+    );
+    const resultContents = new Array<Content>(
+      ...currentContents,
+      ...contents,
+    );
+    await this.writeToDimFile({
+      fileVersion: DIM_FILE_VERSION,
+      contents: resultContents,
+    });
+  }
   async removeContent(name: string) {
     if (this.dimJSON === undefined) {
       return;

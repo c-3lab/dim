@@ -267,8 +267,22 @@ export class InstallAction {
           Deno.exit(1);
         },
       );
+      const contentList: Content[] = [];
       if (lockContentList !== undefined) {
+        for (const lockContent of lockContentList) {
+          contentList.push(
+            {
+              name: lockContent.name,
+              url: lockContent.url,
+              catalogUrl: lockContent.catalogUrl,
+              catalogResourceId: lockContent.catalogResourceId,
+              postProcesses: lockContent.postProcesses,
+              headers: lockContent.headers,
+            },
+          );
+        }
         await new DimLockFileAccessor().addContents(lockContentList);
+        await new DimFileAccessor().addContents(contentList);
         if (lockContentList.length != 0) {
           console.log(
             Colors.green(`Successfully installed.`),
