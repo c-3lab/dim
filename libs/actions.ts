@@ -165,86 +165,66 @@ export class InitAction {
 export class InstallAction {
   async execute(
     options: { postProcesses?: string[]; name: string; headers?: string[] },
-    url: string | undefined,
+    url: string,
   ) {
     await createDataFilesDir();
     if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
       await initDimLockFile();
     }
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
-    if (url !== undefined) {
-      const targetContent = new DimFileAccessor().getContents().find((c) =>
-        c.name === options.name
-      );
-      if (targetContent !== undefined) {
-        console.log("The name already exists.");
-        Deno.exit(1);
-      }
-      const result = await installFromURL(
-        url,
-        options.name,
-        parsedHeaders,
-      ).catch(
-        (error) => {
-          console.error(
-            Colors.red("Failed to install."),
-            Colors.red(error.message),
-          );
-          Deno.exit(1);
-        },
-      );
-      const fullPath = result.fullPath;
-      const response = result.response;
-      const lockContent: LockContent = {
-        name: options.name || url,
-        url: url,
-        path: fullPath,
-        catalogUrl: null,
-        catalogResourceId: null,
-        lastModified: null,
-        eTag: null,
-        lastDonwloaded: new Date(),
-        integrity: "",
-        postProcesses: options.postProcesses || [],
-        headers: parsedHeaders,
-      };
-      if (options.postProcesses !== undefined) {
-        await executePostprocess(options.postProcesses, fullPath);
-      }
-      const headers = response.headers;
-      lockContent.eTag = headers.get("etag");
-      if (headers.has("last-modified")) {
-        lockContent.lastModified = new Date(headers.get("last-modified")!);
-      }
-      await new DimFileAccessor().addContent(
-        url,
-        options.name || url,
-        options.postProcesses || [],
-        parsedHeaders,
-      );
-      await new DimLockFileAccessor().addContent(lockContent);
-      console.log(
-        Colors.green(`Installed to ${fullPath}`),
-      );
-    } else {
-      const lockContentList = await installFromDimFile().catch((error) => {
+    const targetContent = new DimFileAccessor().getContents().find((c) =>
+      c.name === options.name
+    );
+    if (targetContent !== undefined) {
+      console.log("The name already exists.");
+      Deno.exit(1);
+    }
+    const result = await installFromURL(
+      url,
+      options.name,
+      parsedHeaders,
+    ).catch(
+      (error) => {
         console.error(
           Colors.red("Failed to install."),
           Colors.red(error.message),
         );
         Deno.exit(1);
-      });
-      if (lockContentList !== undefined) {
-        await new DimLockFileAccessor().addContents(lockContentList);
-        if (lockContentList.length != 0) {
-          console.log(
-            Colors.green(`Successfully installed.`),
-          );
-        } else {
-          console.log("All contents have already been installed.");
-        }
-      }
+      },
+    );
+    const fullPath = result.fullPath;
+    const response = result.response;
+    const lockContent: LockContent = {
+      name: options.name,
+      url: url,
+      path: fullPath,
+      catalogUrl: null,
+      catalogResourceId: null,
+      lastModified: null,
+      eTag: null,
+      lastDonwloaded: new Date(),
+      integrity: "",
+      postProcesses: options.postProcesses || [],
+      headers: parsedHeaders,
+    };
+    if (options.postProcesses !== undefined) {
+      await executePostprocess(options.postProcesses, fullPath);
     }
+    const headers = response.headers;
+    lockContent.eTag = headers.get("etag");
+    if (headers.has("last-modified")) {
+      lockContent.lastModified = new Date(headers.get("last-modified")!);
+    }
+    await new DimFileAccessor().addContent(
+      url,
+      options.name,
+      options.postProcesses || [],
+      parsedHeaders,
+    );
+    await new DimLockFileAccessor().addContent(lockContent);
+    console.log(
+      Colors.green(`Installed to ${fullPath}`),
+    );
   }
 }
 

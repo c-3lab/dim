@@ -29,7 +29,7 @@ await new Command()
   .command(
     "install",
     new Command()
-      .arguments("[url:string]")
+      .arguments("<url:string>")
       .option(
         "-p, --postProcesses <postProcesses>",
         "Specify post-processing when installing.",
