@@ -52,8 +52,8 @@ const installFromURL = async (
   name: string,
   headers?: Record<string, string>,
 ) => {
-  const fullPath = await new Downloader().download(new URL(url), name, headers);
-  return fullPath;
+  const result = await new Downloader().download(new URL(url), name, headers);
+  return result;
 };
 
 const installFromDimFile = async (isUpdate = false) => {
@@ -81,21 +81,30 @@ const installFromDimFile = async (isUpdate = false) => {
         new URL(content.url),
         content.name,
         content.headers,
-      ).then(async (fullPath) => {
+      ).then(async (result) => {
+        const fullPath = result.fullPath;
+        const response = result.response;
         consoleAnimation.stop();
         await executePostprocess(content.postProcesses, fullPath);
+
+        const headers = response.headers;
+        let lastModified: Date | null = null;
+        if (headers.has("last-modified")) {
+          lastModified = new Date(headers.get("last-modified")!);
+        }
         console.log(
           Colors.green(`Installed to ${fullPath}`),
         );
         console.log();
+
         resolve({
           name: content.name,
           url: content.url,
           path: fullPath,
           catalogUrl: null,
           catalogResourceId: null,
-          lastModified: null,
-          eTag: null,
+          lastModified: lastModified,
+          eTag: headers.get("etag"),
           lastDonwloaded: new Date(),
           integrity: "",
           postProcesses: content.postProcesses,
@@ -171,7 +180,7 @@ export class InstallAction {
         console.log("The name already exists.");
         Deno.exit(1);
       }
-      const fullPath = await installFromURL(
+      const result = await installFromURL(
         url,
         options.name,
         parsedHeaders,
@@ -184,6 +193,8 @@ export class InstallAction {
           Deno.exit(1);
         },
       );
+      const fullPath = result.fullPath;
+      const response = result.response;
       const lockContent: LockContent = {
         name: options.name || url,
         url: url,
@@ -199,6 +210,11 @@ export class InstallAction {
       };
       if (options.postProcesses !== undefined) {
         await executePostprocess(options.postProcesses, fullPath);
+      }
+      const headers = response.headers;
+      lockContent.eTag = headers.get("etag");
+      if (headers.has("last-modified")) {
+        lockContent.lastModified = new Date(headers.get("last-modified")!);
       }
       await new DimFileAccessor().addContent(
         url,
@@ -377,7 +393,7 @@ export class UpdateAction {
         );
         Deno.exit(1);
       }
-      const fullPath = await installFromURL(
+      const result = await installFromURL(
         content.url,
         name,
       ).catch(
@@ -389,6 +405,8 @@ export class UpdateAction {
           Deno.exit(1);
         },
       );
+      const fullPath = result.fullPath;
+      const response = result.response;
       const lockContent: LockContent = {
         name: name,
         url: content.url,
@@ -405,7 +423,11 @@ export class UpdateAction {
       if (options.postProcesses !== undefined) {
         await executePostprocess(options.postProcesses, fullPath);
       }
-      await new DimLockFileAccessor().addContent(lockContent);
+      const headers = response.headers;
+      lockContent.eTag = headers.get("etag");
+      if (headers.has("last-modified")) {
+        lockContent.lastModified = new Date(headers.get("last-modified")!);
+      }
       console.log(
         Colors.green(`Updated ${content.name}.`),
         `\nFile path:`,
