@@ -38,7 +38,6 @@ await new Command()
       .option(
         "-n, --name <name:string>",
         "Specify the name.This is required.",
-        { required: true },
       )
       .option(
         "-H, --headers <headers:string>",

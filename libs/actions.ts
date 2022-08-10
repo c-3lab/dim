@@ -164,7 +164,11 @@ export class InitAction {
 
 export class InstallAction {
   async execute(
-    options: { postProcesses?: string[]; name: string; headers?: string[] },
+    options: {
+      postProcesses?: string[];
+      name?: string;
+      headers?: string[];
+    },
     url: string | undefined,
   ) {
     await createDataFilesDir();
@@ -173,6 +177,10 @@ export class InstallAction {
     }
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
     if (url !== undefined) {
+      if (options.name === undefined) {
+        console.log(Colors.red("The -n option is not specified."));
+        Deno.exit(1);
+      }
       const targetContent = new DimFileAccessor().getContents().find((c) =>
         c.name === options.name
       );
