@@ -204,7 +204,7 @@ export class InstallAction {
       const fullPath = result.fullPath;
       const response = result.response;
       const lockContent: LockContent = {
-        name: options.name || url,
+        name: options.name,
         url: url,
         path: fullPath,
         catalogUrl: null,
@@ -226,7 +226,7 @@ export class InstallAction {
       }
       await new DimFileAccessor().addContent(
         url,
-        options.name || url,
+        options.name,
         options.postProcesses || [],
         parsedHeaders,
       );
