@@ -105,7 +105,7 @@ This command stores information about installed data in `dim.json` and
 `dim-lock.json`.
 
 ```
-$ dim install [url] -n [name]
+$ dim install https://example.com -n "example"
 ```
 
 3. Installed data is saved in `data_files`.
@@ -150,54 +150,80 @@ $ dim init
 
 ## Install
 
-Install the all data.
+### Install the all data.
 
 ```
 $ dim install
 ```
 
-Install the specified data.
+Install from a specified local `dim.json`.
 
 ```
-$ dim install [url] -n [name]
+$ dim install -f ./path/dim.json
 ```
 
-### Postprocess unzip
+Install from a specified remote `dim.json` in internet.
 
 ```
-$ dim install [url] -p unzip
+$ dim install -f https://raw.githubusercontent.com/xxxx/xxxx/main/dim.json
 ```
 
-### Postprocess encoding-
+### Install the specified data.
 
 ```
-$ dim install [url] -p encoding-utf-8
+$ dim install https://example.com -n "example"
 ```
 
-### Postprocess xlsx-to-csv
+Specify headers.
 
 ```
-$ dim install [url] -p xlsx-to-csv
+$ dim install https://example.com -n "example" -H "Authorization : 1234567890abc" -H "Fiware-Service : example"
 ```
 
-### Postprocess custom command
+Specify the installation post-process
+
+Postprocess unzip
+
+```
+$ dim install https://example.com -n "example" -p unzip
+```
+
+Postprocess encoding
+
+```
+$ dim install https://example.com -n "example" -p "encode utf-8"
+```
+
+Postprocess xlsx-to-csv
+
+```
+$ dim install https://example.com -n "example" -p xlsx-to-csv
+```
+
+Postprocess custom command
 
 You can specify a custom command after **"CMD:"**.
 
 ```
-$ dim install [url] -p CMD:******
+$ dim install https://example.com -n "example" -p "CMD:******"
 ```
 
 The file path will be passed as an argument at the end of the specified command.
 
 ```
-$ dim install [url] -p "CMD:python ./tests/test_custom_command.py"
+$ dim install https://example.com -n "example" -p "CMD:python ./tests/test_custom_command.py"
 ```
 
 Command to be executed during postprocessing.
 
 ```
 $ python ./tests/test_custom_command.py ./data_files/***/***.xx
+```
+
+### Forced execution
+Forced install. Overwrite already exist data file.
+```
+$ dim install https://example.com -n "example" -F
 ```
 
 ## Uninstall
