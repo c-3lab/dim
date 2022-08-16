@@ -46,7 +46,7 @@ await new Command()
       )
       .option(
         "-F, --force",
-        "Force execution.",
+        "Forced install. Overwrite already exist data file.",
       )
       .description(
         "Install the data.\n" +
