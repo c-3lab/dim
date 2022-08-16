@@ -56,8 +56,17 @@ const installFromURL = async (
   return result;
 };
 
-const installFromDimFile = async (isUpdate = false) => {
-  let contents = new DimFileAccessor().getContents();
+const installFromDimFile = async (path: string, isUpdate = false) => {
+  let contents;
+  if (path.match(/^https?:\/\//)) {
+    const dimJson: DimJSON = await ky.get(
+      path,
+    ).json<DimJSON>();
+    contents = dimJson.contents;
+  } else {
+    contents = new DimFileAccessor(path).getContents();
+  }
+
   if (contents.length == 0) {
     console.log("No contents.\nYou should run a 'dim install <data url>'. ");
     return;
@@ -168,10 +177,17 @@ export class InstallAction {
       postProcesses?: string[];
       name?: string;
       headers?: string[];
+      file?: string;
       force?: boolean;
     },
     url: string | undefined,
   ) {
+    if (url && options.file) {
+      console.log(
+        Colors.red("Cannot use -f option and URL at the same time."),
+      );
+      Deno.exit(1);
+    }
     await createDataFilesDir();
     if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
       await initDimLockFile();
@@ -239,7 +255,10 @@ export class InstallAction {
         Colors.green(`Installed to ${fullPath}`),
       );
     } else {
-      const lockContentList = await installFromDimFile(options.force).catch(
+      const lockContentList = await installFromDimFile(
+        options.file || DEFAULT_DIM_FILE_PATH,
+        options.force,
+      ).catch(
         (error) => {
           console.error(
             Colors.red("Failed to install."),
@@ -248,8 +267,22 @@ export class InstallAction {
           Deno.exit(1);
         },
       );
+      const contentList: Content[] = [];
       if (lockContentList !== undefined) {
+        for (const lockContent of lockContentList) {
+          contentList.push(
+            {
+              name: lockContent.name,
+              url: lockContent.url,
+              catalogUrl: lockContent.catalogUrl,
+              catalogResourceId: lockContent.catalogResourceId,
+              postProcesses: lockContent.postProcesses,
+              headers: lockContent.headers,
+            },
+          );
+        }
         await new DimLockFileAccessor().addContents(lockContentList);
+        await new DimFileAccessor().addContents(contentList);
         if (lockContentList.length != 0) {
           console.log(
             Colors.green(`Successfully installed.`),
@@ -451,13 +484,18 @@ export class UpdateAction {
         Colors.yellow(fullPath),
       );
     } else {
-      const lockContentList = await installFromDimFile(true).catch((error) => {
-        console.error(
-          Colors.red("Failed to update."),
-          Colors.red(error.message),
-        );
-        Deno.exit(1);
-      });
+      const lockContentList = await installFromDimFile(
+        DEFAULT_DIM_FILE_PATH,
+        true,
+      ).catch(
+        (error) => {
+          console.error(
+            Colors.red("Failed to update."),
+            Colors.red(error.message),
+          );
+          Deno.exit(1);
+        },
+      );
       if (lockContentList !== undefined) {
         await new DimLockFileAccessor().addContents(lockContentList);
       }

@@ -9,9 +9,9 @@ import {
 
 export class DimFileAccessor {
   private dimJSON: DimJSON | undefined;
-  constructor() {
-    if (existsSync(DEFAULT_DIM_FILE_PATH)) {
-      this.dimJSON = JSON.parse(Deno.readTextFileSync(DEFAULT_DIM_FILE_PATH));
+  constructor(path = DEFAULT_DIM_FILE_PATH) {
+    if (existsSync(path)) {
+      this.dimJSON = JSON.parse(Deno.readTextFileSync(path));
     } else {
       console.log("Not found a dim.json. You should run a 'dim init'. ");
       Deno.exit(0);
@@ -48,6 +48,25 @@ export class DimFileAccessor {
     await this.writeToDimFile({
       fileVersion: DIM_FILE_VERSION,
       contents: contents,
+    });
+  }
+  async addContents(contents: Content[]) {
+    if (this.dimJSON === undefined) {
+      return;
+    }
+    // Override the existing content.
+    const currentContents = this.dimJSON.contents.filter((c) =>
+      !contents.map((newContent) => newContent.name).includes(
+        c.name,
+      )
+    );
+    const resultContents = new Array<Content>(
+      ...currentContents,
+      ...contents,
+    );
+    await this.writeToDimFile({
+      fileVersion: DIM_FILE_VERSION,
+      contents: resultContents,
     });
   }
   async removeContent(name: string) {

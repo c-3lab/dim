@@ -45,6 +45,10 @@ await new Command()
         { collect: true },
       )
       .option(
+        "-f, --file <file:string>",
+        "Specify the dim.json file when installing data.",
+      )
+      .option(
         "-F, --force",
         "Forced install. Overwrite already exist data file.",
       )
