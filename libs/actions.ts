@@ -625,7 +625,7 @@ export class SearchAction {
       for (const resource of catalog.resources) {
         console.log(`    ${i}.`, resource.name);
         console.log(
-          "      * Resourse URL        :",
+          "      * Resource URL        :",
           Colors.green(resource.url == null ? "" : resource.url),
         );
         console.log(
