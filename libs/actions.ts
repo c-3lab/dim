@@ -608,50 +608,50 @@ export class SearchAction {
     const catalogs = response.result.results;
 
     let i = 1;
-    if (options.install == true) {
-      const catalogResources: CatalogResource[] = [];
-      for (const catalog of catalogs) {
-        console.log(catalog.xckan_title);
+    const catalogResources: CatalogResource[] = [];
+    for (const catalog of catalogs) {
+      console.log(catalog.xckan_title);
+      console.log(
+        "  - Catalog URL        :",
+        Colors.green(catalog.xckan_site_url),
+      );
+      console.log(
+        "  - Catalog Description:",
+        Colors.green(
+          catalog.xckan_description == null
+            ? ""
+            : catalog.xckan_description.replace(/\r(?!\n)/g, "\n"),
+        ),
+      );
+      console.log(
+        "  - Catalog License    :",
+        Colors.green(
+          catalog.license_title == null ? "" : catalog.license_title,
+        ),
+      );
+      for (const resource of catalog.resources) {
+        console.log(`    ${i}.`, resource.name);
         console.log(
-          "  - Catalog URL        :",
-          Colors.green(catalog.xckan_site_url),
+          "      * Resourse URL        :",
+          Colors.green(resource.url == null ? "" : resource.url),
         );
         console.log(
-          "  - Catalog Description:",
+          "      * Resource Description:",
           Colors.green(
-            catalog.xckan_description == null
+            resource.description == null
               ? ""
-              : catalog.xckan_description.replace(/\r(?!\n)/g, "\n"),
+              : resource.description.replace(/\r(?!\n)/g, "\n"),
           ),
         );
         console.log(
-          "  - Catalog License    :",
-          Colors.green(
-            catalog.license_title == null ? "" : catalog.license_title,
-          ),
+          "      * Created             :",
+          Colors.green(resource.created == null ? "" : resource.created),
         );
-        for (const resource of catalog.resources) {
-          console.log(`    ${i}.`, resource.name);
-          console.log(
-            "      * Resourse URL        :",
-            Colors.green(resource.url == null ? "" : resource.url),
-          );
-          console.log(
-            "      * Resource Description:",
-            Colors.green(
-              resource.description == null
-                ? ""
-                : resource.description.replace(/\r(?!\n)/g, "\n"),
-            ),
-          );
-          console.log(
-            "      * Created             :",
-            Colors.green(resource.created == null ? "" : resource.created),
-          );
-          console.log(
-            "      * Format              :",
-            Colors.green(resource.format == null ? "" : resource.format),
-          );
+        console.log(
+          "      * Format              :",
+          Colors.green(resource.format == null ? "" : resource.format),
+        );
+        if (options.install) {
           catalogResources.push(
             {
               catalogTitle: catalog.xckan_title,
@@ -661,11 +661,13 @@ export class SearchAction {
               url: resource.url,
             },
           );
-          i++;
         }
-        console.log();
+        i++;
       }
+      console.log();
+    }
 
+    if (options.install) {
       const enteredNumber = await Number.prompt({
         message: "Enter the number of the data to install",
         min: 1,
@@ -725,53 +727,6 @@ export class SearchAction {
         name,
         postProcesses,
       );
-    } else {
-      for (const catalog of catalogs) {
-        console.log(catalog.xckan_title);
-        console.log(
-          "  - Catalog URL        :",
-          Colors.green(catalog.xckan_site_url),
-        );
-        console.log(
-          "  - Catalog Description:",
-          Colors.green(
-            catalog.xckan_description == null
-              ? ""
-              : catalog.xckan_description.replace(/\r(?!\n)/g, "\n"),
-          ),
-        );
-        console.log(
-          "  - Catalog License    :",
-          Colors.green(
-            catalog.license_title == null ? "" : catalog.license_title,
-          ),
-        );
-        for (const resource of catalog.resources) {
-          console.log(`    ${i}.`, resource.name);
-          console.log(
-            "      * Resourse URL        :",
-            Colors.green(resource.url == null ? "" : resource.url),
-          );
-          console.log(
-            "      * Resource Description:",
-            Colors.green(
-              resource.description == null
-                ? ""
-                : resource.description.replace(/\r(?!\n)/g, "\n"),
-            ),
-          );
-          console.log(
-            "      * Created             :",
-            Colors.green(resource.created == null ? "" : resource.created),
-          );
-          console.log(
-            "      * Format              :",
-            Colors.green(resource.format == null ? "" : resource.format),
-          );
-          i++;
-        }
-        console.log();
-      }
     }
   }
 }
