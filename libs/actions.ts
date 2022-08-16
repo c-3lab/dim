@@ -117,7 +117,7 @@ const installFromDimFile = async (path: string, isUpdate = false) => {
           lastDonwloaded: new Date(),
           integrity: "",
           postProcesses: content.postProcesses,
-          headers: {},
+          headers: content.headers,
         });
       });
     });
@@ -479,6 +479,7 @@ export class UpdateAction {
       const result = await installFromURL(
         content.url,
         name,
+        content.headers,
       ).catch(
         (error) => {
           console.error(
@@ -501,7 +502,7 @@ export class UpdateAction {
         lastDonwloaded: new Date(),
         integrity: "",
         postProcesses: options.postProcesses || [],
-        headers: {},
+        headers: content.headers,
       };
       if (options.postProcesses !== undefined) {
         await executePostprocess(options.postProcesses, fullPath);
