@@ -212,13 +212,6 @@ const installFromCatalog = async (
   name: string,
   postProcesses: string[],
 ) => {
-  const targetContent = new DimFileAccessor().getContents().find((c) =>
-    c.name === name
-  );
-  if (targetContent !== undefined) {
-    console.log("The name already exists.");
-    Deno.exit(1);
-  }
   const fullPath = await installFromURL(
     catalogResource.url,
     name,
@@ -721,6 +714,14 @@ export class SearchAction {
         ? catalogResources[enteredNumber - 1].catalogTitle + "_" +
           catalogResources[enteredNumber - 1].name
         : enteredName;
+
+      const targetContent = new DimFileAccessor().getContents().find((c) =>
+        c.name === name
+      );
+      if (targetContent !== undefined) {
+        console.log("The name already exists.");
+        Deno.exit(1);
+      }
 
       installFromCatalog(
         catalogResources[enteredNumber - 1],
