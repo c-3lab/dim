@@ -228,9 +228,8 @@ const installFromCatalog = async (
       Deno.exit(1);
     },
   );
-  console.log(
-    Colors.green(`Installed to ${fullPath}`),
-  );
+
+  return fullPath;
 };
 
 const executePostprocess = async (
@@ -723,10 +722,14 @@ export class SearchAction {
         Deno.exit(1);
       }
 
-      installFromCatalog(
+      const fullPath = await installFromCatalog(
         catalogResources[enteredNumber - 1],
         name,
         postProcesses,
+      );
+
+      console.log(
+        Colors.green(`Installed to ${fullPath}`),
       );
     }
   }
