@@ -128,23 +128,56 @@ const executePostprocess = async (
   postProcesses: string[],
   targetPath: string,
 ) => {
-  for (const p of postProcesses) {
-    if (p.startsWith("encoding-")) {
-      const encodingTo = p.replace("encoding-", "").toUpperCase();
+  for (const postProcess of postProcesses) {
+    const [type, ...argumentList] = postProcess.split(" ");
+    if (type === "encode") {
+      if (argumentList.length === 0) {
+        console.log(
+          Colors.red("Argument not specified."),
+        );
+        Deno.exit(1);
+      } else if (argumentList.length > 1) {
+        console.log(
+          Colors.red("error: Too many arguments:"),
+          Colors.red(type + " " + argumentList.join(" ")),
+        );
+        Deno.exit(1);
+      }
+      const encodingTo = argumentList[0].toUpperCase();
       await new Encoder().encodeFile(targetPath, encodingTo);
       console.log("Converted encoding to", encodingTo);
-    } else if (p === "unzip") {
+    } else if (type === "unzip") {
+      if (argumentList.length > 0) {
+        console.log(
+          Colors.red("error: Too many arguments:"),
+          Colors.red(type + " " + argumentList.join(" ")),
+        );
+        Deno.exit(1);
+      }
       const targetDir = await new Unzipper().unzip(targetPath);
       console.log(`Unzip the file to ${targetDir}`);
-    } else if (p === "xlsx-to-csv") {
+    } else if (type === "xlsx-to-csv") {
+      if (argumentList.length > 0) {
+        console.log(
+          Colors.red("error: Too many arguments:"),
+          Colors.red(type + " " + argumentList.join(" ")),
+        );
+        Deno.exit(1);
+      }
       await new XLSXConverter().convertToCSV(targetPath);
       console.log(`Convert xlsx to csv.`);
-    } else if (p.startsWith("CMD:")) {
-      const script = p.replace("CMD:", "");
-      await new Command().execute(script, targetPath);
+    } else if (postProcess.startsWith("CMD:")) {
+      const script = postProcess.replace("CMD:", "");
+      if (script === "") {
+        console.log(
+          Colors.red("No command entered"),
+        );
+        Deno.exit(1);
+      }
+      await new Command().execute(script.trim(), targetPath);
       console.log("Execute Command: ", script, targetPath);
     } else {
-      console.log(`No support a postprocess '${p}'.`);
+      console.log(`No support a postprocess '${postProcess}'.`);
     }
   }
 };
