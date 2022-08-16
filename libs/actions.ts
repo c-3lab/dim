@@ -168,6 +168,7 @@ export class InstallAction {
       postProcesses?: string[];
       name?: string;
       headers?: string[];
+      force?: boolean;
     },
     url: string | undefined,
   ) {
@@ -184,8 +185,11 @@ export class InstallAction {
       const targetContent = new DimFileAccessor().getContents().find((c) =>
         c.name === options.name
       );
-      if (targetContent !== undefined) {
+      if (targetContent !== undefined && !options.force) {
         console.log("The name already exists.");
+        console.log(
+          "Use the -F option to force installation and overwrite existing files.",
+        );
         Deno.exit(1);
       }
       const result = await installFromURL(
@@ -235,13 +239,15 @@ export class InstallAction {
         Colors.green(`Installed to ${fullPath}`),
       );
     } else {
-      const lockContentList = await installFromDimFile().catch((error) => {
-        console.error(
-          Colors.red("Failed to install."),
-          Colors.red(error.message),
-        );
-        Deno.exit(1);
-      });
+      const lockContentList = await installFromDimFile(options.force).catch(
+        (error) => {
+          console.error(
+            Colors.red("Failed to install."),
+            Colors.red(error.message),
+          );
+          Deno.exit(1);
+        },
+      );
       if (lockContentList !== undefined) {
         await new DimLockFileAccessor().addContents(lockContentList);
         if (lockContentList.length != 0) {
@@ -250,6 +256,9 @@ export class InstallAction {
           );
         } else {
           console.log("All contents have already been installed.");
+          console.log(
+            "Use the -F option to force installation and overwrite existing files.",
+          );
         }
       }
     }
