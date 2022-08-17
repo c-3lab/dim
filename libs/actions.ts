@@ -688,7 +688,7 @@ export class SearchAction {
 
     const postProcesses: string[] = [];
     const encodingPostProcesses = ENCODINGS.map((encoding) =>
-      `encoding ${encoding.toLowerCase()}`
+      `encode ${encoding.toLowerCase()}`
     );
     const availablePostProcesses = [
       "unzip",
@@ -701,7 +701,7 @@ export class SearchAction {
         message:
           "Enter the post-processing you want to add. Enter blank if not required.",
         hint:
-          "(ex.: > unzip, xlsx-to-csv, encoding utf-8 or CMD:[some cli command])",
+          "(ex.: > unzip, xlsx-to-csv, encode utf-8 or CMD:[some cli command])",
         validate: (text) => {
           return text === "" || text.startsWith("CMD:") ||
             availablePostProcesses.includes(text);
