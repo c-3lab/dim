@@ -597,6 +597,15 @@ export class SearchAction {
       );
       Deno.exit(1);
     }
+
+    if (response.result.results.length === 0) {
+      console.error(
+        Colors.red("There were no results matching your keywords."),
+        Colors.red("Please change the keyword and search again."),
+      );
+      Deno.exit(1);
+    }
+
     const catalogs = response.result.results;
 
     let i = 1;
