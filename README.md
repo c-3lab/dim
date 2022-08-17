@@ -22,7 +22,7 @@ manager.
 
 ### Install the dim from binary files
 
-Donwload the dim from binary files.
+Download the dim from binary files.
 
 [aarch64-apple-darwin](https://github.com/c-3lab/dim/raw/main/bin/aarch64-apple-darwin/dim)
 

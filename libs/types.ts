@@ -16,7 +16,7 @@ export interface LockContent {
   catalogResourceId: string | null;
   lastModified: Date | null;
   eTag: string | null;
-  lastDonwloaded: Date;
+  lastDownloaded: Date;
   integrity: string;
   postProcesses: string[];
   headers: { [key: string]: string };

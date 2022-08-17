@@ -114,7 +114,7 @@ const installFromDimFile = async (path: string, isUpdate = false) => {
           catalogResourceId: null,
           lastModified: lastModified,
           eTag: headers.get("etag"),
-          lastDonwloaded: new Date(),
+          lastDownloaded: new Date(),
           integrity: "",
           postProcesses: content.postProcesses,
           headers: content.headers,
@@ -264,7 +264,7 @@ export class InstallAction {
         catalogResourceId: null,
         lastModified: null,
         eTag: null,
-        lastDonwloaded: new Date(),
+        lastDownloaded: new Date(),
         integrity: "",
         postProcesses: options.postProcesses || [],
         headers: parsedHeaders,
@@ -386,7 +386,7 @@ export class ListAction {
           content.catalogResourceId,
           content.lastModified,
           content.eTag,
-          content.lastDonwloaded,
+          content.lastDownloaded,
           content.integrity,
           content.postProcesses.join(","),
           content.headers,
@@ -426,7 +426,7 @@ export class ListAction {
           Colors.green(
             content.lastModified === null
               ? "null"
-              : content.lastDonwloaded.toString(),
+              : content.lastDownloaded.toString(),
           ),
         );
         console.log(
@@ -434,8 +434,8 @@ export class ListAction {
           Colors.green(content.eTag === null ? "null" : content.eTag),
         );
         console.log(
-          "  - Last donwloaded   :",
-          Colors.green(content.lastDonwloaded.toString()),
+          "  - Last downloaded   :",
+          Colors.green(content.lastDownloaded.toString()),
         );
         console.log(
           "  - Integrity         :",
@@ -499,7 +499,7 @@ export class UpdateAction {
         catalogResourceId: null,
         lastModified: null,
         eTag: null,
-        lastDonwloaded: new Date(),
+        lastDownloaded: new Date(),
         integrity: "",
         postProcesses: options.postProcesses || [],
         headers: content.headers,
