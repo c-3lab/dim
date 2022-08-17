@@ -106,7 +106,11 @@ const installFromURL = async (
   return result.fullPath;
 };
 
-const installFromDimFile = async (path: string, isUpdate = false) => {
+const installFromDimFile = async (
+  path: string,
+  asyncInstall = false,
+  isUpdate = false,
+) => {
   await createDataFilesDir();
   if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
     await initDimLockFile();
@@ -134,57 +138,78 @@ const installFromDimFile = async (path: string, isUpdate = false) => {
       );
     contents = contents.filter(isNotInstalled);
   }
-  const downloadList = contents.map((content) => {
-    return new Promise<LockContent>((resolve) => {
-      const consoleAnimation = new ConsoleAnimation(
-        ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
-        `Installing ${content.url} ...`,
-      );
-      consoleAnimation.start(100);
-      new Downloader().download(
-        new URL(content.url),
-        content.name,
-        content.headers,
-      ).then(async (result) => {
-        const fullPath = result.fullPath;
-        const response = result.response;
-        consoleAnimation.stop();
-        await executePostprocess(content.postProcesses, fullPath);
-
-        const headers = response.headers;
-        let lastModified: Date | null = null;
-        if (headers.has("last-modified")) {
-          lastModified = new Date(headers.get("last-modified")!);
-        }
+  const installList = contents.map((content) => {
+    return function () {
+      return new Promise<LockContent>(async (resolve) => {
         console.log(
-          Colors.green(`Installed to ${fullPath}`),
+          Colors.green(`Installing ${content.url}`),
         );
-        console.log();
+        const consoleAnimation = new ConsoleAnimation(
+          ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
+          `Installing ${content.url} ...`,
+        );
+        consoleAnimation.start(100);
+        new Downloader().download(
+          new URL(content.url),
+          content.name,
+          content.headers,
+        ).then(async (result) => {
+          const fullPath = result.fullPath;
+          const response = result.response;
+          consoleAnimation.stop();
+          await executePostprocess(content.postProcesses, fullPath);
 
-        resolve({
-          name: content.name,
-          url: content.url,
-          path: fullPath,
-          catalogUrl: null,
-          catalogResourceId: null,
-          lastModified: lastModified,
-          eTag: headers.get("etag"),
-          lastDownloaded: new Date(),
-          integrity: "",
-          postProcesses: content.postProcesses,
-          headers: content.headers,
+          const headers = response.headers;
+          let lastModified: Date | null = null;
+          if (headers.has("last-modified")) {
+            lastModified = new Date(headers.get("last-modified")!);
+          }
+          console.log(
+            Colors.green(`Installed to ${fullPath}`),
+          );
+          console.log();
+
+          resolve({
+            name: content.name,
+            url: content.url,
+            path: fullPath,
+            catalogUrl: null,
+            catalogResourceId: null,
+            lastModified: lastModified,
+            eTag: headers.get("etag"),
+            lastDownloaded: new Date(),
+            integrity: "",
+            postProcesses: content.postProcesses,
+            headers: content.headers,
+          });
         });
       });
-    });
+    };
   });
+  let lockContentList: LockContent[] = [];
 
-  const lockContentList = await Promise.all(downloadList).catch((error) => {
-    console.error(
-      Colors.red("Failed to process."),
-      Colors.red(error.message),
-    );
-    Deno.exit(1);
-  });
+  if (!asyncInstall) {
+    for (const install of installList) {
+      const lockContent = await install().catch((error) => {
+        console.error(
+          Colors.red("Failed to process."),
+          Colors.red(error.message),
+        );
+        Deno.exit(1);
+      });
+      lockContentList.push(lockContent);
+    }
+  } else {
+    lockContentList = await Promise.all(
+      installList.map((install) => install()),
+    ).catch((error) => {
+      console.error(
+        Colors.red("Failed to process."),
+        Colors.red(error.message),
+      );
+      Deno.exit(1);
+    });
+  }
 
   const contentList: Content[] = [];
   if (lockContentList !== undefined) {
@@ -320,6 +345,7 @@ export class InstallAction {
       headers?: string[];
       file?: string;
       force?: boolean;
+      asyncInstall?: boolean;
     },
     url: string | undefined,
   ) {
@@ -366,6 +392,7 @@ export class InstallAction {
     } else {
       const lockContentList = await installFromDimFile(
         options.file || DEFAULT_DIM_FILE_PATH,
+        options.asyncInstall,
         options.force,
       );
       if (lockContentList !== undefined) {
@@ -510,7 +537,7 @@ export class ListAction {
 
 export class UpdateAction {
   async execute(
-    options: { postProcesses?: string[] },
+    options: { postProcesses?: string[]; asyncInstall?: boolean },
     name: string | undefined,
   ) {
     if (name !== undefined) {
@@ -545,7 +572,11 @@ export class UpdateAction {
         Colors.yellow(fullPath),
       );
     } else {
-      await installFromDimFile(DEFAULT_DIM_FILE_PATH, true);
+      await installFromDimFile(
+        DEFAULT_DIM_FILE_PATH,
+        options.asyncInstall,
+        true,
+      );
       console.log(
         Colors.green(`Successfully Updated.`),
       );
