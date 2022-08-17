@@ -28,6 +28,8 @@ export class DimFileAccessor {
     name: string,
     postProcesses: string[],
     headers: Record<string, string>,
+    catalogUrl: string | null = null,
+    catalogResourceId: string | null = null,
   ) {
     if (this.dimJSON === undefined) {
       return;
@@ -35,8 +37,8 @@ export class DimFileAccessor {
     const content: Content = {
       url,
       name,
-      catalogUrl: null,
-      catalogResourceId: null,
+      catalogUrl,
+      catalogResourceId,
       postProcesses,
       headers: headers,
     };

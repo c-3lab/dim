@@ -1,4 +1,13 @@
-import { Colors, ensureDir, ensureFile, existsSync, ky } from "../deps.ts";
+import {
+  Colors,
+  Confirm,
+  ensureDir,
+  ensureFile,
+  existsSync,
+  Input,
+  ky,
+  Number,
+} from "../deps.ts";
 import {
   DEFAULT_DATAFILES_PATH,
   DEFAULT_DIM_FILE_PATH,
@@ -6,11 +15,13 @@ import {
   DEFAULT_SEARCH_ENDPOINT,
   DIM_FILE_VERSION,
   DIM_LOCK_FILE_VERSION,
+  ENCODINGS,
 } from "./consts.ts";
 import { Downloader } from "./downloader.ts";
 import { ConsoleAnimation } from "./console_animation.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import {
+  CatalogResource,
   CkanApiResponse,
   Content,
   DimJSON,
@@ -50,13 +61,57 @@ const createDataFilesDir = async () => {
 const installFromURL = async (
   url: string,
   name: string,
-  headers?: Record<string, string>,
+  postProcesses: string[] | undefined,
+  headers: Record<string, string> = {},
+  catalogUrl: string | null = null,
+  catalogResourceId: string | null = null,
 ) => {
+  await createDataFilesDir();
+  if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
+    await initDimLockFile();
+  }
+
   const result = await new Downloader().download(new URL(url), name, headers);
-  return result;
+  if (postProcesses !== undefined) {
+    await executePostprocess(postProcesses, result.fullPath);
+  }
+  const lockContent: LockContent = {
+    name: name,
+    url: url,
+    path: result.fullPath,
+    catalogUrl: catalogUrl,
+    catalogResourceId: catalogResourceId,
+    lastModified: null,
+    eTag: null,
+    lastDownloaded: new Date(),
+    integrity: "",
+    postProcesses: postProcesses || [],
+    headers: headers,
+  };
+  const responseHeaders = result.response.headers;
+  lockContent.eTag = responseHeaders.get("etag");
+  if (responseHeaders.has("last-modified")) {
+    lockContent.lastModified = new Date(responseHeaders.get("last-modified")!);
+  }
+  await new DimFileAccessor().addContent(
+    url,
+    name,
+    postProcesses || [],
+    headers,
+    catalogUrl,
+    catalogResourceId,
+  );
+  await new DimLockFileAccessor().addContent(lockContent);
+
+  return result.fullPath;
 };
 
 const installFromDimFile = async (path: string, isUpdate = false) => {
+  await createDataFilesDir();
+  if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
+    await initDimLockFile();
+  }
+
   let contents;
   if (path.match(/^https?:\/\//)) {
     const dimJson: DimJSON = await ky.get(
@@ -122,8 +177,61 @@ const installFromDimFile = async (path: string, isUpdate = false) => {
       });
     });
   });
-  return await Promise.all(downloadList);
+
+  const lockContentList = await Promise.all(downloadList).catch((error) => {
+    console.error(
+      Colors.red("Failed to process."),
+      Colors.red(error.message),
+    );
+    Deno.exit(1);
+  });
+
+  const contentList: Content[] = [];
+  if (lockContentList !== undefined) {
+    for (const lockContent of lockContentList) {
+      contentList.push(
+        {
+          name: lockContent.name,
+          url: lockContent.url,
+          catalogUrl: lockContent.catalogUrl,
+          catalogResourceId: lockContent.catalogResourceId,
+          postProcesses: lockContent.postProcesses,
+          headers: lockContent.headers,
+        },
+      );
+    }
+    await new DimLockFileAccessor().addContents(lockContentList);
+    await new DimFileAccessor().addContents(contentList);
+  }
+
+  return lockContentList;
 };
+
+const installFromCatalog = async (
+  catalogResource: CatalogResource,
+  name: string,
+  postProcesses: string[],
+) => {
+  const fullPath = await installFromURL(
+    catalogResource.url,
+    name,
+    postProcesses,
+    {},
+    catalogResource.catalogUrl,
+    catalogResource.id,
+  ).catch(
+    (error) => {
+      console.error(
+        Colors.red("Failed to install."),
+        Colors.red(error.message),
+      );
+      Deno.exit(1);
+    },
+  );
+
+  return fullPath;
+};
+
 const executePostprocess = async (
   postProcesses: string[],
   targetPath: string,
@@ -221,10 +329,7 @@ export class InstallAction {
       );
       Deno.exit(1);
     }
-    await createDataFilesDir();
-    if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
-      await initDimLockFile();
-    }
+
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
     if (url !== undefined) {
       if (options.name === undefined) {
@@ -241,9 +346,10 @@ export class InstallAction {
         );
         Deno.exit(1);
       }
-      const result = await installFromURL(
+      const fullPath = await installFromURL(
         url,
         options.name,
+        options.postProcesses,
         parsedHeaders,
       ).catch(
         (error) => {
@@ -254,36 +360,6 @@ export class InstallAction {
           Deno.exit(1);
         },
       );
-      const fullPath = result.fullPath;
-      const response = result.response;
-      const lockContent: LockContent = {
-        name: options.name,
-        url: url,
-        path: fullPath,
-        catalogUrl: null,
-        catalogResourceId: null,
-        lastModified: null,
-        eTag: null,
-        lastDownloaded: new Date(),
-        integrity: "",
-        postProcesses: options.postProcesses || [],
-        headers: parsedHeaders,
-      };
-      if (options.postProcesses !== undefined) {
-        await executePostprocess(options.postProcesses, fullPath);
-      }
-      const headers = response.headers;
-      lockContent.eTag = headers.get("etag");
-      if (headers.has("last-modified")) {
-        lockContent.lastModified = new Date(headers.get("last-modified")!);
-      }
-      await new DimFileAccessor().addContent(
-        url,
-        options.name,
-        options.postProcesses || [],
-        parsedHeaders,
-      );
-      await new DimLockFileAccessor().addContent(lockContent);
       console.log(
         Colors.green(`Installed to ${fullPath}`),
       );
@@ -291,31 +367,8 @@ export class InstallAction {
       const lockContentList = await installFromDimFile(
         options.file || DEFAULT_DIM_FILE_PATH,
         options.force,
-      ).catch(
-        (error) => {
-          console.error(
-            Colors.red("Failed to install."),
-            Colors.red(error.message),
-          );
-          Deno.exit(1);
-        },
       );
-      const contentList: Content[] = [];
       if (lockContentList !== undefined) {
-        for (const lockContent of lockContentList) {
-          contentList.push(
-            {
-              name: lockContent.name,
-              url: lockContent.url,
-              catalogUrl: lockContent.catalogUrl,
-              catalogResourceId: lockContent.catalogResourceId,
-              postProcesses: lockContent.postProcesses,
-              headers: lockContent.headers,
-            },
-          );
-        }
-        await new DimLockFileAccessor().addContents(lockContentList);
-        await new DimFileAccessor().addContents(contentList);
         if (lockContentList.length != 0) {
           console.log(
             Colors.green(`Successfully installed.`),
@@ -460,10 +513,6 @@ export class UpdateAction {
     options: { postProcesses?: string[] },
     name: string | undefined,
   ) {
-    await createDataFilesDir();
-    if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
-      await initDimLockFile();
-    }
     if (name !== undefined) {
       const content = new DimLockFileAccessor().getContents().find((c) =>
         c.name === name
@@ -476,9 +525,10 @@ export class UpdateAction {
         );
         Deno.exit(1);
       }
-      const result = await installFromURL(
+      const fullPath = await installFromURL(
         content.url,
         name,
+        options.postProcesses,
         content.headers,
       ).catch(
         (error) => {
@@ -489,50 +539,13 @@ export class UpdateAction {
           Deno.exit(1);
         },
       );
-      const fullPath = result.fullPath;
-      const response = result.response;
-      const lockContent: LockContent = {
-        name: name,
-        url: content.url,
-        path: fullPath,
-        catalogUrl: null,
-        catalogResourceId: null,
-        lastModified: null,
-        eTag: null,
-        lastDownloaded: new Date(),
-        integrity: "",
-        postProcesses: options.postProcesses || [],
-        headers: content.headers,
-      };
-      if (options.postProcesses !== undefined) {
-        await executePostprocess(options.postProcesses, fullPath);
-      }
-      const headers = response.headers;
-      lockContent.eTag = headers.get("etag");
-      if (headers.has("last-modified")) {
-        lockContent.lastModified = new Date(headers.get("last-modified")!);
-      }
       console.log(
-        Colors.green(`Updated ${content.name}.`),
+        Colors.green(`Updated ${name}.`),
         `\nFile path:`,
         Colors.yellow(fullPath),
       );
     } else {
-      const lockContentList = await installFromDimFile(
-        DEFAULT_DIM_FILE_PATH,
-        true,
-      ).catch(
-        (error) => {
-          console.error(
-            Colors.red("Failed to update."),
-            Colors.red(error.message),
-          );
-          Deno.exit(1);
-        },
-      );
-      if (lockContentList !== undefined) {
-        await new DimLockFileAccessor().addContents(lockContentList);
-      }
+      await installFromDimFile(DEFAULT_DIM_FILE_PATH, true);
       console.log(
         Colors.green(`Successfully Updated.`),
       );
@@ -542,7 +555,7 @@ export class UpdateAction {
 
 export class SearchAction {
   async execute(
-    options: { number: number },
+    options: { number: number; install?: boolean },
     keyword: string,
   ) {
     if (options.number <= 0 || options.number > 100) {
@@ -584,33 +597,42 @@ export class SearchAction {
       );
       Deno.exit(1);
     }
-    const datasets = response.result.results;
+
+    if (response.result.results.length === 0) {
+      console.error(
+        Colors.red("There were no results matching your keywords."),
+        Colors.red("Please change the keyword and search again."),
+      );
+      Deno.exit(1);
+    }
+
+    const catalogs = response.result.results;
 
     let i = 1;
-    for (const dataset of datasets) {
-      console.log(dataset.xckan_title);
+    for (const catalog of catalogs) {
+      console.log(catalog.xckan_title);
       console.log(
-        "  - Package URL        :",
-        Colors.green(dataset.xckan_site_url),
+        "  - Catalog URL        :",
+        Colors.green(catalog.xckan_site_url),
       );
       console.log(
-        "  - Package Description:",
+        "  - Catalog Description:",
         Colors.green(
-          dataset.xckan_description == null
+          catalog.xckan_description == null
             ? ""
-            : dataset.xckan_description.replace(/\r(?!\n)/g, "\n"),
+            : catalog.xckan_description.replace(/\r(?!\n)/g, "\n"),
         ),
       );
       console.log(
-        "  - Package License    :",
+        "  - Catalog License    :",
         Colors.green(
-          dataset.license_title == null ? "" : dataset.license_title,
+          catalog.license_title == null ? "" : catalog.license_title,
         ),
       );
-      for (const resource of dataset.resources) {
+      for (const resource of catalog.resources) {
         console.log(`    ${i}.`, resource.name);
         console.log(
-          "      * Resourse URL        :",
+          "      * Resource URL        :",
           Colors.green(resource.url == null ? "" : resource.url),
         );
         console.log(
@@ -633,5 +655,95 @@ export class SearchAction {
       }
       console.log();
     }
+
+    if (!options.install) {
+      return;
+    }
+
+    const catalogResources: CatalogResource[] = [];
+    for (const catalog of catalogs) {
+      for (const resource of catalog.resources) {
+        catalogResources.push(
+          {
+            catalogTitle: catalog.xckan_title,
+            catalogUrl: catalog.xckan_site_url,
+            id: resource.id,
+            name: resource.name,
+            url: resource.url,
+          },
+        );
+      }
+    }
+
+    const enteredNumber = await Number.prompt({
+      message: "Enter the number of the data to install",
+      min: 1,
+      max: catalogResources.length,
+    });
+
+    const enteredName = await Input.prompt({
+      message: "Enter the name. Enter blank if want to use CKAN resource name.",
+      validate: (text) => /^[\w\-０-９ぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠\s]*$/.test(text),
+    });
+
+    const postProcesses: string[] = [];
+    const encodingPostProcesses = ENCODINGS.map((encoding) =>
+      `encode ${encoding.toLowerCase()}`
+    );
+    const availablePostProcesses = [
+      "unzip",
+      "xlsx-to-csv",
+      ...encodingPostProcesses,
+    ];
+
+    while (true) {
+      const enteredPostProcess = await Input.prompt({
+        message:
+          "Enter the post-processing you want to add. Enter blank if not required.",
+        hint:
+          "(ex.: > unzip, xlsx-to-csv, encode utf-8 or CMD:[some cli command])",
+        validate: (text) => {
+          return text === "" || text.startsWith("CMD:") ||
+            availablePostProcesses.includes(text);
+        },
+        suggestions: availablePostProcesses,
+      });
+
+      if (enteredPostProcess === "") {
+        break;
+      }
+      postProcesses.push(enteredPostProcess);
+
+      const addNext = await Confirm.prompt({
+        message: "Is there a post-processing you would like to add next?",
+        default: true,
+      });
+      if (!addNext) {
+        break;
+      }
+    }
+
+    const name = enteredName === ""
+      ? catalogResources[enteredNumber - 1].catalogTitle + "_" +
+        catalogResources[enteredNumber - 1].name
+      : enteredName;
+
+    const targetContent = new DimFileAccessor().getContents().find((c) =>
+      c.name === name
+    );
+    if (targetContent !== undefined) {
+      console.log("The name already exists.");
+      Deno.exit(1);
+    }
+
+    const fullPath = await installFromCatalog(
+      catalogResources[enteredNumber - 1],
+      name,
+      postProcesses,
+    );
+
+    console.log(
+      Colors.green(`Installed to ${fullPath}`),
+    );
   }
 }
