@@ -52,6 +52,10 @@ await new Command()
         "-F, --force",
         "Forced install. Overwrite already exist data file.",
       )
+      .option(
+        "-A, --asyncInstall",
+        "Execute asyncronous install.",
+      )
       .description(
         "Install the data.\n" +
           "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",
@@ -86,6 +90,10 @@ await new Command()
         "-p, --postProcesses <postProcesses>",
         "Specify post-processing when installing.",
         { collect: true },
+      )
+      .option(
+        "-A, --asyncInstall",
+        "Execute asyncronous install.",
       )
       .description("Update the data.")
       .action(new UpdateAction().execute),
