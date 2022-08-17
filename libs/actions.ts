@@ -141,9 +141,6 @@ const installFromDimFile = async (
   const installList = contents.map((content) => {
     return function () {
       return new Promise<LockContent>(async (resolve) => {
-        console.log(
-          Colors.green(`Installing ${content.url}`),
-        );
         const consoleAnimation = new ConsoleAnimation(
           ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
           `Installing ${content.url} ...`,
