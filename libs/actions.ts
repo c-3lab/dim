@@ -106,7 +106,11 @@ const installFromURL = async (
   return result.fullPath;
 };
 
-const installFromDimFile = async (path: string, isUpdate = false) => {
+const installFromDimFile = async (
+  path: string,
+  asyncDownload = false,
+  isUpdate = false,
+) => {
   await createDataFilesDir();
   if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
     await initDimLockFile();
@@ -177,14 +181,28 @@ const installFromDimFile = async (path: string, isUpdate = false) => {
       });
     });
   });
+  let lockContentList: LockContent[] = [];
 
-  const lockContentList = await Promise.all(downloadList).catch((error) => {
-    console.error(
-      Colors.red("Failed to process."),
-      Colors.red(error.message),
-    );
-    Deno.exit(1);
-  });
+  if (!asyncDownload) {
+    for (const donwloadPromsie of downloadList) {
+      const lockContent = await donwloadPromsie.catch((error) => {
+        console.error(
+          Colors.red("Failed to process."),
+          Colors.red(error.message),
+        );
+        Deno.exit(1);
+      });
+      lockContentList.push(lockContent);
+    }
+  } else {
+    lockContentList = await Promise.all(downloadList).catch((error) => {
+      console.error(
+        Colors.red("Failed to process."),
+        Colors.red(error.message),
+      );
+      Deno.exit(1);
+    });
+  }
 
   const contentList: Content[] = [];
   if (lockContentList !== undefined) {
@@ -320,6 +338,7 @@ export class InstallAction {
       headers?: string[];
       file?: string;
       force?: boolean;
+      asyncDownload?: boolean;
     },
     url: string | undefined,
   ) {
@@ -366,6 +385,7 @@ export class InstallAction {
     } else {
       const lockContentList = await installFromDimFile(
         options.file || DEFAULT_DIM_FILE_PATH,
+        options.asyncDownload,
         options.force,
       );
       if (lockContentList !== undefined) {
@@ -510,7 +530,7 @@ export class ListAction {
 
 export class UpdateAction {
   async execute(
-    options: { postProcesses?: string[] },
+    options: { postProcesses?: string[]; asyncDownload?: boolean },
     name: string | undefined,
   ) {
     if (name !== undefined) {
@@ -545,7 +565,11 @@ export class UpdateAction {
         Colors.yellow(fullPath),
       );
     } else {
-      await installFromDimFile(DEFAULT_DIM_FILE_PATH, true);
+      await installFromDimFile(
+        DEFAULT_DIM_FILE_PATH,
+        options.asyncDownload,
+        true,
+      );
       console.log(
         Colors.green(`Successfully Updated.`),
       );
