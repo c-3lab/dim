@@ -174,13 +174,13 @@ $ dim install -f https://raw.githubusercontent.com/xxxx/xxxx/main/dim.json
 $ dim install https://example.com -n "example"
 ```
 
-Specify headers.
+#### Specify headers.
 
 ```
-$ dim install https://example.com -n "example" -H "Authorization : 1234567890abc" -H "Fiware-Service : example"
+$ dim install https://example.com -n "example" -H "Authorization: 1234567890abc" -H "Fiware-Service: example"
 ```
 
-Specify the installation post-process
+#### Specify the installation post-process
 
 Postprocess unzip
 
@@ -220,7 +220,8 @@ Command to be executed during postprocessing.
 $ python ./tests/test_custom_command.py ./data_files/***/***.xx
 ```
 
-### Forced execution
+#### Forced execution
+
 Forced install. Overwrite already exist data file.
 ```
 $ dim install https://example.com -n "example" -F
