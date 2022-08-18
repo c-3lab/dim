@@ -27,13 +27,13 @@ Download the dim from binary files.
 [aarch64-apple-darwin](https://github.com/c-3lab/dim/releases/latest/download/aarch64-apple-darwin-dim)
 
 ```
-curl https://github.com/c-3lab/dim/releases/latest/download/aarch64-apple-darwin-dim -o /usr/local/bin/dim
+curl -L https://github.com/c-3lab/dim/releases/latest/download/aarch64-apple-darwin-dim -o /usr/local/bin/dim
 ```
 
 [x86_64-apple-darwin](https://github.com/c-3lab/dim/releases/latest/download/x86_64-apple-darwin-dim)
 
 ```
-curl https://github.com/c-3lab/dim/releases/latest/download/x86_64-apple-darwin-dim -o /usr/local/bin/dim
+curl -L https://github.com/c-3lab/dim/releases/latest/download/x86_64-apple-darwin-dim -o /usr/local/bin/dim
 ```
 
 [x86_64-pc-windows-msvc](https://github.com/c-3lab/dim/releases/latest/download/x86_64-pc-windows-msvc-dim.exe)
@@ -45,7 +45,7 @@ curl https://github.com/c-3lab/dim/releases/latest/download/x86_64-pc-windows-ms
 [x86_64-unknown-linux-gnu](https://github.com/c-3lab/dim/releases/latest/download/x86_64-unknown-linux-gnu-dim)
 
 ```
-curl https://github.com/c-3lab/dim/releases/latest/download/x86_64-unknown-linux-gnu-dim -o /usr/local/bin/dim
+curl -L https://github.com/c-3lab/dim/releases/latest/download/x86_64-unknown-linux-gnu-dim -o /usr/local/bin/dim
 ```
 
 #### Grant user execution permission
