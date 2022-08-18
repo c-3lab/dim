@@ -300,15 +300,24 @@ const executePostprocess = async (
       await new XLSXConverter().convertToCSV(targetPath);
       console.log(`Convert xlsx to csv.`);
     } else if (postProcess.startsWith("CMD:")) {
-      const script = postProcess.replace("CMD:", "");
+      const script = postProcess.replace("CMD:", "").trim();
       if (script === "") {
         console.log(
           Colors.red("No command entered"),
         );
         Deno.exit(1);
       }
-      await new Command().execute(script.trim(), targetPath);
-      console.log("Execute Command: ", script, targetPath);
+      try {
+        console.log("Execute Command: ", script, targetPath);
+        const result = await new Command().execute(script, targetPath);
+        console.log(result);
+      } catch (e) {
+        console.log(
+          Colors.red(`Failed to execute the "${script}"\n`),
+          Colors.red(`${e}`),
+        );
+        // Do not `exit` because there are commands that do not correspond when obtained from external dim.json.
+      }
     } else {
       console.log(`No support a postprocess '${postProcess}'.`);
     }
