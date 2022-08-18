@@ -259,6 +259,70 @@ Update the specified data.
 $ dim update [name]
 ```
 
+## Search
+
+Search data from package_search CKAN API.
+
+Use [データカタログ横断検索システム](https://search.ckan.jp/) by default to do the search.
+
+```
+$ dim search 避難所
+```
+
+Specify the number of data to get by option -n (default 10).
+
+```
+$ dim search 避難所 -n 3
+```
+
+### Interactive installation
+
+Write data information to `dim.json` from ckan.
+
+Store the data to `data_files`.
+
+```
+$ dim search -i "東京 避難所"
+
+131105_東京都_目黒区_大地震時における地域避難所
+  - Catalog URL        : https://www.geospatial.jp/ckan/dataset/131105-002
+  - Catalog Description: ####大地震時における地域避難所のデータです。
+####東京都目黒区のオープンデータです。【リソース】大地震時における地域避難所 / ####大地震時における地域避難所のXLSXです。
+【キーワード】東京都 / 目黒区 / 避難所
+  - Catalog License    : クリエイティブ・コモンズ 表示
+    1. 大地震時における地域避難所
+      * Resource URL        : https://www.geospatial.jp/ckan/dataset/1e07b569-80a5-4c31-8a7b-be88d1e8f327/resource/8d8de117-2342-4c61-a98d-8f7a9c5b71a2/download/131105evacuationspace.xlsx
+      * Resource Description: ####大地震時における地域避難所のXLSXです。
+      * Created             : 2018-10-30T02:55:40.179726
+      * Format              : XLSX
+
+131059_東京都_文京区_緊急避難場所・避難所
+  - Catalog URL        : https://www.geospatial.jp/ckan/dataset/131059-025
+  - Catalog Description: ####緊急避難場所・避難所のデータです。
+####東京都文京区のオープンデータです。【リソース】緊急避難場所・避難所 / ####文京区の避難所・緊急避難場所の一覧データのCSVです。####更新日:2018年10月23日 / ####文京区の避難所・緊急避難場所の一覧データのXLSXです。
+####更新日:2018年10月23日【キーワード】文京区 / 東京都 / 避難場所 / 避難所
+  - Catalog License    : CC-BY2.1
+    2. 緊急避難場所・避難所
+      * Resource URL        : https://www.geospatial.jp/ckan/dataset/b17c1f51-ce1c-4e6a-8ff9-5ff0203b1e43/resource/008d34ad-61a5-4dbd-8996-fa6d647c2986/download/kinkyuhinanbasyo-hinanjo.csv
+      * Resource Description: ####文京区の避難所・緊急避難場所の一覧データのCSVです。
+####更新日:2018年10月23日
+      * Created             : 2018-10-30T05:44:44.623645
+      * Format              : CSV
+    3. 緊急避難場所・避難所
+      * Resource URL        : https://www.geospatial.jp/ckan/dataset/b17c1f51-ce1c-4e6a-8ff9-5ff0203b1e43/resource/0c4942d4-a149-4091-a52f-69b7da8fa143/download/kinkyuhinanbasyo-hinanjo.xlsx
+      * Resource Description: ####文京区の避難所・緊急避難場所の一覧データのXLSXです。
+####更新日:2018年10月23日
+      * Created             : 2018-10-30T05:44:46.127915
+      * Format              : XLSX
+...
+? Enter the number of the data to install > 1
+? Enter the name. Enter blank if want to use CKAN resource name. > 
+? Enter the post-processing you wish to add. Enter blank if not required. > xlsx-to-csv
+? Is there a post-processing you would like to add next? (Y/n) > No
+Convert xlsx to csv.
+Installed to ./data_files/131105_東京都_目黒区_大地震時における地域避難所_大地震時における地域避難所/131105evacuationspace.xlsx
+```
+
 ## Help
 
 ```
