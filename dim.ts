@@ -1,7 +1,6 @@
 import {
   Command,
   CompletionsCommand,
-  DenoLandProvider,
   GithubProvider,
   HelpCommand,
   UpgradeCommand,

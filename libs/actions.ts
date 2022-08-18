@@ -67,8 +67,8 @@ const installFromURL = async (
 ) => {
   await createDataFilesDir();
   try {
-    Deno.statSync(DEFAULT_DIM_LOCK_FILE_PATH)
-  } catch (e) {
+    Deno.statSync(DEFAULT_DIM_LOCK_FILE_PATH);
+  } catch {
     await initDimLockFile();
   }
 
@@ -114,8 +114,8 @@ const installFromDimFile = async (
 ) => {
   await createDataFilesDir();
   try {
-    Deno.statSync(DEFAULT_DIM_LOCK_FILE_PATH)
-  } catch (e) {
+    Deno.statSync(DEFAULT_DIM_LOCK_FILE_PATH);
+  } catch {
     await initDimLockFile();
   }
 
@@ -143,7 +143,7 @@ const installFromDimFile = async (
   }
   const installList = contents.map((content) => {
     return function () {
-      return new Promise<LockContent>(async (resolve) => {
+      return new Promise<LockContent>((resolve) => {
         const consoleAnimation = new ConsoleAnimation(
           ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
           `Installing ${content.url} ...`,
@@ -329,7 +329,7 @@ export const parseHeader = function (
 };
 
 export class InitAction {
-  async execute(options: any) {
+  async execute() {
     await createDataFilesDir();
     await initDimFile();
     await initDimLockFile();
@@ -412,7 +412,7 @@ export class InstallAction {
 }
 
 export class UninstallAction {
-  async execute(options: any, name: string) {
+  async execute(_: void, name: string) {
     const isRemovedDimFile = await new DimFileAccessor().removeContent(name);
     if (isRemovedDimFile) {
       console.log(
@@ -441,12 +441,12 @@ export class UninstallAction {
     }
     if (targetContent !== undefined) {
       try {
-        Deno.statSync(targetContent.path)
+        Deno.statSync(targetContent.path);
         await Deno.remove(targetContent.path);
         console.log(
           Colors.green(`Removed a file '${targetContent.path}'.`),
         );
-      } catch (e) {
+      } catch {
         console.log(
           Colors.red(`Failed to remove a file '${targetContent.path}'.`),
         );

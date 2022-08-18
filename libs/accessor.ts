@@ -12,7 +12,7 @@ export class DimFileAccessor {
     try {
       Deno.statSync(path);
       this.dimJSON = JSON.parse(Deno.readTextFileSync(path));
-    } catch (e) {
+    } catch {
       console.log("Not found a dim.json. You should run a 'dim init'. ");
       Deno.exit(1);
     }
@@ -99,7 +99,7 @@ export class DimLockFileAccessor {
       this.dimLockJSON = JSON.parse(
         Deno.readTextFileSync(DEFAULT_DIM_LOCK_FILE_PATH),
       );
-    } catch (e) {
+    } catch {
       console.log("Not found a dim-lock.json");
       Deno.exit(1);
     }
