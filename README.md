@@ -236,8 +236,7 @@ $ dim update [name or url]
 
 Search data from package_search CKAN API.
 
-To eliminate the need for users to search around for the desired data, use an
-[API that searches across data](https://search.ckan.jp/) by default.
+Use [データカタログ横断検索システム](https://search.ckan.jp/) by default to do the search.
 
 ```
 $ dim search 避難所
