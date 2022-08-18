@@ -4,6 +4,6 @@ export class XLSXConverter {
     const workbook = await readXLSX(targetPath);
     const sheetData = workbook.Sheets[workbook.SheetNames[0]];
     const csv = xlsx.utils.sheet_to_csv(sheetData);
-    Deno.writeTextFileSync(targetPath, csv);
+    Deno.writeTextFileSync(targetPath.replace(/\.xlsx$/, ".csv"), csv);
   }
 }
