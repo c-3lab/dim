@@ -3,7 +3,6 @@ import {
   Confirm,
   ensureDir,
   ensureFile,
-  existsSync,
   Input,
   ky,
   Number,
@@ -67,7 +66,9 @@ const installFromURL = async (
   catalogResourceId: string | null = null,
 ) => {
   await createDataFilesDir();
-  if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
+  try {
+    Deno.statSync(DEFAULT_DIM_LOCK_FILE_PATH)
+  } catch (e) {
     await initDimLockFile();
   }
 
@@ -112,7 +113,9 @@ const installFromDimFile = async (
   isUpdate = false,
 ) => {
   await createDataFilesDir();
-  if (!existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
+  try {
+    Deno.statSync(DEFAULT_DIM_LOCK_FILE_PATH)
+  } catch (e) {
     await initDimLockFile();
   }
 
@@ -437,10 +440,15 @@ export class UninstallAction {
       );
     }
     if (targetContent !== undefined) {
-      if (existsSync(targetContent.path)) {
+      try {
+        Deno.statSync(targetContent.path)
         await Deno.remove(targetContent.path);
         console.log(
           Colors.green(`Removed a file '${targetContent.path}'.`),
+        );
+      } catch (e) {
+        console.log(
+          Colors.red(`Failed to remove a file '${targetContent.path}'.`),
         );
       }
       // TODO: Remove an empty direcotory

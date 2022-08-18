@@ -1,4 +1,3 @@
-import { existsSync } from "../deps.ts";
 import { Content, DimJSON, DimLockJSON, LockContent } from "./types.ts";
 import {
   DEFAULT_DIM_FILE_PATH,
@@ -10,11 +9,12 @@ import {
 export class DimFileAccessor {
   private dimJSON: DimJSON | undefined;
   constructor(path = DEFAULT_DIM_FILE_PATH) {
-    if (existsSync(path)) {
+    try {
+      Deno.statSync(path);
       this.dimJSON = JSON.parse(Deno.readTextFileSync(path));
-    } else {
+    } catch (e) {
       console.log("Not found a dim.json. You should run a 'dim init'. ");
-      Deno.exit(0);
+      Deno.exit(1);
     }
   }
   private async writeToDimFile(json: DimJSON) {
@@ -94,13 +94,14 @@ export class DimFileAccessor {
 export class DimLockFileAccessor {
   private dimLockJSON: DimLockJSON | undefined;
   constructor() {
-    if (existsSync(DEFAULT_DIM_LOCK_FILE_PATH)) {
+    try {
+      Deno.statSync(DEFAULT_DIM_LOCK_FILE_PATH);
       this.dimLockJSON = JSON.parse(
         Deno.readTextFileSync(DEFAULT_DIM_LOCK_FILE_PATH),
       );
-    } else {
+    } catch (e) {
       console.log("Not found a dim-lock.json");
-      Deno.exit(0);
+      Deno.exit(1);
     }
   }
   private async writeToDimLockFile(json: DimLockJSON) {

@@ -12,7 +12,6 @@ export {
   ensureDir,
   ensureDirSync,
   ensureFile,
-  existsSync,
 } from "https://deno.land/std@0.146.0/fs/mod.ts";
 
 export * as Colors from "https://deno.land/std@0.146.0/fmt/colors.ts";
