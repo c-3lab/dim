@@ -11,7 +11,6 @@ import {
   DEFAULT_DATAFILES_PATH,
   DEFAULT_DIM_FILE_PATH,
   DEFAULT_DIM_LOCK_FILE_PATH,
-  DEFAULT_SEARCH_ENDPOINT,
   DIM_FILE_VERSION,
   DIM_LOCK_FILE_VERSION,
   ENCODINGS,
@@ -21,7 +20,6 @@ import { ConsoleAnimation } from "./console_animation.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import {
   CatalogResource,
-  CkanApiResponse,
   Content,
   DimJSON,
   DimLockJSON,
@@ -31,6 +29,7 @@ import { Encoder } from "./postprocess/encoder.ts";
 import { Unzipper } from "./postprocess/unzipper.ts";
 import { XLSXConverter } from "./postprocess/xlsx_converter.ts";
 import { Command } from "./postprocess/command.ts";
+import { CkanApiClient } from "./ckan_api_client.ts";
 
 const initDimFile = async () => {
   const dimData: DimJSON = { fileVersion: DIM_FILE_VERSION, contents: [] };
@@ -612,36 +611,7 @@ export class SearchAction {
     }
 
     const keywords = keyword.trim().split(/\s+/);
-    let searchWord: string;
-    if (keywords.length === 1) {
-      searchWord = `*${keywords[0]}*`;
-    } else {
-      searchWord = "(" + keywords.map((keyword) =>
-        `*${keyword}*`
-      ).join(" AND ") + ")";
-    }
-
-    const searchParams = new URLSearchParams(
-      {
-        fq:
-          `xckan_title:${searchWord} OR tags:${searchWord} OR x_ckan_description:${searchWord}`,
-        rows: options.number.toString(),
-      },
-    );
-
-    let response: CkanApiResponse;
-    try {
-      response = await ky.get(
-        DEFAULT_SEARCH_ENDPOINT,
-        { searchParams },
-      ).json<CkanApiResponse>();
-    } catch (error) {
-      console.error(
-        Colors.red("Failed to search."),
-        Colors.red(error.message),
-      );
-      Deno.exit(1);
-    }
+    const response = await new CkanApiClient().search(keywords, options.number);
 
     if (response.result.results.length === 0) {
       console.error(
