@@ -100,6 +100,14 @@ await new Command()
   .command(
     "upgrade",
     new UpgradeCommand({
+      main: "dim.ts",
+      args: [
+        "--allow-run",
+        "--allow-read",
+        "--allow-net",
+        "--allow-write",
+        "--unstable",
+      ],
       provider: [
         new GithubProvider({ repository: "c-3lab/dim" }),
       ],
