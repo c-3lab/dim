@@ -25,11 +25,8 @@ import {
   DimLockJSON,
   LockContent,
 } from "./types.ts";
-import { Encoder } from "./postprocess/encoder.ts";
-import { Unzipper } from "./postprocess/unzipper.ts";
-import { XLSXConverter } from "./postprocess/xlsx_converter.ts";
-import { Command } from "./postprocess/command.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
+import { PostprocessDispatcher } from "./postprocess/postprocess_dispatcher.ts";
 
 const initDimFile = async () => {
   const dimData: DimJSON = { fileVersion: DIM_FILE_VERSION, contents: [] };
@@ -256,70 +253,15 @@ const installFromCatalog = async (
   return fullPath;
 };
 
+const postprocessDispatcher = new PostprocessDispatcher();
+
 const executePostprocess = async (
   postProcesses: string[],
   targetPath: string,
 ) => {
   for (const postProcess of postProcesses) {
     const [type, ...argumentList] = postProcess.split(" ");
-    if (type === "encode") {
-      if (argumentList.length === 0) {
-        console.log(
-          Colors.red("Argument not specified."),
-        );
-        Deno.exit(1);
-      } else if (argumentList.length > 1) {
-        console.log(
-          Colors.red("error: Too many arguments:"),
-          Colors.red(type + " " + argumentList.join(" ")),
-        );
-        Deno.exit(1);
-      }
-      const encodingTo = argumentList[0].toUpperCase();
-      await new Encoder().encodeFile(targetPath, encodingTo);
-      console.log("Converted encoding to", encodingTo);
-    } else if (type === "unzip") {
-      if (argumentList.length > 0) {
-        console.log(
-          Colors.red("error: Too many arguments:"),
-          Colors.red(type + " " + argumentList.join(" ")),
-        );
-        Deno.exit(1);
-      }
-      const targetDir = await new Unzipper().unzip(targetPath);
-      console.log(`Unzip the file to ${targetDir}`);
-    } else if (type === "xlsx-to-csv") {
-      if (argumentList.length > 0) {
-        console.log(
-          Colors.red("error: Too many arguments:"),
-          Colors.red(type + " " + argumentList.join(" ")),
-        );
-        Deno.exit(1);
-      }
-      await new XLSXConverter().convertToCSV(targetPath);
-      console.log(`Convert xlsx to csv.`);
-    } else if (postProcess.startsWith("CMD:")) {
-      const script = postProcess.replace("CMD:", "").trim();
-      if (script === "") {
-        console.log(
-          Colors.red("No command entered"),
-        );
-        Deno.exit(1);
-      }
-      try {
-        console.log("Execute Command: ", script, targetPath);
-        const result = await new Command().execute(script, targetPath);
-        console.log(result);
-      } catch (e) {
-        console.log(
-          Colors.red(`Failed to execute the "${script}"\n`),
-          Colors.red(`${e}`),
-        );
-        // Do not `exit` because there are commands that do not correspond when obtained from external dim.json.
-      }
-    } else {
-      console.log(`No support a postprocess '${postProcess}'.`);
-    }
+    await postprocessDispatcher.dispatch(type, argumentList, targetPath);
   }
 };
 
@@ -716,9 +658,9 @@ export class SearchAction {
         message:
           "Enter the post-processing you want to add. Enter blank if not required.",
         hint:
-          "(ex.: > unzip, xlsx-to-csv, encode utf-8 or CMD:[some cli command])",
+          "(ex.: > unzip, xlsx-to-csv, encode utf-8 or cmd [some cli command])",
         validate: (text) => {
-          return text === "" || text.startsWith("CMD:") ||
+          return text === "" || text.startsWith("cmd ") ||
             availablePostProcesses.includes(text);
         },
         suggestions: availablePostProcesses,

@@ -202,16 +202,16 @@ $ dim install https://example.com -n "example" -p xlsx-to-csv
 
 Postprocess custom command
 
-You can specify a custom command after **"CMD:"**.
+You can specify a custom command after **"cmd"**.
 
 ```
-$ dim install https://example.com -n "example" -p "CMD:******"
+$ dim install https://example.com -n "example" -p "cmd ******"
 ```
 
 The file path will be passed as an argument at the end of the specified command.
 
 ```
-$ dim install https://example.com -n "example" -p "CMD:python ./tests/test_custom_command.py"
+$ dim install https://example.com -n "example" -p "cmd python ./tests/test_custom_command.py"
 ```
 
 Command to be executed during postprocessing.
@@ -223,6 +223,7 @@ $ python ./tests/test_custom_command.py ./data_files/***/***.xx
 #### Forced execution
 
 Forced install. Overwrite already exist data file.
+
 ```
 $ dim install https://example.com -n "example" -F
 ```
