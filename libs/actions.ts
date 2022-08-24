@@ -317,9 +317,11 @@ export class InstallAction {
         c.name === options.name
       );
       if (targetContent !== undefined && !options.force) {
-        console.log("The name already exists.");
+        console.log(Colors.red("The name already exists."));
         console.log(
-          "Use the -F option to force installation and overwrite existing files.",
+          Colors.red(
+            "Use the -F option to force installation and overwrite existing files.",
+          ),
         );
         Deno.exit(1);
       }
