@@ -510,7 +510,7 @@ export class UpdateAction {
       const fullPath = await installFromURL(
         content.url,
         name,
-        options.postProcesses,
+        content.postProcesses,
         content.headers,
       ).catch(
         (error) => {

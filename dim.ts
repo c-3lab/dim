@@ -86,11 +86,6 @@ await new Command()
     new Command()
       .arguments("[name:string]")
       .option(
-        "-p, --postProcesses <postProcesses>",
-        "Specify post-processing when installing.",
-        { collect: true },
-      )
-      .option(
         "-A, --asyncInstall",
         "Execute asyncronous install.",
       )
