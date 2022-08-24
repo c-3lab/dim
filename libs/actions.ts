@@ -86,7 +86,8 @@ const installFromURL = async (
     headers: headers,
   };
   const responseHeaders = result.response.headers;
-  lockContent.eTag = responseHeaders.get("etag");
+  lockContent.eTag = responseHeaders.get("etag")?.replace(/^"(.*)"$/, "$1") ??
+    null;
   if (responseHeaders.has("last-modified")) {
     lockContent.lastModified = new Date(responseHeaders.get("last-modified")!);
   }
@@ -172,7 +173,7 @@ const installFromDimFile = async (
             catalogUrl: null,
             catalogResourceId: null,
             lastModified: lastModified,
-            eTag: headers.get("etag"),
+            eTag: headers.get("etag")?.replace(/^"(.*)"$/, "$1") ?? null,
             lastDownloaded: new Date(),
             integrity: "",
             postProcesses: content.postProcesses,
