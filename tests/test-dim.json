@@ -1,0 +1,33 @@
+{
+  "fileVersion": "1.1",
+  "contents": [
+    {
+      "name": "test1",
+      "url": "http://linkdata.org/download/rdf1s7742i/link/201901_tyotyobetu_jinkotokei.txt",
+      "catalogUrl": null,
+      "catalogResourceId": null,
+      "postProcesses": [
+        "encoding-utf-8"
+      ],
+      "headers": {}
+    },
+    {
+      "name": "test2",
+      "url": "https://www.opendata.metro.tokyo.lg.jp/akishima/132071_population_20220601.csv",
+      "catalogUrl": null,
+      "catalogResourceId": null,
+      "postProcesses": [],
+      "headers": {}
+    },
+    {
+      "url": "https://www.city.shinjuku.lg.jp/content/000259916.zip",
+      "name": "cmdecho",
+      "catalogUrl": null,
+      "catalogResourceId": null,
+      "postProcesses": [
+        "cmd echo aaa"
+      ],
+      "headers": {}
+    }
+  ]
+}
