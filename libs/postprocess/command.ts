@@ -10,6 +10,7 @@ export class Command extends BasePostprocess {
       stdout: "piped",
     });
     const o = await p.output();
+    p.close();
     return new TextDecoder().decode(o);
   }
   validate(argumentList: string[]) {
