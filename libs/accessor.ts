@@ -43,13 +43,18 @@ export class DimFileAccessor {
       catalogUrl,
       catalogResourceId,
       postProcesses,
-      headers: headers,
+      headers,
     };
-    // Override the existing content.
-    const currentContents = this.dimJSON.contents.filter((c) =>
-      c.name !== content.name
+    const contents = this.dimJSON.contents;
+    const contentIndex = this.dimJSON.contents.findIndex((c) =>
+      c.name === name
     );
-    const contents = new Array<Content>(...currentContents, content);
+    if (contentIndex !== -1) {
+      // Override the existing content.
+      contents.splice(contentIndex, 1, content);
+    } else {
+      contents.push(content);
+    }
     await this.writeToDimFile({
       fileVersion: DIM_FILE_VERSION,
       contents: contents,
@@ -117,11 +122,16 @@ export class DimLockFileAccessor {
     if (this.dimLockJSON === undefined) {
       return;
     }
-    // Override the existing content.
-    const currentContents = this.dimLockJSON.contents.filter((c) =>
-      c.name !== content.name
+    const contents = this.dimLockJSON.contents;
+    const contentIndex = this.dimLockJSON.contents.findIndex((c) =>
+      c.name === content.name
     );
-    const contents = new Array<LockContent>(...currentContents, content);
+    if (contentIndex !== -1) {
+      // Override the existing content.
+      contents.splice(contentIndex, 1, content);
+    } else {
+      contents.push(content);
+    }
     await this.writeToDimLockFile({
       lockFileVersion: DIM_LOCK_FILE_VERSION,
       contents: contents,
