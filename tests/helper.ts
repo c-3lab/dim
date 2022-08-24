@@ -1,4 +1,4 @@
-import { resolve } from "https://deno.land/std/path/mod.ts";
+import { resolve } from "https://deno.land/std@0.152.0/path/mod.ts";
 
 const currentDirectory = new URL(".", import.meta.url).pathname;
 export const temporaryDirectory = resolve(currentDirectory, "temporary") + "/";
