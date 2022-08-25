@@ -1,12 +1,4 @@
-import {
-  Colors,
-  Confirm,
-  ensureDir,
-  ensureFile,
-  Input,
-  ky,
-  Number,
-} from "../deps.ts";
+import { Colors, Confirm, ensureDir, ensureFile, Input, ky, Number } from "../deps.ts";
 import {
   DEFAULT_DATAFILES_PATH,
   DEFAULT_DIM_FILE_PATH,
@@ -18,13 +10,7 @@ import {
 import { Downloader } from "./downloader.ts";
 import { ConsoleAnimation } from "./console_animation.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
-import {
-  CatalogResource,
-  Content,
-  DimJSON,
-  DimLockJSON,
-  LockContent,
-} from "./types.ts";
+import { CatalogResource, Content, DimJSON, DimLockJSON, LockContent } from "./types.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
 import { PostprocessDispatcher } from "./postprocess/postprocess_dispatcher.ts";
 
@@ -133,9 +119,7 @@ const installFromDimFile = async (
   const dimLockFileAccessor = new DimLockFileAccessor();
   if (!isUpdate) {
     const isNotInstalled = (content: Content) =>
-      dimLockFileAccessor.getContents().every((lockContent) =>
-        lockContent.name !== content.name
-      );
+      dimLockFileAccessor.getContents().every((lockContent) => lockContent.name !== content.name);
     contents = contents.filter(isNotInstalled);
   }
   const installList = contents.map((content) => {
@@ -313,9 +297,7 @@ export class InstallAction {
         console.log(Colors.red("The -n option is not specified."));
         Deno.exit(1);
       }
-      const targetContent = new DimFileAccessor().getContents().find((c) =>
-        c.name === options.name
-      );
+      const targetContent = new DimFileAccessor().getContents().find((c) => c.name === options.name);
       if (targetContent !== undefined && !options.force) {
         console.log(Colors.red("The name already exists."));
         console.log(
@@ -380,9 +362,7 @@ export class UninstallAction {
       );
     }
     const dimLockFileAccessor = new DimLockFileAccessor();
-    const targetContent = dimLockFileAccessor.getContents().find((c) =>
-      c.name === name
-    );
+    const targetContent = dimLockFileAccessor.getContents().find((c) => c.name === name);
     const isRemovedDimLockFile = await dimLockFileAccessor.removeContent(name);
     if (isRemovedDimLockFile) {
       console.log(
@@ -457,17 +437,13 @@ export class ListAction {
         console.log(
           "  - Catalog resourceid:",
           Colors.green(
-            content.catalogResourceId === null
-              ? "null"
-              : content.catalogResourceId,
+            content.catalogResourceId === null ? "null" : content.catalogResourceId,
           ),
         );
         console.log(
           "  - Last modified     :",
           Colors.green(
-            content.lastModified === null
-              ? "null"
-              : content.lastDownloaded.toString(),
+            content.lastModified === null ? "null" : content.lastDownloaded.toString(),
           ),
         );
         console.log(
@@ -502,9 +478,7 @@ export class UpdateAction {
     name: string | undefined,
   ) {
     if (name !== undefined) {
-      const content = new DimLockFileAccessor().getContents().find((c) =>
-        c.name === name
-      );
+      const content = new DimLockFileAccessor().getContents().find((c) => c.name === name);
       if (content === undefined) {
         console.error(
           Colors.red(
@@ -581,9 +555,7 @@ export class SearchAction {
       console.log(
         "  - Catalog Description:",
         Colors.green(
-          catalog.xckan_description == null
-            ? ""
-            : catalog.xckan_description.replace(/\r(?!\n)/g, "\n"),
+          catalog.xckan_description == null ? "" : catalog.xckan_description.replace(/\r(?!\n)/g, "\n"),
         ),
       );
       console.log(
@@ -601,9 +573,7 @@ export class SearchAction {
         console.log(
           "      * Resource Description:",
           Colors.green(
-            resource.description == null
-              ? ""
-              : resource.description.replace(/\r(?!\n)/g, "\n"),
+            resource.description == null ? "" : resource.description.replace(/\r(?!\n)/g, "\n"),
           ),
         );
         console.log(
@@ -650,9 +620,7 @@ export class SearchAction {
     });
 
     const postProcesses: string[] = [];
-    const encodingPostProcesses = ENCODINGS.map((encoding) =>
-      `encode ${encoding.toLowerCase()}`
-    );
+    const encodingPostProcesses = ENCODINGS.map((encoding) => `encode ${encoding.toLowerCase()}`);
     const availablePostProcesses = [
       "unzip",
       "xlsx-to-csv",
@@ -661,10 +629,8 @@ export class SearchAction {
 
     while (true) {
       const enteredPostProcess = await Input.prompt({
-        message:
-          "Enter the post-processing you want to add. Enter blank if not required.",
-        hint:
-          "(ex.: > unzip, xlsx-to-csv, encode utf-8 or cmd [some cli command])",
+        message: "Enter the post-processing you want to add. Enter blank if not required.",
+        hint: "(ex.: > unzip, xlsx-to-csv, encode utf-8 or cmd [some cli command])",
         validate: (text) => {
           return text === "" || text.startsWith("cmd ") ||
             availablePostProcesses.includes(text);
@@ -691,9 +657,7 @@ export class SearchAction {
         catalogResources[enteredNumber - 1].name
       : enteredName;
 
-    const targetContent = new DimFileAccessor().getContents().find((c) =>
-      c.name === name
-    );
+    const targetContent = new DimFileAccessor().getContents().find((c) => c.name === name);
     if (targetContent !== undefined) {
       console.log("The name already exists.");
       Deno.exit(1);

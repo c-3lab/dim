@@ -46,9 +46,7 @@ export class DimFileAccessor {
       headers,
     };
     const contents = this.dimJSON.contents;
-    const contentIndex = this.dimJSON.contents.findIndex((c) =>
-      c.name === name
-    );
+    const contentIndex = this.dimJSON.contents.findIndex((c) => c.name === name);
     if (contentIndex !== -1) {
       // Override the existing content.
       contents.splice(contentIndex, 1, content);
@@ -123,9 +121,7 @@ export class DimLockFileAccessor {
       return;
     }
     const contents = this.dimLockJSON.contents;
-    const contentIndex = this.dimLockJSON.contents.findIndex((c) =>
-      c.name === content.name
-    );
+    const contentIndex = this.dimLockJSON.contents.findIndex((c) => c.name === content.name);
     if (contentIndex !== -1) {
       // Override the existing content.
       contents.splice(contentIndex, 1, content);
