@@ -1,18 +1,5 @@
-import {
-  Command,
-  CompletionsCommand,
-  GithubProvider,
-  HelpCommand,
-  UpgradeCommand,
-} from "./deps.ts";
-import {
-  InitAction,
-  InstallAction,
-  ListAction,
-  SearchAction,
-  UninstallAction,
-  UpdateAction,
-} from "./libs/actions.ts";
+import { Command, CompletionsCommand, GithubProvider, HelpCommand, UpgradeCommand } from "./deps.ts";
+import { InitAction, InstallAction, ListAction, SearchAction, UninstallAction, UpdateAction } from "./libs/actions.ts";
 import { NAME, VERSION } from "./libs/consts.ts";
 
 await new Command()

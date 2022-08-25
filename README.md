@@ -1,7 +1,6 @@
 # dim
 
-Data Installation Manager: Manage the open data in your project like a package
-manager.
+Data Installation Manager: Manage the open data in your project like a package manager.
 
 ![8bket-vzuiv](https://user-images.githubusercontent.com/6661165/148486923-a29f6ea5-ecbc-4d69-9f40-66bed34e3f99.gif)
 
@@ -9,8 +8,7 @@ manager.
 
 - 📀 Record the source url and post-processing, etc., of downloaded open-data
 - 🔧 Prepare all open data in one command by using files recorded by someone else
-- 🚀 General post-processing, such as unzip, encoding, etc., is available from
-  the start
+- 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
 - 🔍 Search open-data from CKAN
 
 # Usage
@@ -101,8 +99,7 @@ $ dim init
 
 2. Install a data
 
-This command stores information about installed data in `dim.json` and
-`dim-lock.json`.
+This command stores information about installed data in `dim.json` and `dim-lock.json`.
 
 ```
 $ dim install https://example.com -n "example"

@@ -8,15 +8,13 @@ export class CkanApiClient {
     if (keywords.length === 1) {
       searchWord = `*${keywords[0]}*`;
     } else {
-      searchWord = "(" + keywords.map((keyword) =>
-        `*${keyword}*`
-      ).join(" AND ") + ")";
+      searchWord = "(" + keywords.map((keyword) => `*${keyword}*`).join(" AND ") +
+        ")";
     }
 
     const searchParams = new URLSearchParams(
       {
-        fq:
-          `xckan_title:${searchWord} OR tags:${searchWord} OR x_ckan_description:${searchWord}`,
+        fq: `xckan_title:${searchWord} OR tags:${searchWord} OR x_ckan_description:${searchWord}`,
         rows: number.toString(),
       },
     );
