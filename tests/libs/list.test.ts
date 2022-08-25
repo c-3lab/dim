@@ -14,14 +14,20 @@ Deno.test({
     );
 
     //  オプションを指定せずに実行
-    await t.step("Run without options", async () => {
-      await new ListAction().execute({});
-    });
+    await t.step(
+      "molded and displayed information on downloaded data",
+      async () => {
+        await new ListAction().execute({});
+      },
+    );
 
     //  -sを指定し実行
-    await t.step("Specify -s and execute", async () => {
-      await new ListAction().execute({ simple: true });
-    });
+    await t.step(
+      "displays information on downloaded data without molding",
+      async () => {
+        await new ListAction().execute({ simple: true });
+      },
+    );
     removeTemporaryFiles();
   },
   //  AssertionError: Test case is leaking 1 resourceの原因が特定出来ていないため、一時的に無視している。

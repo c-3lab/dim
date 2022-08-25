@@ -10,28 +10,28 @@ Deno.test("UninstallAction", async (t) => {
   );
 
   //  install済みの名前を指定し実行
-  await t.step("Specify an installed name and run", async () => {
-    await new UpdateAction().execute({}, "example");
-  });
-
-  //  未installの名前を指定し実行
-  await t.step("Specify an uninstalled name and run", async () => {
-    let error = "";
-    await new UpdateAction().execute({}, "example2").catch((e) => {
-      error = e.message;
-    });
-    assertEquals(error, "Test case attempted to exit with exit code: 1");
-  });
-
-  //  install済みの名前と-p "xlsx-to-csv"を指定し実行
   await t.step(
-    'Specify the installed name and -p "xlsx-to-csv" and execute',
+    'execute with the "name" listed in dim.json to check if the data has been updated.',
     async () => {
-      await new UpdateAction().execute(
-        { postProcesses: ["xlsx-to-csv"] },
-        "example",
-      );
+      await new UpdateAction().execute({}, "example");
     },
   );
+
+  //  未installの名前を指定し実行
+  await t.step(
+    'exit with error when run with "name" not listed in dim.json',
+    async () => {
+      let error = "";
+      await new UpdateAction().execute({}, "example2").catch((e) => {
+        error = e.message;
+      });
+      assertEquals(error, "Test case attempted to exit with exit code: 1");
+    },
+  );
+
+  //  全データ更新
+  "execute without specifying any options or arguments, and check if the data in dim.json has been updated.";
+  //  非同期化
+  "specify -A and check for asynchronous execution";
   removeTemporaryFiles();
 });

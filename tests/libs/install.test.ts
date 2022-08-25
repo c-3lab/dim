@@ -67,7 +67,7 @@ describe("InstallAction", () => {
   });
 
   describe("with URL", () => {
-    it("and headers will download and save it to data_files, dim.json and dim-lock.json", async () => {
+    it("download and save it to data_files, dim.json and dim-lock.json", async () => {
       createEmptyDimJson();
 
       await new InstallAction().execute(
@@ -244,8 +244,10 @@ describe("InstallAction", () => {
     });
 
     //  -nと-Hを指定し実行
-    it('"Specify "encode utf-8" in -n and -p and execute"', async () => {
+    it("specify request headers and perform download, recording in dim.json and dim-lock.json", async () => {
       createEmptyDimJson();
+      //  kyのStub化 : npm msw
+
       //  InstallActionを実行
       await new InstallAction().execute(
         { name: "Header", headers: ["aaa: aaa"] },
@@ -260,7 +262,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"encode utf-8"を指定し実行
-    it('"Specify "encode utf-8" in -n and -p and execute"', async () => {
+    it('specify "encode utf-8" in "postProcess", download the file, check that it is saved in data_files, dim.json, dim-lock.json, and confirm that the data is "utf-8"', async () => {
       createEmptyDimJson();
       //  InstallActionを実行
       await new InstallAction().execute(
@@ -276,7 +278,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"encode utf-8 sjis"を指定し実行
-    it('"Specify "encode utf-8 sjis" in -n and -p and execute"', async () => {
+    it('exit with error when specify "encode utf-8 sjis" in "postProcess", and download', async () => {
       createEmptyDimJson();
       //  InstallActionを実行
       await new InstallAction().execute(
@@ -287,7 +289,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"encode"を指定し実行
-    it('"Specify "encode" in -n and -p and execute"', async () => {
+    it('exit with error when specify "encode" in "postProcess", and download.', async () => {
       createEmptyDimJson();
       //  InstallActionを実行
       await new InstallAction().execute(
@@ -298,7 +300,32 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"unzip"を指定し実行(Deno.build.osがlinuxの場合)
-    it('"Specify "unzip" in -n and -p and execute"', async () => {
+    it('specify "unzip" in "postProcess", download files, save to data_files, dim.json, dim-lock.json, check if downloaded data is unpacked.', async () => {
+      createEmptyDimJson();
+      const denoRunStub = stub(Deno, "run");
+      try {
+        //  InstallActionを実行
+        await new InstallAction().execute(
+          { name: "unzip", postProcesses: ["unzip"] },
+          "	https://opendata.pref.shizuoka.jp/fs/2/6/4/2/4/_/_________-_-_.zip",
+        );
+        assertEquals(
+          await fileExists(
+            "data_files/unzip/_________-_-_.zip",
+          ),
+          true,
+        );
+        assertSpyCall(denoRunStub, 0, {
+          args: [{
+            cmd: ["unzip", "./data_files/unzip/_________-_-_.zip", "-d", "./"],
+          }],
+        });
+      } finally {
+        denoRunStub.restore();
+      }
+    });
+    //  -nと-pに"unzip"を指定し実行(Deno.build.osがdarwinの場合)
+    it("check standard output when deno.build.os is darwin", async () => {
       createEmptyDimJson();
       const denoRunStub = stub(Deno, "run");
       try {
@@ -324,7 +351,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"unzip a"を指定し実行
-    it('"Specify "unzip a" in -n and -p and execute"', async () => {
+    it('exit with error when specify "unzip a" in "postProcess" and download', async () => {
       createEmptyDimJson();
       //  InstallActionを実行
       await new InstallAction().execute(
@@ -335,7 +362,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"xlsx-to-csv"を指定し実行
-    it('"Specify "xlsx-to-csv" in -n and -p and execute"', async () => {
+    it('specify "xlsx-to-csv" in "postProcess", download files, save to data_files, dim.json, dim-lock.json, check if downloaded data is converted to csv', async () => {
       createEmptyDimJson();
       //  InstallActionを実行
       await new InstallAction().execute(
@@ -351,7 +378,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"xlsx-to-csv a"を指定し実行
-    it('"Specify "xlsx-to-csv a" in -n and -p and execute"', async () => {
+    it('exit with error when specify "xlsx-to-csv a" in "postProcess" and download', async () => {
       createEmptyDimJson();
       //  InstallActionを実行
       await new InstallAction().execute(
@@ -362,7 +389,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"cmd echo"を指定し実行
-    it('Specify "cmd echo" in -n and -p and execute', async () => {
+    it('specify "cmd echo" in "postProcess", download files, confirm that they are saved in data_files, dim.json, dim-lock.json, confirm that the path of downloaded data is output to standard output', async () => {
       createEmptyDimJson();
       //  InstallActionを実行
       await new InstallAction().execute(
@@ -378,7 +405,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"cmd echo a"を指定し実行
-    it('Specify "cmd echo a" in -n and -p and execute', async () => {
+    it('specify "cmd a" for "postProcess", download the file, and confirm that the path to the downloaded data is output to standard output with "a" at the beginning', async () => {
       createEmptyDimJson();
       //  InstallActionを実行
       await new InstallAction().execute(
@@ -394,7 +421,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"cmd"を指定し実行
-    it('"Specify "cmd" in -n and -p and execute"', async () => {
+    it('exit with error when specify "cmd" for "postProcess" and download', async () => {
       //  InstallActionを実行
       await new InstallAction().execute(
         { name: "cmd", postProcesses: ["cmd"] },
@@ -409,7 +436,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"cmd aaa"(存在しないコマンド)を指定し実行
-    it('"Specify "cmd aaa" in -n and -p and execute"', async () => {
+    it('exit with error when specify "cmd aaa" for "postProcess" and download', async () => {
       //  InstallActionを実行
       await new InstallAction().execute(
         { name: "ecmd aaa", postProcesses: ["cmd aaa"] },
@@ -424,7 +451,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"aaa"(存在しないコマンド)を指定し実行
-    it('"Specify "aaa" in -n and -p and execute"', async () => {
+    it('exit with error when specify "aaa" in "postProcess" and download', async () => {
       //  InstallActionを実行
       await new InstallAction().execute(
         { name: "aaa", postProcesses: ["aaa"] },
@@ -449,7 +476,7 @@ describe("InstallAction", () => {
     });
 
     //  URLと-fを指定し実行
-    it("Specify URL and -f and execute", async () => {
+    it("exit with error when execute with URL and -f ", async () => {
       await new InstallAction().execute(
         { file: "./../test-dim.json" },
         "https://www.city.shinjuku.lg.jp/content/000259916.zip",
@@ -460,7 +487,7 @@ describe("InstallAction", () => {
 
   describe("without URL", () => {
     //  install済みのデータがない状態で実行
-    it("Run without INSTALLED data", async () => {
+    it("Run with an empty dim.json and verify that a message appears prompting to download data", async () => {
       createEmptyDimJson();
       await new InstallAction().execute(
         {},
@@ -469,13 +496,13 @@ describe("InstallAction", () => {
     });
 
     //  dim.jsonが存在しない状況で実行
-    it("Run with no dim.json", async () => {
+    it("exit with error when Runs without dim.json", async () => {
       await new InstallAction().execute({}, undefined);
       assertSpyCall(denoExitStub, 0, { args: [1] });
     });
 
     //  -fにローカルに存在するdim.jsonのパスを指定し実行
-    it("Specify the path of dim.json that exists locally in -f and execute", async () => {
+    it("specify a locally existing dim.json, download data not listed in the dim.json that exists in the current directory, and save it to data_files, dim.json and dim-lock.json", async () => {
       createEmptyDimJson();
       await new InstallAction().execute(
         { file: "./../test-dim.json" },
@@ -484,7 +511,7 @@ describe("InstallAction", () => {
     });
 
     //  install済みのデータがある状態で-fにローカルに存在するdim.jsonのパスを指定し実行
-    it("With the data already installed, specify the path to the locally existing dim.json in -f and execute.", async () => {
+    it("with no difference between the data stored in dim.json and dim-lock.json, specify the locally existing dim.json file and execute it to confirm that the output is correct.", async () => {
       //  TODO: tests/temporary以下にtest-dim.jsonを作成
       await new InstallAction().execute(
         { file: "./../test-dim.json" },
@@ -493,7 +520,7 @@ describe("InstallAction", () => {
     });
 
     //  -fにローカルに存在するdim.json以外のパスを指定し実行
-    it("Specify a path other than dim.json that exists locally in -f and execute", async () => {
+    it("specify a locally existing dim.json, download data not listed in the dim.json that exists in the current directory, and save it to data_files, dim.json and dim-lock.json", async () => {
       await new InstallAction().execute(
         { file: "./../helper.ts" },
         undefined,
@@ -501,18 +528,18 @@ describe("InstallAction", () => {
       assertSpyCall(denoExitStub, 0, { args: [1] });
     });
     //  install済みのデータがある状態で実行
-    it("Run with installde data", async () => {
+    it("run with no difference between the data stored in dim.json and dim-lock.json to check for correct output.", async () => {
       await new InstallAction().execute({}, undefined);
     });
 
     //  install済みのデータがある状態で-Fを指定し実行
-    it("With installed data, specify -F and execute", async () => {
+    it('with no difference between the data stored in dim.json and dim-lock.json, specify "-F" and execute to confirm that the data recorded in dim.json has been downloaded.', async () => {
       await new InstallAction().execute({ force: true }, undefined);
     });
 
     //  install済みのデータがある状態で-Fと-Aを指定し実行
     it(
-      "With data already installed, specify -F and -A and execute",
+      'with no difference between the data stored in dim.json and dim-lock.json, specify "-F -A" and execute to confirm that the data recorded in dim.json has been downloaded.',
       async () => {
         await new InstallAction().execute(
           { force: true, asyncInstall: true },
@@ -523,7 +550,7 @@ describe("InstallAction", () => {
 
     //  -fにインターネット上に存在するdim.jsonのパスを指定し実行
     it(
-      "Specify the path to dim.json on the Internet in -f and run",
+      "specify a Internet existing dim.json, download data not listed in the dim.json that exists in the current directory, and save it to data_files, dim.json and dim-lock.json",
       async () => {
         await new InstallAction().execute(
           {
@@ -537,7 +564,7 @@ describe("InstallAction", () => {
 
     //  -fにインターネット上に存在するdim.json以外ののパスを指定し実行
     it(
-      "Specify a path other than dim.json that exists on the Internet in -f and execute.",
+      "exit with error when run by specifying a non-dim.json file that exists on the Internet",
       async () => {
         let error = "";
         await new InstallAction().execute(
@@ -554,7 +581,7 @@ describe("InstallAction", () => {
     );
 
     //  dim.tsの呼び出し
-    it("install", async () => {
+    it("call dim.ts and execute it in command line form.", async () => {
       const p = Deno.run({
         cmd: [
           "deno",

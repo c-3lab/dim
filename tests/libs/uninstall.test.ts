@@ -14,17 +14,21 @@ Deno.test("UninstallAction", async (t) => {
   );
 
   //  install済みの名前を指定して実行
-  await t.step("Run with an installed name", async () => {
-    let _: void;
-    await new UninstallAction().execute(_, "example");
-  });
+  await t.step(
+    "delete downloaded data and rewrite dim.json, dim-lock.json",
+    async () => {
+      let _: void;
+      await new UninstallAction().execute(_, "example");
+    },
+  );
 
   //  未installの名前を指定して実行
-  await t.step("Run with uninstalled name", async () => {
-    let _: void;
-    await new UninstallAction().execute(_, "example");
-  });
-  //  名前を指定しないで実行->引数を渡さないことはできないので保留
-
+  await t.step(
+    'exit with error when run with "name" not recorded in dim.json',
+    async () => {
+      let _: void;
+      await new UninstallAction().execute(_, "example");
+    },
+  );
   removeTemporaryFiles();
 });
