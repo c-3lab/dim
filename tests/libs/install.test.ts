@@ -18,7 +18,11 @@ import { Colors } from "../../deps.ts";
 import { InstallAction } from "../../libs/actions.ts";
 import { DEFAULT_DIM_FILE_PATH, DIM_FILE_VERSION } from "../../libs/consts.ts";
 import { DimJSON } from "../../libs/types.ts";
-import { removeTemporaryFiles, temporaryDirectory } from "../helper.ts";
+import {
+  createKyGetStub,
+  removeTemporaryFiles,
+  temporaryDirectory,
+} from "../helper.ts";
 
 function fileExists(filePath: string): boolean {
   try {
@@ -191,17 +195,28 @@ describe("InstallAction", () => {
         DEFAULT_DIM_FILE_PATH,
         JSON.stringify(dimData, null, 2),
       );
+      //  上書きされる前のファイルを用意
+      Deno.mkdirSync("data_files/installedName2", { recursive: true });
+      Deno.writeTextFileSync("data_files/installedName2/dummy.csv", "before");
+
+      const kyGetStub = createKyGetStub("after", {
+        headers: {
+          "etag": '"12345-1234567890abc"',
+          "last-modified": "Thu, 3 Feb 2022 04:05:06 GMT",
+        },
+      });
+
       //  重複する名前でintall
       await new InstallAction().execute(
         { name: "installedName2", force: true },
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
+        "https://example.com/dummy.csv",
       );
-      assertEquals(
-        await fileExists(
-          "data_files/installedName2/000259916.zip",
-        ),
-        true,
+
+      //  ファイルが更新されているか確認
+      const fileContent = Deno.readTextFileSync(
+        "data_files/installedName2/dummy.csv",
       );
+      assertEquals(fileContent, "after");
 
       const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
       assertEquals(dimJson, {
@@ -212,7 +227,7 @@ describe("InstallAction", () => {
           headers: {},
           name: "installedName2",
           postProcesses: [],
-          url: "https://www.city.shinjuku.lg.jp/content/000259916.zip",
+          url: "https://example.com/dummy.csv",
         }],
       });
 
@@ -222,43 +237,81 @@ describe("InstallAction", () => {
         contents: [{
           catalogResourceId: null,
           catalogUrl: null,
-          eTag: "3a73f-5d5743bf7dec8",
+          eTag: "12345-1234567890abc",
           headers: {},
           integrity: "",
           lastDownloaded: "2022-01-02T03:04:05.678Z",
-          lastModified: "2022-01-13T10:34:42.000Z",
+          lastModified: "2022-02-03T04:05:06.000Z",
           name: "installedName2",
-          path: "./data_files/installedName2/000259916.zip",
+          path: "./data_files/installedName2/dummy.csv",
           postProcesses: [],
-          url: "https://www.city.shinjuku.lg.jp/content/000259916.zip",
+          url: "https://example.com/dummy.csv",
         }],
       });
 
       assertSpyCall(consoleLogStub, 0, {
         args: [
           Colors.green(
-            "Installed to ./data_files/installedName2/000259916.zip",
+            "Installed to ./data_files/installedName2/dummy.csv",
           ),
         ],
       });
+
+      kyGetStub.restore();
     });
 
     //  -nと-Hを指定し実行
     it("specify request headers and perform download, recording in dim.json and dim-lock.json", async () => {
       createEmptyDimJson();
-      //  kyのStub化 : npm msw
+
+      const kyGetStub = createKyGetStub("dummy body");
 
       //  InstallActionを実行
       await new InstallAction().execute(
-        { name: "Header", headers: ["aaa: aaa"] },
-        "https://od.city.otsu.lg.jp/dataset/97d09f65-852b-4395-9dbb-9f0f82da1524/resource/daa71a2a-5d95-4760-8076-7e65923366e7/download/20210915.txt",
+        { name: "Header", headers: ["key: value"] },
+        "https://example.com/dummy.csv",
       );
+
+      assertEquals(kyGetStub.calls[0].args[1].headers, { "key": "value" });
       assertEquals(
         await fileExists(
-          "data_files/Header/20210915.txt",
+          "data_files/Header/dummy.csv",
         ),
         true,
       );
+
+      const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+      assertEquals(dimJson, {
+        fileVersion: "1.1",
+        contents: [{
+          catalogResourceId: null,
+          catalogUrl: null,
+          headers: { key: "value" },
+          name: "Header",
+          postProcesses: [],
+          url: "https://example.com/dummy.csv",
+        }],
+      });
+
+      const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+      assertEquals(dimLockJson, {
+        lockFileVersion: "1.1",
+        contents: [{
+          catalogResourceId: null,
+          catalogUrl: null,
+          eTag: null,
+          headers: { key: "value" },
+          integrity: "",
+          lastDownloaded: "2022-01-02T03:04:05.678Z",
+          lastModified: null,
+          name: "Header",
+          path: "./data_files/Header/dummy.csv",
+          postProcesses: [],
+          url: "https://example.com/dummy.csv",
+        }],
+      });
+
+      kyGetStub.restore();
     });
 
     //  -nと-pに"encode utf-8"を指定し実行
