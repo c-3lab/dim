@@ -11,12 +11,12 @@ Data Installation Manager: Manage the open data in your project like a package m
 - 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
 - 🔍 Search open-data from CKAN
 
-# Usage
+# Quick Start
 
 ## Install the dim
 
 [Install the dim from binary files](#install-the-dim-from-binary-files) or
-[Install the dim from Deno install](#install-the-dim-from-deno-install)
+[Build the dim from Deno install](#build-the-dim-from-deno-install)
 
 ### Install the dim from binary files
 
@@ -52,42 +52,7 @@ curl -L https://github.com/c-3lab/dim/releases/latest/download/x86_64-unknown-li
 chmod u+x /usr/local/bin/dim
 ```
 
-### Install the dim from Deno install
-
-1. Install Deno
-
-```
-$ curl -fsSL https://deno.land/install.sh | sh
-$ echo 'export DENO_INSTALL=~/.deno' >> ~/.bashrc
-$ echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
-$ source ~/.bashrc
-```
-
-2. Clone the repository
-
-```
-$ git clone https://github.com/c-3lab/dim.git
-```
-
-```
-$ cd dim
-```
-
-3. Install dim
-
-```
-$ deno install --unstable --allow-read --allow-write --allow-run --allow-net dim.ts
-```
-
-## Upgrade the dim version
-
-```
-$ dim upgrade
-```
-
-## Quick Start
-
-### New Project
+## New Project
 
 1. init the project
 
@@ -111,7 +76,7 @@ $ dim install https://example.com -n "example"
 $ ls ./data_files
 ```
 
-### Install all data written to dim.json shared by members
+## Install all data written to dim.json shared by members
 
 Install all data written to `dim.json` shared by members.
 
@@ -137,7 +102,7 @@ $ dim install
 $ ls ./data_files
 ```
 
-# Commands
+# Command Usage
 
 ## Init
 
@@ -326,6 +291,44 @@ Installed to ./data_files/131105_東京都_目黒区_大地震時における地
 ```
 $ dim help
 ```
+
+# Build the dim from Deno install
+
+1. Install Deno
+
+```
+$ curl -fsSL https://deno.land/install.sh | sh
+$ echo 'export DENO_INSTALL=~/.deno' >> ~/.bashrc
+$ echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
+$ source ~/.bashrc
+```
+
+2. Clone the repository
+
+```
+$ git clone https://github.com/c-3lab/dim.git
+```
+
+```
+$ cd dim
+```
+
+3. Install dim
+
+```
+$ deno install --unstable --allow-read --allow-write --allow-run --allow-net dim.ts
+```
+
+# Upgrade the dim version
+
+You need to be able to run Deno in a local environment.  
+If you don't have an execution environment in Deno, please re-install.  
+[Install the dim from binary files](#install-the-dim-from-binary-files)
+
+```
+$ dim upgrade
+```
+
 
 # Contributers
 
