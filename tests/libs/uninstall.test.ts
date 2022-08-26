@@ -1,7 +1,4 @@
-import {
-  assertEquals,
-  assertMatch,
-} from "https://deno.land/std@0.152.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
 import {
   assertSpyCall,
   Stub,
@@ -15,18 +12,13 @@ import {
   it,
 } from "https://deno.land/std@0.152.0/testing/bdd.ts";
 import { Colors } from "../../deps.ts";
+import { UninstallAction } from "../../libs/actions.ts";
 import {
-  InstallAction,
-  ListAction,
-  UninstallAction,
-} from "../../libs/actions.ts";
-import { DEFAULT_DIM_FILE_PATH, DIM_FILE_VERSION } from "../../libs/consts.ts";
-import { DimJSON } from "../../libs/types.ts";
-import {
-  createKyGetStub,
-  removeTemporaryFiles,
-  temporaryDirectory,
-} from "../helper.ts";
+  DEFAULT_DIM_FILE_PATH,
+  DEFAULT_DIM_LOCK_FILE_PATH,
+} from "../../libs/consts.ts";
+import { DimJSON, DimLockJSON } from "../../libs/types.ts";
+import { removeTemporaryFiles, temporaryDirectory } from "../helper.ts";
 
 function fileExists(filePath: string): boolean {
   try {
@@ -37,17 +29,6 @@ function fileExists(filePath: string): boolean {
     return false;
   }
 }
-
-const createEmptyDimJson = () => {
-  Deno.writeTextFileSync(
-    "dim.json",
-    JSON.stringify({ fileVersion: "1.1", contents: [] }),
-  );
-  Deno.writeTextFileSync(
-    "dim-lock.json",
-    JSON.stringify({ lockfileVersion: "1.1", contents: [] }),
-  );
-};
 
 describe("UninstallAction", () => {
   let consoleLogStub: Stub;
@@ -75,14 +56,115 @@ describe("UninstallAction", () => {
   });
 
   it("delete downloaded data and rewrite dim.json, dim-lock.json", async () => {
-    createEmptyDimJson();
+    const dimData: DimJSON = {
+      fileVersion: "1.1",
+      contents: [
+        {
+          name: "test1",
+          url: "https://example.com/dummy.test",
+          catalogUrl: null,
+          catalogResourceId: null,
+          postProcesses: [],
+          headers: {},
+        },
+      ],
+    };
+    const dimLockData: DimLockJSON = {
+      lockFileVersion: "1.1",
+      contents: [{
+        catalogResourceId: null,
+        catalogUrl: null,
+        eTag: null,
+        headers: {},
+        integrity: "",
+        lastDownloaded: new Date(),
+        lastModified: null,
+        name: "test1",
+        path: "./data_files/test1/dummy.txt",
+        postProcesses: ["encoding-utf-8"],
+        url: "https://example.com/dummy.txt",
+      }],
+    };
+    await Deno.writeTextFile(
+      DEFAULT_DIM_LOCK_FILE_PATH,
+      JSON.stringify(dimLockData, null, 2),
+    );
+    await Deno.writeTextFile(
+      DEFAULT_DIM_FILE_PATH,
+      JSON.stringify(dimData, null, 2),
+    );
+    Deno.mkdirSync("data_files/test1", { recursive: true });
+    Deno.writeTextFileSync("./data_files/test1/dummy.txt", "dummy");
     let _: void;
-    await new UninstallAction().execute(_, "example");
+    await new UninstallAction().execute(_, "test1");
+
+    assertEquals(fileExists("./data_files/test1/dummy.txt"), false);
+    const dimJson = JSON.parse(Deno.readTextFileSync(DEFAULT_DIM_FILE_PATH));
+    assertEquals(dimJson, {
+      fileVersion: "1.1",
+      contents: [],
+    });
+    const dimLockJson = JSON.parse(
+      Deno.readTextFileSync(DEFAULT_DIM_LOCK_FILE_PATH),
+    );
+    assertEquals(dimLockJson, {
+      lockFileVersion: "1.1",
+      contents: [],
+    });
   });
 
   it('exit with error when run with "name" not recorded in dim.json', async () => {
-    createEmptyDimJson();
+    const dimData: DimJSON = {
+      fileVersion: "1.1",
+      contents: [
+        {
+          name: "test1",
+          url: "https://example.com/dummy.test",
+          catalogUrl: null,
+          catalogResourceId: null,
+          postProcesses: [],
+          headers: {},
+        },
+      ],
+    };
+    const dimLockData: DimLockJSON = {
+      lockFileVersion: "1.1",
+      contents: [{
+        catalogResourceId: null,
+        catalogUrl: null,
+        eTag: null,
+        headers: {},
+        integrity: "",
+        lastDownloaded: new Date(),
+        lastModified: null,
+        name: "test1",
+        path: "./data_files/test1/dummy.txt",
+        postProcesses: ["encoding-utf-8"],
+        url: "https://example.com/dummy.txt",
+      }],
+    };
+    await Deno.writeTextFile(
+      DEFAULT_DIM_LOCK_FILE_PATH,
+      JSON.stringify(dimLockData, null, 2),
+    );
+    await Deno.writeTextFile(
+      DEFAULT_DIM_FILE_PATH,
+      JSON.stringify(dimData, null, 2),
+    );
     let _: void;
     await new UninstallAction().execute(_, "example");
+
+    assertSpyCall(consoleLogStub, 0, {
+      args: [
+        Colors.red("Faild to remove. Not Found a content in the dim.json."),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 1, {
+      args: [
+        Colors.red(
+          "Faild to remove. Not Found a content in the dim-lock.json.",
+        ),
+      ],
+    });
   });
 });
