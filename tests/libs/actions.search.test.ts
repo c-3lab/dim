@@ -2,6 +2,7 @@ import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
 import {
   assertSpyCall,
   assertSpyCalls,
+  returnsNext,
   spy,
   Stub,
   stub,
@@ -25,6 +26,8 @@ import { Downloader } from "../../libs/downloader.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "../../libs/accessor.ts";
 import { CkanApiClient } from "../../libs/ckan_api_client.ts";
 import { Colors } from "../../deps.ts";
+import { ENCODINGS } from "../../libs/consts.ts";
+import { boolean } from "https://deno.land/x/cliffy@v0.24.2/flags/types/boolean.ts";
 
 function fileExists(filePath: string): boolean {
   try {
@@ -64,7 +67,7 @@ describe("SearchAction", () => {
   });
 
   afterEach(() => {
-    removeTemporaryFiles();
+    //removeTemporaryFiles();
     fakeTime.restore();
     denoExitStub.restore();
     denoStdoutStub.restore();
@@ -954,6 +957,336 @@ describe("SearchAction", () => {
         confirmStub.restore();
         downloaderStub.restore();
       }
+    });
+
+    it("enter invalid number", async () => {
+      createEmptyDimJson();
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+      const jsonData = JSON.parse(data);
+
+      let enteredNumber: number;
+      const enteredNumbers = [0, -1, 101, 1];
+      enteredNumbers.forEach((number) => {
+        if (1 <= number <= jsonData.result.results.length) {
+          enteredNumber = number;
+        }
+      });
+
+      const numberStub = stub(
+        Number,
+        "prompt",
+        () => {
+          return Promise<number>.resolve(enteredNumber);
+        },
+      );
+      const inputStub = stub(
+        Input,
+        "prompt",
+        () => {
+          return Promise<string>.resolve("");
+        },
+      );
+      const confirmStub = stub(
+        Confirm,
+        "prompt",
+        () => {
+          return Promise<boolean>.resolve(false);
+        },
+      );
+
+      await new SearchAction().execute(
+        { number: 10, install: true },
+        "避難所",
+      );
+
+      const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+      assertEquals(dimJson, {
+        fileVersion: "1.1",
+        contents: [{
+          catalogResourceId: "resource_id",
+          catalogUrl: "https://example.com",
+          headers: {},
+          name: "xckan_title_name",
+          postProcesses: [],
+          url: "https://example.com/dummy.csv",
+        }],
+      });
+
+      const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+      assertEquals(dimLockJson, {
+        lockFileVersion: "1.1",
+        contents: [{
+          catalogResourceId: "resource_id",
+          catalogUrl: "https://example.com",
+          eTag: null,
+          headers: {},
+          integrity: "",
+          lastDownloaded: "2022-01-02T03:04:05.678Z",
+          lastModified: null,
+          name: "xckan_title_name",
+          path: "./data_files/xckan_title_name/dummy.csv",
+          postProcesses: [],
+          url: "https://example.com/dummy.csv",
+        }],
+      });
+
+      numberStub.restore();
+      inputStub.restore();
+      confirmStub.restore();
+      kyStub.restore();
+    });
+
+    it("enter invalid characters", async () => {
+      createEmptyDimJson();
+      const numberStub = stub(
+        Number,
+        "prompt",
+        () => {
+          return Promise<number>.resolve(1);
+        },
+      );
+      const enteredNames = ["!?", "success value"];
+      const successValue = enteredNames.filter((text) => {
+        if (/^[\w\-０-９ぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠\s]*$/.test(text)) {
+          return text;
+        }
+      })[0];
+      const inputStub = stub(
+        Input,
+        "prompt",
+        returnsNext([
+          Promise<string>.resolve(successValue),
+          Promise<string>.resolve(""),
+        ]),
+      );
+      const confirmStub = stub(
+        Confirm,
+        "prompt",
+        () => {
+          return Promise<boolean>.resolve(false);
+        },
+      );
+
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+
+      await new SearchAction().execute(
+        { number: 10, install: true },
+        "避難所",
+      );
+
+      const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+      assertEquals(dimJson, {
+        fileVersion: "1.1",
+        contents: [{
+          catalogResourceId: "resource_id",
+          catalogUrl: "https://example.com",
+          headers: {},
+          name: "success value",
+          postProcesses: [],
+          url: "https://example.com/dummy.csv",
+        }],
+      });
+
+      const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+      assertEquals(dimLockJson, {
+        lockFileVersion: "1.1",
+        contents: [{
+          catalogResourceId: "resource_id",
+          catalogUrl: "https://example.com",
+          eTag: null,
+          headers: {},
+          integrity: "",
+          lastDownloaded: "2022-01-02T03:04:05.678Z",
+          lastModified: null,
+          name: "success value",
+          path: "./data_files/success value/dummy.csv",
+          postProcesses: [],
+          url: "https://example.com/dummy.csv",
+        }],
+      });
+
+      numberStub.restore();
+      inputStub.restore();
+      confirmStub.restore();
+      kyStub.restore();
+    });
+
+    it("enter invalid postprocess", async () => {
+      createEmptyDimJson();
+      const numberStub = stub(
+        Number,
+        "prompt",
+        () => {
+          return Promise<number>.resolve(1);
+        },
+      );
+      const encodingPostProcesses = ENCODINGS.map((encoding) =>
+        `encode ${encoding.toLowerCase()}`
+      );
+      const availablePostProcesses = [
+        "unzip",
+        "xlsx-to-csv",
+        ...encodingPostProcesses,
+      ];
+      const enteredPostProcesses = ["hoge", "cmd echo hoge", "encode utf-8"];
+      const successValues = enteredPostProcesses.filter((text) => {
+        if (
+          text === "" || text.startsWith("cmd ") ||
+          availablePostProcesses.includes(text)
+        ) {
+          return text;
+        }
+      });
+      const inputStub = stub(
+        Input,
+        "prompt",
+        returnsNext([
+          Promise<string>.resolve("name"),
+          Promise<string>.resolve(successValues[0]),
+          Promise<string>.resolve(successValues[1]),
+        ]),
+      );
+      const confirmStub = stub(
+        Confirm,
+        "prompt",
+        returnsNext([
+          Promise<boolean>.resolve(true),
+          Promise<boolean>.resolve(false),
+        ]),
+      );
+
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+
+      await new SearchAction().execute(
+        { number: 10, install: true },
+        "避難所",
+      );
+
+      const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+      assertEquals(dimJson, {
+        fileVersion: "1.1",
+        contents: [{
+          catalogResourceId: "resource_id",
+          catalogUrl: "https://example.com",
+          headers: {},
+          name: "name",
+          postProcesses: ["cmd echo hoge", "encode utf-8"],
+          url: "https://example.com/dummy.csv",
+        }],
+      });
+
+      const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+      assertEquals(dimLockJson, {
+        lockFileVersion: "1.1",
+        contents: [{
+          catalogResourceId: "resource_id",
+          catalogUrl: "https://example.com",
+          eTag: null,
+          headers: {},
+          integrity: "",
+          lastDownloaded: "2022-01-02T03:04:05.678Z",
+          lastModified: null,
+          name: "name",
+          path: "./data_files/name/dummy.csv",
+          postProcesses: ["cmd echo hoge", "encode utf-8"],
+          url: "https://example.com/dummy.csv",
+        }],
+      });
+
+      numberStub.restore();
+      inputStub.restore();
+      confirmStub.restore();
+      kyStub.restore();
+    });
+
+    it("enter a blank in postprocess", async () => {
+      createEmptyDimJson();
+      const numberStub = stub(
+        Number,
+        "prompt",
+        () => {
+          return Promise<number>.resolve(1);
+        },
+      );
+      const encodingPostProcesses = ENCODINGS.map((encoding) =>
+        `encode ${encoding.toLowerCase()}`
+      );
+      const availablePostProcesses = [
+        "unzip",
+        "xlsx-to-csv",
+        ...encodingPostProcesses,
+      ];
+      let enteredPostProcesses = "";
+      let successValue = "";
+      if (
+        enteredPostProcesses === "" ||
+        enteredPostProcesses.startsWith("cmd ") ||
+        availablePostProcesses.includes(enteredPostProcesses)
+      ) {
+        successValue = enteredPostProcesses;
+      }
+      const inputStub = stub(
+        Input,
+        "prompt",
+        returnsNext([
+          Promise<string>.resolve("name"),
+          Promise<string>.resolve(successValue),
+        ]),
+      );
+      const confirmStub = stub(
+        Confirm,
+        "prompt",
+        returnsNext([
+          Promise<boolean>.resolve(false),
+        ]),
+      );
+
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+
+      await new SearchAction().execute(
+        { number: 10, install: true },
+        "避難所",
+      );
+
+      const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+      assertEquals(dimJson, {
+        fileVersion: "1.1",
+        contents: [{
+          catalogResourceId: "resource_id",
+          catalogUrl: "https://example.com",
+          headers: {},
+          name: "name",
+          postProcesses: [],
+          url: "https://example.com/dummy.csv",
+        }],
+      });
+
+      const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+      assertEquals(dimLockJson, {
+        lockFileVersion: "1.1",
+        contents: [{
+          catalogResourceId: "resource_id",
+          catalogUrl: "https://example.com",
+          eTag: null,
+          headers: {},
+          integrity: "",
+          lastDownloaded: "2022-01-02T03:04:05.678Z",
+          lastModified: null,
+          name: "name",
+          path: "./data_files/name/dummy.csv",
+          postProcesses: [],
+          url: "https://example.com/dummy.csv",
+        }],
+      });
+
+      numberStub.restore();
+      inputStub.restore();
+      confirmStub.restore();
+      kyStub.restore();
     });
   });
 });
