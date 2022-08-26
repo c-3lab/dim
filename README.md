@@ -56,7 +56,7 @@ chmod u+x /usr/local/bin/dim
 
 1. init the project
 
-Generate `dim.json`, `dim-lock.json` and `./data_files` by init command.
+Generate `dim.json`, `dim-lock.json` and `data_files/` by init command.
 
 ```
 $ dim init
@@ -70,7 +70,7 @@ This command stores information about installed data in `dim.json` and `dim-lock
 $ dim install https://example.com -n "example"
 ```
 
-3. Installed data is saved in `data_files`.
+3. Installed data is saved in `data_files/`.
 
 ```
 $ ls ./data_files
@@ -96,7 +96,7 @@ dim.json  ....
 $ dim install
 ```
 
-3. Installed data is saved in `data_files`.
+3. Installed data is saved in `data_files/`.
 
 ```
 $ ls ./data_files
@@ -105,6 +105,8 @@ $ ls ./data_files
 # Command Usage
 
 ## Init
+
+Generate `dim.json`, `dim-lock.json` and `data_files/`.
 
 ```
 $ dim init
@@ -192,11 +194,15 @@ $ dim install https://example.com -n "example" -F
 
 ## Uninstall
 
+Delete data with the specified name from `dim.json`, `dim-lock.json` and `data_files/`.
+
 ```
 $ dim uninstall [name]
 ```
 
 ## List
+
+Display the information described in `dim-lock.json`.
 
 ```
 $ dim list
