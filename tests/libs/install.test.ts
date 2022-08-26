@@ -14,10 +14,14 @@ import {
   describe,
   it,
 } from "https://deno.land/std@0.152.0/testing/bdd.ts";
-import { Colors } from "../../deps.ts";
+import { Colors, decompress, encoding } from "../../deps.ts";
 import { InstallAction } from "../../libs/actions.ts";
-import { DEFAULT_DIM_FILE_PATH, DIM_FILE_VERSION } from "../../libs/consts.ts";
-import { DimJSON } from "../../libs/types.ts";
+import {
+  DEFAULT_DIM_FILE_PATH,
+  DEFAULT_DIM_LOCK_FILE_PATH,
+  DIM_FILE_VERSION,
+} from "../../libs/consts.ts";
+import { DimJSON, DimLockJSON } from "../../libs/types.ts";
 import {
   createKyGetStub,
   removeTemporaryFiles,
@@ -57,7 +61,7 @@ describe("InstallAction", () => {
     consoleErrorStub = stub(console, "error");
     denoExitStub = stub(Deno, "exit");
     denoStdoutStub = stub(Deno.stdout, "write");
-    fakeTime = new FakeTime("2022-01-02 03:04:05.678Z");
+    fakeTime = new FakeTime("2022-01-02T03:04:05.678Z");
     Deno.chdir(temporaryDirectory);
   });
 
@@ -72,107 +76,119 @@ describe("InstallAction", () => {
 
   describe("with URL", () => {
     it("download and save it to data_files, dim.json and dim-lock.json", async () => {
-      createEmptyDimJson();
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        createEmptyDimJson();
+        await new InstallAction().execute(
+          { name: "example" },
+          "https://example.com/dummy.txt",
+        );
+        assertEquals(
+          await fileExists(
+            "data_files/example/dummy.txt",
+          ),
+          true,
+        );
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "example",
+            postProcesses: [],
+            url: "https://example.com/dummy.txt",
+          }],
+        });
 
-      await new InstallAction().execute(
-        { name: "example" },
-        "https://www.pref.ehime.jp/opendata-catalog/dataset/2262/resource/9169/7iryouinnR3.pdf",
-      );
-      assertEquals(
-        await fileExists(
-          "data_files/example/7iryouinnR3.pdf",
-        ),
-        true,
-      );
-      const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
-      assertEquals(dimJson, {
-        fileVersion: "1.1",
-        contents: [{
-          catalogResourceId: null,
-          catalogUrl: null,
-          headers: {},
-          name: "example",
-          postProcesses: [],
-          url:
-            "https://www.pref.ehime.jp/opendata-catalog/dataset/2262/resource/9169/7iryouinnR3.pdf",
-        }],
-      });
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "example",
+            path: "./data_files/example/dummy.txt",
+            postProcesses: [],
+            url: "https://example.com/dummy.txt",
+          }],
+        });
 
-      const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
-      assertEquals(dimLockJson, {
-        lockFileVersion: "1.1",
-        contents: [{
-          catalogResourceId: null,
-          catalogUrl: null,
-          eTag: null,
-          headers: {},
-          integrity: "",
-          lastDownloaded: "2022-01-02T03:04:05.678Z",
-          lastModified: "2021-10-26T03:02:14.000Z",
-          name: "example",
-          path: "./data_files/example/7iryouinnR3.pdf",
-          postProcesses: [],
-          url:
-            "https://www.pref.ehime.jp/opendata-catalog/dataset/2262/resource/9169/7iryouinnR3.pdf",
-        }],
-      });
-
-      assertSpyCall(consoleLogStub, 0, {
-        args: [
-          Colors.green("Installed to ./data_files/example/7iryouinnR3.pdf"),
-        ],
-      });
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.green("Installed to ./data_files/example/dummy.txt"),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     it("exit with error when name is not specified", async () => {
-      createEmptyDimJson();
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        createEmptyDimJson();
 
-      await new InstallAction().execute(
-        {},
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
-      );
-      assertSpyCall(consoleLogStub, 0, {
-        args: [Colors.red("The -n option is not specified.")],
-      });
-      assertSpyCall(denoExitStub, 0, { args: [1] });
+        await new InstallAction().execute(
+          {},
+          "https://example.com/dummy.txt",
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("The -n option is not specified.")],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  重複する名前の-nを指定し実行
     it("exit with error when specified name is already installed", async () => {
-      //  ダミー用のdim.json作成
-      const dimData: DimJSON = {
-        fileVersion: DIM_FILE_VERSION,
-        contents: [
-          {
-            name: "installedName1",
-            url: "dummy",
-            catalogUrl: null,
-            catalogResourceId: null,
-            postProcesses: [],
-            headers: {},
-          },
-        ],
-      };
-      await Deno.writeTextFile(
-        DEFAULT_DIM_FILE_PATH,
-        JSON.stringify(dimData, null, 2),
-      );
-      //  name重複
-      await new InstallAction().execute(
-        { name: "installedName1" },
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
-      );
-      assertSpyCall(consoleLogStub, 0, {
-        args: [Colors.red("The name already exists.")],
-      });
-      assertSpyCall(consoleLogStub, 1, {
-        args: [
-          Colors.red(
-            "Use the -F option to force installation and overwrite existing files.",
-          ),
-        ],
-      });
-      assertSpyCall(denoExitStub, 0, { args: [1] });
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        //  ダミー用のdim.json作成
+        const dimData: DimJSON = {
+          fileVersion: DIM_FILE_VERSION,
+          contents: [
+            {
+              name: "installedName1",
+              url: "dummy",
+              catalogUrl: null,
+              catalogResourceId: null,
+              postProcesses: [],
+              headers: {},
+            },
+          ],
+        };
+        await Deno.writeTextFile(
+          DEFAULT_DIM_FILE_PATH,
+          JSON.stringify(dimData, null, 2),
+        );
+        //  name重複
+        await new InstallAction().execute(
+          { name: "installedName1" },
+          "https://example.com/dummy.txt",
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("The name already exists.")],
+        });
+        assertSpyCall(consoleLogStub, 1, {
+          args: [
+            Colors.red(
+              "Use the -F option to force installation and overwrite existing files.",
+            ),
+          ],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  重複する名前の-nと-Fを指定し実行
@@ -205,336 +221,568 @@ describe("InstallAction", () => {
           "last-modified": "Thu, 3 Feb 2022 04:05:06 GMT",
         },
       });
+      try {
+        //  重複する名前でintall
+        await new InstallAction().execute(
+          { name: "installedName2", force: true },
+          "https://example.com/dummy.csv",
+        );
 
-      //  重複する名前でintall
-      await new InstallAction().execute(
-        { name: "installedName2", force: true },
-        "https://example.com/dummy.csv",
-      );
+        //  ファイルが更新されているか確認
+        const fileContent = Deno.readTextFileSync(
+          "data_files/installedName2/dummy.csv",
+        );
+        assertEquals(fileContent, "after");
 
-      //  ファイルが更新されているか確認
-      const fileContent = Deno.readTextFileSync(
-        "data_files/installedName2/dummy.csv",
-      );
-      assertEquals(fileContent, "after");
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "installedName2",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
 
-      const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
-      assertEquals(dimJson, {
-        fileVersion: "1.1",
-        contents: [{
-          catalogResourceId: null,
-          catalogUrl: null,
-          headers: {},
-          name: "installedName2",
-          postProcesses: [],
-          url: "https://example.com/dummy.csv",
-        }],
-      });
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: "12345-1234567890abc",
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: "2022-02-03T04:05:06.000Z",
+            name: "installedName2",
+            path: "./data_files/installedName2/dummy.csv",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
 
-      const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
-      assertEquals(dimLockJson, {
-        lockFileVersion: "1.1",
-        contents: [{
-          catalogResourceId: null,
-          catalogUrl: null,
-          eTag: "12345-1234567890abc",
-          headers: {},
-          integrity: "",
-          lastDownloaded: "2022-01-02T03:04:05.678Z",
-          lastModified: "2022-02-03T04:05:06.000Z",
-          name: "installedName2",
-          path: "./data_files/installedName2/dummy.csv",
-          postProcesses: [],
-          url: "https://example.com/dummy.csv",
-        }],
-      });
-
-      assertSpyCall(consoleLogStub, 0, {
-        args: [
-          Colors.green(
-            "Installed to ./data_files/installedName2/dummy.csv",
-          ),
-        ],
-      });
-
-      kyGetStub.restore();
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.green(
+              "Installed to ./data_files/installedName2/dummy.csv",
+            ),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -nと-Hを指定し実行
     it("specify request headers and perform download, recording in dim.json and dim-lock.json", async () => {
       createEmptyDimJson();
 
-      const kyGetStub = createKyGetStub("dummy body");
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        //  InstallActionを実行
+        await new InstallAction().execute(
+          { name: "Header", headers: ["key: value"] },
+          "https://example.com/dummy.csv",
+        );
 
-      //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "Header", headers: ["key: value"] },
-        "https://example.com/dummy.csv",
-      );
+        assertEquals(kyGetStub.calls[0].args[1].headers, { "key": "value" });
+        assertEquals(
+          await fileExists(
+            "data_files/Header/dummy.csv",
+          ),
+          true,
+        );
 
-      assertEquals(kyGetStub.calls[0].args[1].headers, { "key": "value" });
-      assertEquals(
-        await fileExists(
-          "data_files/Header/dummy.csv",
-        ),
-        true,
-      );
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: { key: "value" },
+            name: "Header",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
 
-      const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
-      assertEquals(dimJson, {
-        fileVersion: "1.1",
-        contents: [{
-          catalogResourceId: null,
-          catalogUrl: null,
-          headers: { key: "value" },
-          name: "Header",
-          postProcesses: [],
-          url: "https://example.com/dummy.csv",
-        }],
-      });
-
-      const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
-      assertEquals(dimLockJson, {
-        lockFileVersion: "1.1",
-        contents: [{
-          catalogResourceId: null,
-          catalogUrl: null,
-          eTag: null,
-          headers: { key: "value" },
-          integrity: "",
-          lastDownloaded: "2022-01-02T03:04:05.678Z",
-          lastModified: null,
-          name: "Header",
-          path: "./data_files/Header/dummy.csv",
-          postProcesses: [],
-          url: "https://example.com/dummy.csv",
-        }],
-      });
-
-      kyGetStub.restore();
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: { key: "value" },
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "Header",
+            path: "./data_files/Header/dummy.csv",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -nと-pに"encode utf-8"を指定し実行
     it('specify "encode utf-8" in "postProcess", download the file, check that it is saved in data_files, dim.json, dim-lock.json, and confirm that the data is "utf-8"', async () => {
       createEmptyDimJson();
-      //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "encodeUtf8", postProcesses: ["encode utf-8"] },
-        "https://od.city.otsu.lg.jp/dataset/97d09f65-852b-4395-9dbb-9f0f82da1524/resource/daa71a2a-5d95-4760-8076-7e65923366e7/download/20210915.txt",
-      );
-      assertEquals(
-        await fileExists(
-          "data_files/encodeUtf8/20210915.txt",
-        ),
-        true,
-      );
+      const kyGetStub = createKyGetStub("テストデータ");
+      try {
+        const utf8Bytes = new TextEncoder().encode("テストデータ");
+        const sjisBytesArray = encoding.convert(utf8Bytes, {
+          from: "UTF8",
+          to: "SJIS",
+        });
+        Deno.writeFileSync("test.txt", Uint8Array.from(sjisBytesArray));
+
+        //  InstallActionを実行
+        await new InstallAction().execute(
+          { name: "encodeSjis", postProcesses: ["encode sjis"] },
+          "https://example.com/dummy.txt",
+        );
+        assertEquals(
+          await fileExists(
+            "data_files/encodeSjis/dummy.txt",
+          ),
+          true,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            "Converted encoding to",
+            "SJIS",
+          ],
+        });
+        assertSpyCall(consoleLogStub, 1, {
+          args: [
+            Colors.green(
+              "Installed to ./data_files/encodeSjis/dummy.txt",
+            ),
+          ],
+        });
+        const testTxt = Deno.readTextFileSync("test.txt");
+        const downloadTxt = Deno.readTextFileSync(
+          "data_files/encodeSjis/dummy.txt",
+        );
+        assertEquals(testTxt, downloadTxt);
+
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "encodeSjis",
+            postProcesses: ["encode sjis"],
+            url: "https://example.com/dummy.txt",
+          }],
+        });
+
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "encodeSjis",
+            path: "./data_files/encodeSjis/dummy.txt",
+            postProcesses: ["encode sjis"],
+            url: "https://example.com/dummy.txt",
+          }],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -nと-pに"encode utf-8 sjis"を指定し実行
     it('exit with error when specify "encode utf-8 sjis" in "postProcess", and download', async () => {
-      createEmptyDimJson();
-      //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "encodeUtf8Sjis", postProcesses: ["encode utf-8 sjis"] },
-        "https://od.city.otsu.lg.jp/dataset/97d09f65-852b-4395-9dbb-9f0f82da1524/resource/daa71a2a-5d95-4760-8076-7e65923366e7/download/20210915.txt",
-      );
-      assertSpyCall(denoExitStub, 0, { args: [1] });
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        createEmptyDimJson();
+        //  InstallActionを実行
+        await new InstallAction().execute(
+          { name: "encodeUtf8Sjis", postProcesses: ["encode utf-8 sjis"] },
+          "https://example.com/dummy.txt",
+        );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.red(
+              "error: Too many arguments:",
+            ),
+            Colors.red(
+              "encode utf-8 sjis",
+            ),
+          ],
+        });
+        assertEquals(
+          await fileExists(
+            "data_files/encodeUtf8Sjis/dummy.txt",
+          ),
+          true,
+        );
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -nと-pに"encode"を指定し実行
     it('exit with error when specify "encode" in "postProcess", and download.', async () => {
-      createEmptyDimJson();
-      //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "encode", postProcesses: ["encode"] },
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
-      );
-      assertSpyCall(denoExitStub, 0, { args: [1] });
-    });
-
-    //  -nと-pに"unzip"を指定し実行(Deno.build.osがlinuxの場合)
-    it('specify "unzip" in "postProcess", download files, save to data_files, dim.json, dim-lock.json, check if downloaded data is unpacked.', async () => {
-      createEmptyDimJson();
-      const denoRunStub = stub(Deno, "run");
+      const kyGetStub = createKyGetStub("dummy");
       try {
+        createEmptyDimJson();
         //  InstallActionを実行
         await new InstallAction().execute(
-          { name: "unzip", postProcesses: ["unzip"] },
-          "	https://opendata.pref.shizuoka.jp/fs/2/6/4/2/4/_/_________-_-_.zip",
+          { name: "encode", postProcesses: ["encode"] },
+          "https://example.com/dummy.txt",
         );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.red(
+              "Argument not specified.",
+            ),
+          ],
+        });
         assertEquals(
           await fileExists(
-            "data_files/unzip/_________-_-_.zip",
+            "data_files/encode/dummy.txt",
           ),
           true,
         );
-        assertSpyCall(denoRunStub, 0, {
-          args: [{
-            cmd: ["unzip", "./data_files/unzip/_________-_-_.zip", "-d", "./"],
-          }],
-        });
       } finally {
-        denoRunStub.restore();
+        kyGetStub.restore();
       }
     });
-    //  -nと-pに"unzip"を指定し実行(Deno.build.osがdarwinの場合)
-    it("check standard output when deno.build.os is darwin", async () => {
+
+    //linux
+    it('specify "unzip" in "postProcess", download files, save to data_files, dim.json, dim-lock.json, check if downloaded data is unpacked.', async () => {
       createEmptyDimJson();
+      const kyGetStub = createKyGetStub("dummy");
       const denoRunStub = stub(Deno, "run");
       try {
         //  InstallActionを実行
         await new InstallAction().execute(
           { name: "unzip", postProcesses: ["unzip"] },
-          "	https://opendata.pref.shizuoka.jp/fs/2/6/4/2/4/_/_________-_-_.zip",
+          "https://example.com/dummy.zip",
         );
         assertEquals(
           await fileExists(
-            "data_files/unzip/_________-_-_.zip",
+            "data_files/unzip/dummy.zip",
           ),
           true,
         );
         assertSpyCall(denoRunStub, 0, {
           args: [{
-            cmd: ["unzip", "./data_files/unzip/_________-_-_.zip", "-d", "./"],
+            cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./"],
           }],
         });
       } finally {
         denoRunStub.restore();
+        kyGetStub.restore();
+      }
+    });
+    //darwin
+    it.ignore("check standard output when deno.build.os is darwin", async () => {
+      createEmptyDimJson();
+      const kyGetStub = createKyGetStub("dummy");
+      const denoRunStub = stub(Deno, "run");
+      const denoBuildOsStub = stub(Deno.build, "os");
+      try {
+        //  InstallActionを実行
+        await new InstallAction().execute(
+          { name: "unzip", postProcesses: ["unzip"] },
+          "https://example.com/dummy.zip",
+        );
+        assertEquals(
+          await fileExists(
+            "data_files/unzip/dummy.zip",
+          ),
+          true,
+        );
+        assertSpyCall(denoRunStub, 0, {
+          args: [{
+            cmd: [
+              "ditto",
+              "-xk",
+              "--sequesterRsrc",
+              "data_files/unzip/dummy.zip",
+              "data_files/unzip",
+            ],
+          }],
+        });
+      } finally {
+        kyGetStub.restore();
+        denoRunStub.restore();
+        denoBuildOsStub.restore();
       }
     });
 
     //  -nと-pに"unzip a"を指定し実行
     it('exit with error when specify "unzip a" in "postProcess" and download', async () => {
       createEmptyDimJson();
-      //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "unzipa", postProcesses: ["unzip a"] },
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
-      );
-      assertSpyCall(denoExitStub, 0, { args: [1] });
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        //  InstallActionを実行
+        await new InstallAction().execute(
+          { name: "unzipa", postProcesses: ["unzip a"] },
+          "https://example.com/dummy.zip",
+        );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertEquals(
+          await fileExists(
+            "data_files/unzipa/dummy.zip",
+          ),
+          true,
+        );
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -nと-pに"xlsx-to-csv"を指定し実行
     it('specify "xlsx-to-csv" in "postProcess", download files, save to data_files, dim.json, dim-lock.json, check if downloaded data is converted to csv', async () => {
       createEmptyDimJson();
-      //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "xlsx-to-csv", postProcesses: ["xlsx-to-csv"] },
-        "	https://www.city.fukuoka.lg.jp/data/open/cnt/3/59282/1/27_04_01_1.xlsx",
-      );
-      assertEquals(
-        await fileExists(
-          "data_files/xlsx-to-csv/27_04_01_1.xlsx",
-        ),
-        true,
-      );
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        //  InstallActionを実行
+        await new InstallAction().execute(
+          { name: "xlsx-to-csv", postProcesses: ["xlsx-to-csv"] },
+          "https://example.com/dummy.xlsx",
+        );
+        assertEquals(
+          await fileExists(
+            "data_files/xlsx-to-csv/dummy.csv",
+          ),
+          true,
+        );
+        assertSpyCall(consoleLogStub, 0, { args: ["Convert xlsx to csv."] });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -nと-pに"xlsx-to-csv a"を指定し実行
     it('exit with error when specify "xlsx-to-csv a" in "postProcess" and download', async () => {
       createEmptyDimJson();
-      //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "xlsx-to-csv a", postProcesses: ["xlsx-to-csv a"] },
-        "	https://www.city.fukuoka.lg.jp/data/open/cnt/3/59282/1/27_04_01_1.xlsx",
-      );
-      assertSpyCall(denoExitStub, 0, { args: [1] });
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        //  InstallActionを実行
+        await new InstallAction().execute(
+          { name: "xlsx-to-csv a", postProcesses: ["xlsx-to-csv a"] },
+          "https://example.com/dummy.xlsx",
+        );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertEquals(
+          await fileExists(
+            "data_files/xlsx-to-csv a/dummy.xlsx",
+          ),
+          true,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.red(
+              "error: Too many arguments:",
+            ),
+            Colors.red(
+              "xlsx-to-csv a",
+            ),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -nと-pに"cmd echo"を指定し実行
     it('specify "cmd echo" in "postProcess", download files, confirm that they are saved in data_files, dim.json, dim-lock.json, confirm that the path of downloaded data is output to standard output', async () => {
-      createEmptyDimJson();
-      //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "cmdecho", postProcesses: ["cmd echo"] },
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
-      );
-      assertEquals(
-        await fileExists(
-          "data_files/cmdecho/000259916.zip",
-        ),
-        true,
-      );
+      const kyGetStub = createKyGetStub("dummy");
+      const denoRunStub = stub(Deno, "run");
+      try {
+        createEmptyDimJson();
+        //  InstallActionを実行
+        await new InstallAction().execute(
+          { name: "cmdecho", postProcesses: ["cmd echo"] },
+          "https://example.com/dummy.txt",
+        );
+        assertEquals(
+          await fileExists(
+            "data_files/cmdecho/dummy.txt",
+          ),
+          true,
+        );
+        assertSpyCall(denoRunStub, 0, {
+          args: [{
+            cmd: ["echo", "./data_files/cmdecho/dummy.txt"],
+            stdout: "piped",
+          }],
+        });
+      } finally {
+        kyGetStub.restore();
+        denoRunStub.restore();
+      }
     });
 
     //  -nと-pに"cmd echo a"を指定し実行
     it('specify "cmd a" for "postProcess", download the file, and confirm that the path to the downloaded data is output to standard output with "a" at the beginning', async () => {
-      createEmptyDimJson();
-      //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "cmdechoa", postProcesses: ["cmd echo a"] },
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
-      );
-      assertEquals(
-        await fileExists(
-          "data_files/cmdechoa/000259916.zip",
-        ),
-        true,
-      );
+      const denoRunStub = stub(Deno, "run");
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        createEmptyDimJson();
+        //  InstallActionを実行
+        await new InstallAction().execute(
+          { name: "cmdechoa", postProcesses: ["cmd echo a"] },
+          "https://example.com/dummy.txt",
+        );
+        assertEquals(
+          await fileExists(
+            "data_files/cmdechoa/dummy.txt",
+          ),
+          true,
+        );
+        assertSpyCall(denoRunStub, 0, {
+          args: [{
+            cmd: ["echo", "a", "./data_files/cmdechoa/dummy.txt"],
+            stdout: "piped",
+          }],
+        });
+      } finally {
+        kyGetStub.restore();
+        denoRunStub.restore();
+      }
     });
 
     //  -nと-pに"cmd"を指定し実行
     it('exit with error when specify "cmd" for "postProcess" and download', async () => {
       //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "cmd", postProcesses: ["cmd"] },
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
-      );
-      assertEquals(
-        await fileExists(
-          "data_files/cmd/000259916.zip",
-        ),
-        true,
-      );
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        createEmptyDimJson();
+        await new InstallAction().execute(
+          { name: "cmd", postProcesses: ["cmd"] },
+          "https://example.com/dummy.txt",
+        );
+        assertEquals(
+          await fileExists(
+            "data_files/cmd/dummy.txt",
+          ),
+          true,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.red(
+              "No command entered",
+            ),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -nと-pに"cmd aaa"(存在しないコマンド)を指定し実行
     it('exit with error when specify "cmd aaa" for "postProcess" and download', async () => {
       //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "ecmd aaa", postProcesses: ["cmd aaa"] },
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
-      );
-      assertEquals(
-        await fileExists(
-          "data_files/ecmd aaa/000259916.zip",
-        ),
-        true,
-      );
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        createEmptyDimJson();
+        await new InstallAction().execute(
+          { name: "ecmd aaa", postProcesses: ["cmd aaa"] },
+          "https://example.com/dummy.txt",
+        );
+        assertEquals(
+          await fileExists(
+            "data_files/ecmd aaa/dummy.txt",
+          ),
+          true,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            "Execute Command: ",
+            [
+              "aaa",
+            ],
+            "./data_files/ecmd aaa/dummy.txt",
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -nと-pに"aaa"(存在しないコマンド)を指定し実行
     it('exit with error when specify "aaa" in "postProcess" and download', async () => {
       //  InstallActionを実行
-      await new InstallAction().execute(
-        { name: "aaa", postProcesses: ["aaa"] },
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
-      );
-      assertEquals(
-        await fileExists(
-          "data_files/aaa/000259916.zip",
-        ),
-        true,
-      );
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        createEmptyDimJson();
+        await new InstallAction().execute(
+          { name: "aaa", postProcesses: ["aaa"] },
+          "https://example.com/dummy.txt",
+        );
+        assertEquals(
+          await fileExists(
+            "data_files/aaa/dummy.txt",
+          ),
+          true,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: ["No support a postprocess 'aaa' ''."],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -nと無効なURLを指定し実行
     it("exit with error when failed to download", async () => {
-      //  無効なURL
-      await new InstallAction().execute(
-        { name: "invalidURL" },
-        "aaa",
-      );
-      assertSpyCall(denoExitStub, 0, { args: [1] });
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        createEmptyDimJson();
+        //  無効なURL
+        await new InstallAction().execute(
+          { name: "invalidURL" },
+          "aaa",
+        );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertSpyCall(consoleErrorStub, 0, {
+          args: [Colors.red("Failed to install."), Colors.red("Invalid URL")],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  URLと-fを指定し実行
     it("exit with error when execute with URL and -f ", async () => {
-      await new InstallAction().execute(
-        { file: "./../test-dim.json" },
-        "https://www.city.shinjuku.lg.jp/content/000259916.zip",
-      );
-      assertSpyCall(denoExitStub, 0, { args: [1] });
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        await new InstallAction().execute(
+          { file: "./../test-dim.json" },
+          "https://example.com/dummy.txt",
+        );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("Cannot use -f option and URL at the same time.")],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
   });
 
@@ -542,62 +790,369 @@ describe("InstallAction", () => {
     //  install済みのデータがない状態で実行
     it("Run with an empty dim.json and verify that a message appears prompting to download data", async () => {
       createEmptyDimJson();
-      await new InstallAction().execute(
-        {},
-        undefined,
-      );
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        await new InstallAction().execute(
+          {},
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            "No contents.\nYou should run a 'dim install <data url>'. ",
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  dim.jsonが存在しない状況で実行
     it("exit with error when Runs without dim.json", async () => {
-      await new InstallAction().execute({}, undefined);
-      assertSpyCall(denoExitStub, 0, { args: [1] });
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        await new InstallAction().execute({}, undefined);
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            "Not found a dim.json. You should run a 'dim init'. ",
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -fにローカルに存在するdim.jsonのパスを指定し実行
     it("specify a locally existing dim.json, download data not listed in the dim.json that exists in the current directory, and save it to data_files, dim.json and dim-lock.json", async () => {
       createEmptyDimJson();
-      await new InstallAction().execute(
-        { file: "./../test-dim.json" },
-        undefined,
-      );
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        await new InstallAction().execute(
+          { file: "./../test-dim.json" },
+          undefined,
+        );
+        const dimJson = JSON.parse(Deno.readTextFileSync("./../test-dim.json"));
+        assertEquals(dimJson, JSON.parse(Deno.readTextFileSync("./dim.json")));
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  install済みのデータがある状態で-fにローカルに存在するdim.jsonのパスを指定し実行
     it("with no difference between the data stored in dim.json and dim-lock.json, specify the locally existing dim.json file and execute it to confirm that the output is correct.", async () => {
-      //  TODO: tests/temporary以下にtest-dim.jsonを作成
-      await new InstallAction().execute(
-        { file: "./../test-dim.json" },
-        undefined,
-      );
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        createEmptyDimJson();
+        const dimLockData: DimLockJSON = {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: new Date(),
+            lastModified: null,
+            name: "test1",
+            path: "./data_files/test1/dummy.txt",
+            postProcesses: ["encoding-utf-8"],
+            url: "https://example.com/dummy.txt",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: new Date(),
+            lastModified: null,
+            name: "test2",
+            path: "./data_files/test2/dummy.csv",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: new Date(),
+            lastModified: null,
+            name: "test3",
+            path: "./data_files/test3/dummy.zip",
+            postProcesses: [],
+            url: "https://example.com/dummy.zip",
+          }],
+        };
+        await Deno.writeTextFile(
+          DEFAULT_DIM_LOCK_FILE_PATH,
+          JSON.stringify(dimLockData, null, 2),
+        );
+        //  TODO: tests/temporary以下にtest-dim.jsonを作成
+        await new InstallAction().execute(
+          { file: "./../test-dim.json" },
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: ["All contents have already been installed."],
+        });
+        assertSpyCall(consoleLogStub, 1, {
+          args: [
+            "Use the -F option to force installation and overwrite existing files.",
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  -fにローカルに存在するdim.json以外のパスを指定し実行
     it("specify a locally existing dim.json, download data not listed in the dim.json that exists in the current directory, and save it to data_files, dim.json and dim-lock.json", async () => {
-      await new InstallAction().execute(
-        { file: "./../helper.ts" },
-        undefined,
-      );
-      assertSpyCall(denoExitStub, 0, { args: [1] });
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        await new InstallAction().execute(
+          { file: "./../helper.ts" },
+          undefined,
+        );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertSpyCall(consoleLogStub, 0, {
+          args: ["Not found a dim.json. You should run a 'dim init'. "],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
     //  install済みのデータがある状態で実行
     it("run with no difference between the data stored in dim.json and dim-lock.json to check for correct output.", async () => {
-      await new InstallAction().execute({}, undefined);
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        const dimData: DimJSON = {
+          fileVersion: DIM_FILE_VERSION,
+          contents: [
+            {
+              name: "test1",
+              url: "https://example.com/dummy.test",
+              catalogUrl: null,
+              catalogResourceId: null,
+              postProcesses: [],
+              headers: {},
+            },
+          ],
+        };
+        const dimLockData: DimLockJSON = {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: new Date(),
+            lastModified: null,
+            name: "test1",
+            path: "./data_files/test1/dummy.txt",
+            postProcesses: ["encoding-utf-8"],
+            url: "https://example.com/dummy.txt",
+          }],
+        };
+        await Deno.writeTextFile(
+          DEFAULT_DIM_LOCK_FILE_PATH,
+          JSON.stringify(dimLockData, null, 2),
+        );
+        await Deno.writeTextFile(
+          DEFAULT_DIM_FILE_PATH,
+          JSON.stringify(dimData, null, 2),
+        );
+        await new InstallAction().execute({}, undefined);
+        assertSpyCall(consoleLogStub, 0, {
+          args: ["All contents have already been installed."],
+        });
+        assertSpyCall(consoleLogStub, 1, {
+          args: [
+            "Use the -F option to force installation and overwrite existing files.",
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  install済みのデータがある状態で-Fを指定し実行
     it('with no difference between the data stored in dim.json and dim-lock.json, specify "-F" and execute to confirm that the data recorded in dim.json has been downloaded.', async () => {
-      await new InstallAction().execute({ force: true }, undefined);
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        const dimData: DimJSON = {
+          "fileVersion": "1.1",
+          "contents": [
+            {
+              name: "test1",
+              url: "https://example.com/dummy.txt",
+              catalogUrl: null,
+              catalogResourceId: null,
+              postProcesses: [
+                "encoding-utf-8",
+              ],
+              headers: {},
+            },
+            {
+              name: "test2",
+              url: "https://example.com/dummy.csv",
+              catalogUrl: null,
+              catalogResourceId: null,
+              postProcesses: [],
+              headers: {},
+            },
+            {
+              url: "https://example.com/dummy.zip",
+              name: "test3",
+              catalogUrl: null,
+              catalogResourceId: null,
+              postProcesses: [],
+              headers: {},
+            },
+          ],
+        };
+        await Deno.writeTextFile(
+          DEFAULT_DIM_FILE_PATH,
+          JSON.stringify(dimData, null, 2),
+        );
+        await new InstallAction().execute({ force: true }, undefined);
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "test1",
+            path: "./data_files/test1/dummy.txt",
+            postProcesses: ["encoding-utf-8"],
+            url: "https://example.com/dummy.txt",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "test2",
+            path: "./data_files/test2/dummy.csv",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "test3",
+            path: "./data_files/test3/dummy.zip",
+            postProcesses: [],
+            url: "https://example.com/dummy.zip",
+          }],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
     });
 
     //  install済みのデータがある状態で-Fと-Aを指定し実行
     it(
       'with no difference between the data stored in dim.json and dim-lock.json, specify "-F -A" and execute to confirm that the data recorded in dim.json has been downloaded.',
       async () => {
-        await new InstallAction().execute(
-          { force: true, asyncInstall: true },
-          undefined,
-        );
+        const kyGetStub = createKyGetStub("dummy");
+        try {
+          const dimData: DimJSON = {
+            "fileVersion": "1.1",
+            "contents": [
+              {
+                name: "test1",
+                url: "https://example.com/dummy.txt",
+                catalogUrl: null,
+                catalogResourceId: null,
+                postProcesses: [
+                  "encoding-utf-8",
+                ],
+                headers: {},
+              },
+              {
+                name: "test2",
+                url: "https://example.com/dummy.csv",
+                catalogUrl: null,
+                catalogResourceId: null,
+                postProcesses: [],
+                headers: {},
+              },
+              {
+                url: "https://example.com/dummy.zip",
+                name: "test3",
+                catalogUrl: null,
+                catalogResourceId: null,
+                postProcesses: [],
+                headers: {},
+              },
+            ],
+          };
+          await Deno.writeTextFile(
+            DEFAULT_DIM_FILE_PATH,
+            JSON.stringify(dimData, null, 2),
+          );
+          await new InstallAction().execute(
+            { force: true, asyncInstall: true },
+            undefined,
+          );
+          const dimLockJson = JSON.parse(
+            Deno.readTextFileSync("dim-lock.json"),
+          );
+          assertEquals(dimLockJson, {
+            lockFileVersion: "1.1",
+            contents: [{
+              catalogResourceId: null,
+              catalogUrl: null,
+              eTag: null,
+              headers: {},
+              integrity: "",
+              lastDownloaded: "2022-01-02T03:04:05.678Z",
+              lastModified: null,
+              name: "test1",
+              path: "./data_files/test1/dummy.txt",
+              postProcesses: ["encoding-utf-8"],
+              url: "https://example.com/dummy.txt",
+            }, {
+              catalogResourceId: null,
+              catalogUrl: null,
+              eTag: null,
+              headers: {},
+              integrity: "",
+              lastDownloaded: "2022-01-02T03:04:05.678Z",
+              lastModified: null,
+              name: "test2",
+              path: "./data_files/test2/dummy.csv",
+              postProcesses: [],
+              url: "https://example.com/dummy.csv",
+            }, {
+              catalogResourceId: null,
+              catalogUrl: null,
+              eTag: null,
+              headers: {},
+              integrity: "",
+              lastDownloaded: "2022-01-02T03:04:05.678Z",
+              lastModified: null,
+              name: "test3",
+              path: "./data_files/test3/dummy.zip",
+              postProcesses: [],
+              url: "https://example.com/dummy.zip",
+            }],
+          });
+        } finally {
+          kyGetStub.restore();
+        }
       },
     );
 
@@ -605,13 +1160,26 @@ describe("InstallAction", () => {
     it(
       "specify a Internet existing dim.json, download data not listed in the dim.json that exists in the current directory, and save it to data_files, dim.json and dim-lock.json",
       async () => {
-        await new InstallAction().execute(
-          {
-            file:
-              "https://raw.githubusercontent.com/c-3lab/dim/test/multiple-tests/tests/test-dim.json",
-          },
-          undefined,
-        );
+        const dimJson = Deno.readTextFileSync("./../test-dim.json");
+        const kyGetStub = createKyGetStub(dimJson.replace(/[\n\s]/g, ""));
+        try {
+          createEmptyDimJson();
+          await new InstallAction().execute(
+            {
+              file: "https://example.com/dummy.json",
+            },
+            undefined,
+          );
+          const dimJson = JSON.parse(
+            Deno.readTextFileSync("./../test-dim.json"),
+          );
+          assertEquals(
+            dimJson,
+            JSON.parse(Deno.readTextFileSync("./dim.json")),
+          );
+        } finally {
+          kyGetStub.restore();
+        }
       },
     );
 
@@ -619,35 +1187,46 @@ describe("InstallAction", () => {
     it(
       "exit with error when run by specifying a non-dim.json file that exists on the Internet",
       async () => {
-        let error = "";
-        await new InstallAction().execute(
-          {
-            file:
-              "https://github.com/c-3lab/dim/blob/test/multiple-tests/tests/test_custom_command.py",
-          },
-          undefined,
-        ).catch((e) => {
-          error = e.message;
-        });
-        assertMatch(error, /.*(is not valid JSON)$/);
+        const kyGetStub = createKyGetStub("dummy");
+        try {
+          let error = "";
+          await new InstallAction().execute(
+            {
+              file: "https://example.com/dummy.json",
+            },
+            undefined,
+          ).catch((e) => {
+            error = e.message;
+          });
+          assertMatch(error, /.*(is not valid JSON)$/);
+        } finally {
+          kyGetStub.restore();
+        }
       },
     );
 
     //  dim.tsの呼び出し
     it("call dim.ts and execute it in command line form.", async () => {
-      const p = Deno.run({
-        cmd: [
-          "deno",
-          "run",
-          "--allow-read",
-          "--allow-write",
-          "--allow-net",
-          "../../dim.ts",
-        ],
-        stdout: "piped",
-      });
-      console.log(new TextDecoder().decode(await p.output()));
-      p.close();
+      createEmptyDimJson();
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        const p = Deno.run({
+          cmd: [
+            "deno",
+            "run",
+            "--allow-read",
+            "--allow-write",
+            "--allow-net",
+            "../../dim.ts",
+            "install",
+          ],
+          stdout: "piped",
+        });
+        console.log(new TextDecoder().decode(await p.output()));
+        p.close();
+      } finally {
+        kyGetStub.restore();
+      }
     });
   });
 });
