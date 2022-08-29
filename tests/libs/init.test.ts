@@ -36,7 +36,7 @@ describe("InitAction", () => {
     consoleLogStub.restore();
   });
 
-  it("create empty data directory, dim.json and dim-lock.json", async () => {
+  it("ensure that empty data directories, dim.json and dim-lock.json are created.", async () => {
     await new InitAction().execute();
 
     const dataDirectory = Deno.statSync("data_files");

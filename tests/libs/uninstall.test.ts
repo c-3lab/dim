@@ -55,7 +55,7 @@ describe("UninstallAction", () => {
     consoleLogStub.restore();
   });
 
-  it("delete downloaded data and rewrite dim.json, dim-lock.json", async () => {
+  it("delete the downloaded data and check that dim.json and dim-lock.json have been rewritten.", async () => {
     const dimData: DimJSON = {
       fileVersion: "1.1",
       contents: [

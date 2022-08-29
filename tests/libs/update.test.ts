@@ -76,7 +76,7 @@ describe("UpdateAction", () => {
   });
 
   describe("with name", () => {
-    it('run update with "name" listed in dim.json', async () => {
+    it('confirm that dim.json and dim-lock.json have been updated by running dim.json with the "name" listed in dim.json.', async () => {
       const dimData: DimJSON = {
         fileVersion: DIM_FILE_VERSION,
         contents: [
@@ -196,7 +196,7 @@ describe("UpdateAction", () => {
     });
   });
   describe("without name", () => {
-    it("update all data recorded in dim-lock.json.", async () => {
+    it("check that all data recorded in dim-lock.json is updated.", async () => {
       const kyGetStub = createKyGetStub("after", {
         headers: {
           "etag": '"12345-1234567890abc"',
@@ -293,7 +293,7 @@ describe("UpdateAction", () => {
         kyGetStub.restore();
       }
     });
-    it("asynchronous updating of all data recorded in dim-lock.json.", async () => {
+    it("check that all data recorded in dim-lock.json is updated asynchronously.", async () => {
       const kyGetStub = createKyGetStub("after", {
         headers: {
           "etag": '"12345-1234567890abc"',
