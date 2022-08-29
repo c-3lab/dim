@@ -76,7 +76,7 @@ describe("SearchAction", () => {
   });
 
   describe("with keyword", () => {
-    it("single keyword", async () => {
+    it("check that the results are displayed on the standard output.", async () => {
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
       await new SearchAction().execute(
@@ -86,7 +86,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("multiple keywords", async () => {
+    it("check whether results are displayed in the standard output when multiple keywords are specified.", async () => {
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
       await new SearchAction().execute(
@@ -122,7 +122,7 @@ describe("SearchAction", () => {
     //   });
     // });
 
-    it("0 search results", async () => {
+    it("exit with error when display on stdout that results could not be obtained", async () => {
       const kyStub = createKyGetStub(
         JSON.stringify({ "result": { "results": [] } }),
       );
@@ -163,7 +163,7 @@ describe("SearchAction", () => {
     //   );
     // });
 
-    it("specify 0 for the n option", async () => {
+    it('exit with error when if the value of "-n" is other than 1 to 100', async () => {
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
       await new SearchAction().execute(
@@ -174,7 +174,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("specify -1 for the n option", async () => {
+    it('exit with error when if the value of "-n" is other than 1 to 100', async () => {
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
       await new SearchAction().execute(
@@ -185,7 +185,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("specify 101 for the n option", async () => {
+    it('exit with error when if the value of "-n" is other than 1 to 100', async () => {
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
       await new SearchAction().execute(
@@ -199,7 +199,7 @@ describe("SearchAction", () => {
 
   describe("with i option", () => {
     it(
-      "enter a normal value for no, and specify nothing for name and postprocess.",
+      "if no name is specified, it is automatically generated.",
       async () => {
         createEmptyDimJson();
         const numberStub = stub(
@@ -270,7 +270,7 @@ describe("SearchAction", () => {
       },
     );
 
-    it("specify unzip for postprocess", async () => {
+    it("ensure that the command to extract the downloaded files is entered and recorded in dim.json and dim-lock.json.", async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -339,7 +339,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("specify xlsx-to-csv for postprocess", async () => {
+    it("after downloading, convert the xlsx file to a csv file and check that it is recorded in dim.json and dim-lock.json.", async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -408,7 +408,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("specify encode euc-jp for postprocess", async () => {
+    it('after downloading, encode the file to "euc-jp" and check that it is recorded in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -477,7 +477,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("specify encode iso-2022-jp for postprocess", async () => {
+    it('after downloading, encode the file to "iso-2022-jp" and check that it is recorded in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -546,7 +546,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("specify encode shift_jis for postprocess", async () => {
+    it('after downloading, encode the file to "shift_jis" and check that it is recorded in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -615,7 +615,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("specify encode utf-8 for postprocess", async () => {
+    it('after downloading, encode the file to "utf-8" and check that it is recorded in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -684,7 +684,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("specify encode utf-16 for postprocess", async () => {
+    it('after downloading, encode the file to "utf-16" and check that it is recorded in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -755,7 +755,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("specify encode utf-16be for postprocess", async () => {
+    it('exit with error when specify "encode utf-16be" in "postProcess", and download', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -826,7 +826,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("specify encode utf-16le for postprocess", async () => {
+    it('exit with error when specify "encode utf-16le" in "postProcess", and download', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -896,7 +896,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("specify encode unicode for postprocess", async () => {
+    it('after downloading, encode the file to "encode unicode" and check that it is recorded in dim.json, dim-lock.json', async () => {
       const numberStub = stub(
         Number,
         "prompt",
@@ -936,7 +936,7 @@ describe("SearchAction", () => {
     });
 
     it(
-      "specify encoding cmd:[some cli command] for postprocess",
+      "ensure that the specified string and the path to the downloaded data are displayed on standard output and recorded in data_files, dim.json and dim-lock.json when the file is downloaded.",
       async () => {
         const numberStub = stub(
           Number,
@@ -977,7 +977,7 @@ describe("SearchAction", () => {
       },
     );
 
-    it("The name already exists in dim.json", async () => {
+    it("exit with error when duplicate names.", async () => {
       await new DimFileAccessor().addContent(
         "http://example.com",
         "name duplication check",
@@ -1030,7 +1030,7 @@ describe("SearchAction", () => {
     // Todo 以下のエラーが出る
     // error: AssertionError: Test case is leaking 1 resource:
     //  - A fetch response body (rid 46) was created during the test, but not consumed during the test. Consume or close the response body `ReadableStream`, e.g `await resp.text()` or `await resp.body.cancel()`.
-    it("Failed to install", async () => {
+    it("check whether to terminate in the event of a communication error", async () => {
       const numberStub = stub(
         Number,
         "prompt",
@@ -1082,7 +1082,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("enter invalid number", async () => {
+    it("check whether a download was not performed when an invalid number was entered.", async () => {
       createEmptyDimJson();
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
@@ -1160,7 +1160,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("enter invalid characters", async () => {
+    it("Check whether a download was not performed when invalid characters were entered.", async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -1236,7 +1236,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("enter invalid postprocess", async () => {
+    it("Check whether a download did not take place when an invalid post-process was entered.", async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -1325,7 +1325,7 @@ describe("SearchAction", () => {
       kyStub.restore();
     });
 
-    it("enter a blank in postprocess", async () => {
+    it("Ensure that no post-processing has taken place if a blank is entered for post-processing.", async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
