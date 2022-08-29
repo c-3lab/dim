@@ -148,11 +148,9 @@ describe("InstallAction", () => {
       }
     });
 
-    //  重複する名前の-nを指定し実行
     it("exit with error when specified name is already installed", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
-        //  ダミー用のdim.json作成
         const dimData: DimJSON = {
           fileVersion: DIM_FILE_VERSION,
           contents: [
@@ -170,7 +168,6 @@ describe("InstallAction", () => {
           DEFAULT_DIM_FILE_PATH,
           JSON.stringify(dimData, null, 2),
         );
-        //  name重複
         await new InstallAction().execute(
           { name: "installedName1" },
           "https://example.com/dummy.txt",
@@ -191,9 +188,7 @@ describe("InstallAction", () => {
       }
     });
 
-    //  重複する名前の-nと-Fを指定し実行
     it('overwrite already downloaded file if specify duplicated "name" with "force" option', async () => {
-      //  ダミー用のdim.json作成
       const dimData: DimJSON = {
         fileVersion: DIM_FILE_VERSION,
         contents: [
@@ -211,7 +206,6 @@ describe("InstallAction", () => {
         DEFAULT_DIM_FILE_PATH,
         JSON.stringify(dimData, null, 2),
       );
-      //  上書きされる前のファイルを用意
       Deno.mkdirSync("data_files/installedName2", { recursive: true });
       Deno.writeTextFileSync("data_files/installedName2/dummy.csv", "before");
 
@@ -222,13 +216,11 @@ describe("InstallAction", () => {
         },
       });
       try {
-        //  重複する名前でintall
         await new InstallAction().execute(
           { name: "installedName2", force: true },
           "https://example.com/dummy.csv",
         );
 
-        //  ファイルが更新されているか確認
         const fileContent = Deno.readTextFileSync(
           "data_files/installedName2/dummy.csv",
         );
@@ -277,13 +269,11 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-Hを指定し実行
     it("download using request headers and save in dim.json and dim-lock.json", async () => {
       createEmptyDimJson();
 
       const kyGetStub = createKyGetStub("dummy");
       try {
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "Header", headers: ["key: value"] },
           "https://example.com/dummy.csv",
@@ -332,7 +322,6 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"encode utf-8"を指定し実行
     it('after downloading, encode the file to "utf-8" and record it in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("テストデータ");
@@ -344,7 +333,6 @@ describe("InstallAction", () => {
         });
         Deno.writeFileSync("test.txt", Uint8Array.from(sjisBytesArray));
 
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "encodeSjis", postProcesses: ["encode sjis"] },
           "https://example.com/dummy.txt",
@@ -409,12 +397,10 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"encode utf-8 sjis"を指定し実行
     it('exit with error when specify "encode utf-8 sjis" in "postProcess", and download', async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "encodeUtf8Sjis", postProcesses: ["encode utf-8 sjis"] },
           "https://example.com/dummy.txt",
@@ -441,12 +427,10 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"encode"を指定し実行
     it('exit with error when specify "encode" in "postProcess", and download.', async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "encode", postProcesses: ["encode"] },
           "https://example.com/dummy.txt",
@@ -470,13 +454,11 @@ describe("InstallAction", () => {
       }
     });
 
-    //linux
     it("if OS is Linux, unzip the downloaded file and record it in dim.json,dim-lock.json", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       const denoRunStub = stub(Deno, "run");
       try {
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "unzip", postProcesses: ["unzip"] },
           "https://example.com/dummy.zip",
@@ -504,7 +486,6 @@ describe("InstallAction", () => {
       const denoRunStub = stub(Deno, "run");
       const denoBuildOsStub = stub(Deno.build, "os");
       try {
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "unzip", postProcesses: ["unzip"] },
           "https://example.com/dummy.zip",
@@ -533,12 +514,10 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"unzip a"を指定し実行
     it('exit with error when specify "unzip a" in "postProcess" and download', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "unzipa", postProcesses: ["unzip a"] },
           "https://example.com/dummy.zip",
@@ -555,12 +534,10 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"xlsx-to-csv"を指定し実行
     it("after downloading, convert the xlsx file to a csv file and record it in dim.json, dim-lock.json", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "xlsx-to-csv", postProcesses: ["xlsx-to-csv"] },
           "https://example.com/dummy.xlsx",
@@ -577,12 +554,10 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"xlsx-to-csv a"を指定し実行
     it('exit with error when specify "xlsx-to-csv a" in "postProcess" and download', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "xlsx-to-csv a", postProcesses: ["xlsx-to-csv a"] },
           "https://example.com/dummy.xlsx",
@@ -609,13 +584,11 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"cmd echo"を指定し実行
     it("download the file, and the path to the downloaded data will be output to standard output and recorded in data_files, dim.json, dim-lock.json", async () => {
       const kyGetStub = createKyGetStub("dummy");
       const denoRunStub = stub(Deno, "run");
       try {
         createEmptyDimJson();
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "cmdecho", postProcesses: ["cmd echo"] },
           "https://example.com/dummy.txt",
@@ -638,13 +611,11 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"cmd echo a"を指定し実行
     it('download the file and verify that the path to the downloaded data, prefixed with "a", is output to standard output and record in dim.json, dim-lock.json', async () => {
       const denoRunStub = stub(Deno, "run");
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
-        //  InstallActionを実行
         await new InstallAction().execute(
           { name: "cmdechoa", postProcesses: ["cmd echo a"] },
           "https://example.com/dummy.txt",
@@ -667,9 +638,7 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"cmd"を指定し実行
     it('exit with error when specify "cmd" for "postProcess" and download', async () => {
-      //  InstallActionを実行
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -695,9 +664,7 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"cmd aaa"(存在しないコマンド)を指定し実行
     it('exit with error when specify "cmd aaa" for "postProcess" and download', async () => {
-      //  InstallActionを実行
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -725,9 +692,7 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと-pに"aaa"(存在しないコマンド)を指定し実行
     it('exit with error when specify "aaa" in "postProcess" and download', async () => {
-      //  InstallActionを実行
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -749,12 +714,10 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -nと無効なURLを指定し実行
     it("exit with error when failed to download", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
-        //  無効なURL
         await new InstallAction().execute(
           { name: "invalidURL" },
           "aaa",
@@ -768,7 +731,6 @@ describe("InstallAction", () => {
       }
     });
 
-    //  URLと-fを指定し実行
     it("exit with error when execute with URL and -f ", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -787,7 +749,6 @@ describe("InstallAction", () => {
   });
 
   describe("without URL", () => {
-    //  install済みのデータがない状態で実行
     it("Run with empty dim.json, prompting for data download", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
@@ -806,7 +767,6 @@ describe("InstallAction", () => {
       }
     });
 
-    //  dim.jsonが存在しない状況で実行
     it("exit with error when Runs without dim.json", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -822,7 +782,6 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -fにローカルに存在するdim.jsonのパスを指定し実行
     it("download data from dim.json that exists locally and write them in dim.json and dim-lock.json.", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
@@ -838,7 +797,6 @@ describe("InstallAction", () => {
       }
     });
 
-    //  install済みのデータがある状態で-fにローカルに存在するdim.jsonのパスを指定し実行
     it("download from the locally existing all-data-installed dim.json and record in dim.json and dim-lock.json.", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -887,7 +845,6 @@ describe("InstallAction", () => {
           DEFAULT_DIM_LOCK_FILE_PATH,
           JSON.stringify(dimLockData, null, 2),
         );
-        //  TODO: tests/temporary以下にtest-dim.jsonを作成
         await new InstallAction().execute(
           { file: "./../test-dim.json" },
           undefined,
@@ -905,7 +862,6 @@ describe("InstallAction", () => {
       }
     });
 
-    //  -fにローカルに存在するdim.json以外のパスを指定し実行
     it("exits with error when If a path other than the locally existing dim.json is specified, the program", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -921,7 +877,6 @@ describe("InstallAction", () => {
         kyGetStub.restore();
       }
     });
-    //  install済みのデータがある状態で実行
     it("exits with error when run with no difference between dim.json and dim-lock.json", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -1062,7 +1017,6 @@ describe("InstallAction", () => {
       }
     });
 
-    //  install済みのデータがある状態で-Fと-Aを指定し実行
     it(
       "asynchronous processing for multiple data installations",
       async () => {
@@ -1156,7 +1110,6 @@ describe("InstallAction", () => {
       },
     );
 
-    //  -fにインターネット上に存在するdim.jsonのパスを指定し実行
     it(
       "download the difference between the dim.json that exists on the Internet and the dim.json that exists in the current directory and record it in dim.json, dim-lock.json.",
       async () => {
@@ -1183,7 +1136,6 @@ describe("InstallAction", () => {
       },
     );
 
-    //  -fにインターネット上に存在するdim.json以外ののパスを指定し実行
     it(
       "exit with error when run by specifying a non-dim.json file that exists on the Internet",
       async () => {
@@ -1205,7 +1157,6 @@ describe("InstallAction", () => {
       },
     );
 
-    //  dim.tsの呼び出し
     it("call dim.ts and execute it in command line form.", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");

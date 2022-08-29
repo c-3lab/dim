@@ -37,10 +37,8 @@ describe("InitAction", () => {
   });
 
   it("create empty data directory, dim.json and dim-lock.json", async () => {
-    //  InitActionを実行
     await new InitAction().execute();
 
-    //  data_files, dim.json, dim-lock.jsonを確認
     const dataDirectory = Deno.statSync("data_files");
     assertEquals(dataDirectory.isDirectory, true);
 

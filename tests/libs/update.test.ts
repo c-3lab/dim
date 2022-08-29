@@ -114,7 +114,6 @@ describe("UpdateAction", () => {
         DEFAULT_DIM_LOCK_FILE_PATH,
         JSON.stringify(dimLockData, null, 2),
       );
-      //  上書きされる前のファイルを用意
       Deno.mkdirSync("data_files/example", { recursive: true });
       Deno.writeTextFileSync("data_files/example/dummy.csv", "before");
 
@@ -125,10 +124,8 @@ describe("UpdateAction", () => {
         },
       });
       try {
-        //  重複する名前でintall
         await new UpdateAction().execute({}, "example");
 
-        //  ファイルが更新されているか確認
         const fileContent = Deno.readTextFileSync(
           "data_files/example/dummy.csv",
         );
@@ -196,7 +193,6 @@ describe("UpdateAction", () => {
           ],
         });
       });
-      // assertSpyCall(denoExitStub, 0, { args: [1] });
     });
   });
   describe("without name", () => {
