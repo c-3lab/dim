@@ -14,7 +14,7 @@ import {
   describe,
   it,
 } from "https://deno.land/std@0.152.0/testing/bdd.ts";
-import { Colors, decompress, encoding } from "../../deps.ts";
+import { Colors, encoding } from "../../deps.ts";
 import { InstallAction } from "../../libs/actions.ts";
 import {
   DEFAULT_DIM_FILE_PATH,
@@ -278,7 +278,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-Hを指定し実行
-    it("specify request headers and perform download, recording in dim.json and dim-lock.json", async () => {
+    it("download using request headers and save in dim.json and dim-lock.json", async () => {
       createEmptyDimJson();
 
       const kyGetStub = createKyGetStub("dummy");
@@ -333,7 +333,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"encode utf-8"を指定し実行
-    it('specify "encode utf-8" in "postProcess", download the file, check that it is saved in data_files, dim.json, dim-lock.json, and confirm that the data is "utf-8"', async () => {
+    it('after downloading, encode the file to "utf-8" and record it in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("テストデータ");
       try {
@@ -471,7 +471,7 @@ describe("InstallAction", () => {
     });
 
     //linux
-    it('specify "unzip" in "postProcess", download files, save to data_files, dim.json, dim-lock.json, check if downloaded data is unpacked.', async () => {
+    it("if OS is Linux, unzip the downloaded file and record it in dim.json,dim-lock.json", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       const denoRunStub = stub(Deno, "run");
@@ -498,7 +498,7 @@ describe("InstallAction", () => {
       }
     });
     //darwin
-    it.ignore("check standard output when deno.build.os is darwin", async () => {
+    it.ignore("if OS is darwin, unzip the downloaded file and save it in dim.json,dim-lock.json", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       const denoRunStub = stub(Deno, "run");
@@ -556,7 +556,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"xlsx-to-csv"を指定し実行
-    it('specify "xlsx-to-csv" in "postProcess", download files, save to data_files, dim.json, dim-lock.json, check if downloaded data is converted to csv', async () => {
+    it("after downloading, convert the xlsx file to a csv file and record it in dim.json, dim-lock.json", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -610,7 +610,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"cmd echo"を指定し実行
-    it('specify "cmd echo" in "postProcess", download files, confirm that they are saved in data_files, dim.json, dim-lock.json, confirm that the path of downloaded data is output to standard output', async () => {
+    it("download the file, and the path to the downloaded data will be output to standard output and recorded in data_files, dim.json, dim-lock.json", async () => {
       const kyGetStub = createKyGetStub("dummy");
       const denoRunStub = stub(Deno, "run");
       try {
@@ -639,7 +639,7 @@ describe("InstallAction", () => {
     });
 
     //  -nと-pに"cmd echo a"を指定し実行
-    it('specify "cmd a" for "postProcess", download the file, and confirm that the path to the downloaded data is output to standard output with "a" at the beginning', async () => {
+    it('download the file and verify that the path to the downloaded data, prefixed with "a", is output to standard output and record in dim.json, dim-lock.json', async () => {
       const denoRunStub = stub(Deno, "run");
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -788,7 +788,7 @@ describe("InstallAction", () => {
 
   describe("without URL", () => {
     //  install済みのデータがない状態で実行
-    it("Run with an empty dim.json and verify that a message appears prompting to download data", async () => {
+    it("Run with empty dim.json, prompting for data download", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -823,7 +823,7 @@ describe("InstallAction", () => {
     });
 
     //  -fにローカルに存在するdim.jsonのパスを指定し実行
-    it("specify a locally existing dim.json, download data not listed in the dim.json that exists in the current directory, and save it to data_files, dim.json and dim-lock.json", async () => {
+    it("download data from dim.json that exists locally and write them in dim.json and dim-lock.json.", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -839,7 +839,7 @@ describe("InstallAction", () => {
     });
 
     //  install済みのデータがある状態で-fにローカルに存在するdim.jsonのパスを指定し実行
-    it("with no difference between the data stored in dim.json and dim-lock.json, specify the locally existing dim.json file and execute it to confirm that the output is correct.", async () => {
+    it("download from the locally existing all-data-installed dim.json and record in dim.json and dim-lock.json.", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -906,7 +906,7 @@ describe("InstallAction", () => {
     });
 
     //  -fにローカルに存在するdim.json以外のパスを指定し実行
-    it("specify a locally existing dim.json, download data not listed in the dim.json that exists in the current directory, and save it to data_files, dim.json and dim-lock.json", async () => {
+    it("exits with error when If a path other than the locally existing dim.json is specified, the program", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         await new InstallAction().execute(
@@ -922,7 +922,7 @@ describe("InstallAction", () => {
       }
     });
     //  install済みのデータがある状態で実行
-    it("run with no difference between the data stored in dim.json and dim-lock.json to check for correct output.", async () => {
+    it("exits with error when run with no difference between dim.json and dim-lock.json", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         const dimData: DimJSON = {
@@ -977,7 +977,7 @@ describe("InstallAction", () => {
     });
 
     //  install済みのデータがある状態で-Fを指定し実行
-    it('with no difference between the data stored in dim.json and dim-lock.json, specify "-F" and execute to confirm that the data recorded in dim.json has been downloaded.', async () => {
+    it("run with no differences between dim.json and dim-lock.json to force a re-download.", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         const dimData: DimJSON = {
@@ -1064,7 +1064,7 @@ describe("InstallAction", () => {
 
     //  install済みのデータがある状態で-Fと-Aを指定し実行
     it(
-      'with no difference between the data stored in dim.json and dim-lock.json, specify "-F -A" and execute to confirm that the data recorded in dim.json has been downloaded.',
+      "asynchronous processing for multiple data installations",
       async () => {
         const kyGetStub = createKyGetStub("dummy");
         try {
@@ -1158,7 +1158,7 @@ describe("InstallAction", () => {
 
     //  -fにインターネット上に存在するdim.jsonのパスを指定し実行
     it(
-      "specify a Internet existing dim.json, download data not listed in the dim.json that exists in the current directory, and save it to data_files, dim.json and dim-lock.json",
+      "download the difference between the dim.json that exists on the Internet and the dim.json that exists in the current directory and record it in dim.json, dim-lock.json.",
       async () => {
         const dimJson = Deno.readTextFileSync("./../test-dim.json");
         const kyGetStub = createKyGetStub(dimJson.replace(/[\n\s]/g, ""));
