@@ -4,6 +4,7 @@ import { ky } from "../deps.ts";
 
 const currentDirectory = new URL(".", import.meta.url).pathname;
 export const temporaryDirectory = resolve(currentDirectory, "temporary") + "/";
+Deno.mkdirSync(temporaryDirectory, { recursive: true });
 
 export const createKyGetStub = (body: string, options?: ResponseInit): Stub => {
   const mockedKy = ky.extend({
@@ -21,6 +22,13 @@ export const createKyGetStub = (body: string, options?: ResponseInit): Stub => {
 
 //  テスト中の生成物を削除
 export const removeTemporaryFiles = () => {
+  //  Skip removing process when temporary directory does not exist
+  try {
+    Deno.statSync(temporaryDirectory);
+  } catch {
+    return;
+  }
+
   for (const path of Deno.readDirSync(temporaryDirectory)) {
     Deno.removeSync(temporaryDirectory + path.name, { recursive: true });
   }
