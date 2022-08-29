@@ -67,7 +67,7 @@ describe("SearchAction", () => {
   });
 
   afterEach(() => {
-    //removeTemporaryFiles();
+    removeTemporaryFiles();
     fakeTime.restore();
     denoExitStub.restore();
     denoStdoutStub.restore();
@@ -685,11 +685,12 @@ describe("SearchAction", () => {
     });
 
     it("specify encode utf-16 for postprocess", async () => {
+      createEmptyDimJson();
       const numberStub = stub(
         Number,
         "prompt",
         async () => {
-          return await Promise<number>.resolve(7);
+          return await Promise<number>.resolve(1);
         },
       );
       const inputStub = stub(
@@ -707,24 +708,60 @@ describe("SearchAction", () => {
         },
       );
 
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+
       try {
         await new SearchAction().execute(
           { number: 10, install: true },
           "避難所",
         );
+
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: "resource_id",
+            catalogUrl: "https://example.com",
+            headers: {},
+            name: "encode utf-16",
+            postProcesses: ["encode utf-16"],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
+
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: "resource_id",
+            catalogUrl: "https://example.com",
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "encode utf-16",
+            path: "./data_files/encode utf-16/dummy.csv",
+            postProcesses: ["encode utf-16"],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
       } finally {
         numberStub.restore();
         inputStub.restore();
         confirmStub.restore();
+        kyStub.restore();
       }
     });
 
     it("specify encode utf-16be for postprocess", async () => {
+      createEmptyDimJson();
       const numberStub = stub(
         Number,
         "prompt",
         async () => {
-          return await Promise<number>.resolve(16);
+          return await Promise<number>.resolve(1);
         },
       );
       const inputStub = stub(
@@ -742,24 +779,60 @@ describe("SearchAction", () => {
         },
       );
 
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+
       try {
         await new SearchAction().execute(
           { number: 11, install: true },
           "避難所",
         );
+
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: "resource_id",
+            catalogUrl: "https://example.com",
+            headers: {},
+            name: "encode utf-16be",
+            postProcesses: ["encode utf-16be"],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
+
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: "resource_id",
+            catalogUrl: "https://example.com",
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "encode utf-16be",
+            path: "./data_files/encode utf-16be/dummy.csv",
+            postProcesses: ["encode utf-16be"],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
       } finally {
         numberStub.restore();
         inputStub.restore();
         confirmStub.restore();
+        kyStub.restore();
       }
     });
 
     it("specify encode utf-16le for postprocess", async () => {
+      createEmptyDimJson();
       const numberStub = stub(
         Number,
         "prompt",
         async () => {
-          return await Promise<number>.resolve(11);
+          return await Promise<number>.resolve(1);
         },
       );
       const inputStub = stub(
@@ -777,15 +850,49 @@ describe("SearchAction", () => {
         },
       );
 
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+
       try {
         await new SearchAction().execute(
           { number: 10, install: true },
           "避難所",
         );
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: "resource_id",
+            catalogUrl: "https://example.com",
+            headers: {},
+            name: "encode utf-16le",
+            postProcesses: ["encode utf-16le"],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
+
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: "resource_id",
+            catalogUrl: "https://example.com",
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "encode utf-16le",
+            path: "./data_files/encode utf-16le/dummy.csv",
+            postProcesses: ["encode utf-16le"],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
       } finally {
         numberStub.restore();
         inputStub.restore();
         confirmStub.restore();
+        kyStub.restore();
       }
     });
 
@@ -794,7 +901,7 @@ describe("SearchAction", () => {
         Number,
         "prompt",
         async () => {
-          return await Promise<number>.resolve(12);
+          return await Promise<number>.resolve(1);
         },
       );
       const inputStub = stub(
@@ -812,6 +919,9 @@ describe("SearchAction", () => {
         },
       );
 
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+
       try {
         await new SearchAction().execute(
           { number: 10, install: true },
@@ -821,6 +931,7 @@ describe("SearchAction", () => {
         numberStub.restore();
         inputStub.restore();
         confirmStub.restore();
+        kyStub.restore();
       }
     });
 
@@ -831,7 +942,7 @@ describe("SearchAction", () => {
           Number,
           "prompt",
           async () => {
-            return await Promise<number>.resolve(13);
+            return await Promise<number>.resolve(1);
           },
         );
         const inputStub = stub(
@@ -849,6 +960,9 @@ describe("SearchAction", () => {
           },
         );
 
+        const data = Deno.readTextFileSync("../test_data/searchData.json");
+        const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+
         try {
           await new SearchAction().execute(
             { number: 10, install: true },
@@ -858,6 +972,7 @@ describe("SearchAction", () => {
           numberStub.restore();
           inputStub.restore();
           confirmStub.restore();
+          kyStub.restore();
         }
       },
     );
@@ -873,7 +988,7 @@ describe("SearchAction", () => {
         Number,
         "prompt",
         async () => {
-          return await Promise<number>.resolve(14);
+          return await Promise<number>.resolve(1);
         },
       );
       const inputStub = stub(
@@ -891,6 +1006,9 @@ describe("SearchAction", () => {
         },
       );
 
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+
       try {
         await new SearchAction().execute(
           { number: 10, install: true },
@@ -905,6 +1023,7 @@ describe("SearchAction", () => {
         numberStub.restore();
         inputStub.restore();
         confirmStub.restore();
+        kyStub.restore();
       }
     });
 
@@ -916,7 +1035,7 @@ describe("SearchAction", () => {
         Number,
         "prompt",
         async () => {
-          return await Promise<number>.resolve(15);
+          return await Promise<number>.resolve(1);
         },
       );
       const inputStub = stub(
@@ -941,6 +1060,9 @@ describe("SearchAction", () => {
         },
       );
 
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data.replace(/[\n\s]/g, ""));
+
       try {
         await new SearchAction().execute(
           { number: 10, install: true },
@@ -956,6 +1078,7 @@ describe("SearchAction", () => {
         inputStub.restore();
         confirmStub.restore();
         downloaderStub.restore();
+        kyStub.restore();
       }
     });
 
