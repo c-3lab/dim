@@ -22,20 +22,14 @@ import { Colors } from "../../deps.ts";
 
 describe("ListAction", () => {
   let consoleLogStub: Stub;
-  let consoleErrorStub: Stub;
-  let denoExitStub: Stub;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
-    consoleErrorStub = stub(console, "error");
-    denoExitStub = stub(Deno, "exit");
     Deno.chdir(temporaryDirectory);
   });
 
   afterEach(() => {
     removeTemporaryFiles();
-    denoExitStub.restore();
-    consoleErrorStub.restore();
     consoleLogStub.restore();
   });
 
