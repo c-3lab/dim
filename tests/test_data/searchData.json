@@ -12,7 +12,7 @@
         "url": "https://example.com/dummy.csv",
         "format": "CSV",
         "name": "name",
-        "id": "resource_id"
+        "id": "resource1-1"
       }]
     }, {
       "xckan_id": "xckan_id",
@@ -26,7 +26,14 @@
         "url": "https://example.com/dummy.zip",
         "format": "ZIP",
         "name": "name",
-        "id": "resource_id"
+        "id": "resource2-1"
+      }, {
+        "description": "description",
+        "created": "2018-10-26T05:45:55.266946",
+        "url": "https://example.com/dummy.zip",
+        "format": "ZIP",
+        "name": "name",
+        "id": "resource2-2"
       }]
     }, {
       "xckan_id": "xckan_id",
@@ -40,7 +47,7 @@
         "url": "https://example.com/dummy.xlsx",
         "format": "XLSX",
         "name": "name",
-        "id": "resource_id"
+        "id": "resource3-1"
       }]
     }]
   }
