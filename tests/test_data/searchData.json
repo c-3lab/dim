@@ -1,0 +1,47 @@
+{
+  "result": {
+    "results": [{
+      "xckan_id": "xckan_id",
+      "xckan_title": "xckan_title",
+      "xckan_site_url": "https://example.com",
+      "xckan_description": "xckan_description",
+      "license_title": "license_title",
+      "resources": [{
+        "description": "description",
+        "created": "2018-10-26T05:45:55.266946",
+        "url": "https://example.com/dummy.csv",
+        "format": "CSV",
+        "name": "name",
+        "id": "resource_id"
+      }]
+    }, {
+      "xckan_id": "xckan_id",
+      "xckan_title": "xckan_title",
+      "xckan_site_url": "https://example.com",
+      "xckan_description": "xckan_description",
+      "license_title": "license_title",
+      "resources": [{
+        "description": "description",
+        "created": "2018-10-26T05:45:55.266946",
+        "url": "https://example.com/dummy.zip",
+        "format": "ZIP",
+        "name": "name",
+        "id": "resource_id"
+      }]
+    }, {
+      "xckan_id": "xckan_id",
+      "xckan_title": "xckan_title",
+      "xckan_site_url": "https://example.com",
+      "xckan_description": "xckan_description",
+      "license_title": "license_title",
+      "resources": [{
+        "description": "description",
+        "created": "2018-10-26T05:45:55.266946",
+        "url": "https://example.com/dummy.xlsx",
+        "format": "XLSX",
+        "name": "name",
+        "id": "resource_id"
+      }]
+    }]
+  }
+}
