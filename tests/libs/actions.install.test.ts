@@ -656,6 +656,26 @@ describe("InstallAction", () => {
       }
     });
 
+    it("exit with error when failed to download", async () => {
+      const kyGetStub = createKyGetStub("Not found", { status: 404 });
+      try {
+        createEmptyDimJson();
+        await new InstallAction().execute(
+          { name: "invalidURL" },
+          "https://example.com/dummy.txt",
+        );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertSpyCall(consoleErrorStub, 0, {
+          args: [
+            Colors.red("Failed to install."),
+            Colors.red("Request failed with status code 404"),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
     it("exit with error when execute with URL and file path ", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
