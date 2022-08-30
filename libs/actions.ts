@@ -347,7 +347,10 @@ export class InstallAction {
         options.file || DEFAULT_DIM_FILE_PATH,
         options.asyncInstall,
         options.force,
-      );
+      ).catch(() => {
+        console.log(Colors.red("Selecting other than json."));
+        Deno.exit(1);
+      });
       if (lockContentList !== undefined) {
         if (lockContentList.length != 0) {
           console.log(
