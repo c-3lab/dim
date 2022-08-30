@@ -16,11 +16,6 @@ import {
 } from "https://deno.land/std@0.152.0/testing/bdd.ts";
 import { Colors, encoding } from "../../deps.ts";
 import { InstallAction } from "../../libs/actions.ts";
-import {
-  DEFAULT_DIM_FILE_PATH,
-  DEFAULT_DIM_LOCK_FILE_PATH,
-  DIM_FILE_VERSION,
-} from "../../libs/consts.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
 import {
   createKyGetStub,
@@ -152,7 +147,7 @@ describe("InstallAction", () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         const dimData: DimJSON = {
-          fileVersion: DIM_FILE_VERSION,
+          fileVersion: "1.1",
           contents: [
             {
               name: "installedName1",
@@ -165,7 +160,7 @@ describe("InstallAction", () => {
           ],
         };
         await Deno.writeTextFile(
-          DEFAULT_DIM_FILE_PATH,
+          "./dim.json",
           JSON.stringify(dimData, null, 2),
         );
         await new InstallAction().execute(
@@ -190,7 +185,7 @@ describe("InstallAction", () => {
 
     it('check whether existing files are overwritten if "name" is duplicated in the "force" option.', async () => {
       const dimData: DimJSON = {
-        fileVersion: DIM_FILE_VERSION,
+        fileVersion: "1.1",
         contents: [
           {
             name: "installedName2",
@@ -203,7 +198,7 @@ describe("InstallAction", () => {
         ],
       };
       await Deno.writeTextFile(
-        DEFAULT_DIM_FILE_PATH,
+        "./dim.json",
         JSON.stringify(dimData, null, 2),
       );
       Deno.mkdirSync("data_files/installedName2", { recursive: true });
@@ -814,7 +809,7 @@ describe("InstallAction", () => {
           Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
         );
         await Deno.writeTextFile(
-          DEFAULT_DIM_LOCK_FILE_PATH,
+          "./dim-lock.json",
           JSON.stringify(dimLockData, null, 2),
         );
         await new InstallAction().execute(
@@ -853,7 +848,7 @@ describe("InstallAction", () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         const dimData: DimJSON = {
-          fileVersion: DIM_FILE_VERSION,
+          fileVersion: "1.1",
           contents: [
             {
               name: "test1",
@@ -882,11 +877,11 @@ describe("InstallAction", () => {
           }],
         };
         await Deno.writeTextFile(
-          DEFAULT_DIM_LOCK_FILE_PATH,
+          "./dim-lock.json",
           JSON.stringify(dimLockData, null, 2),
         );
         await Deno.writeTextFile(
-          DEFAULT_DIM_FILE_PATH,
+          "./dim.json",
           JSON.stringify(dimData, null, 2),
         );
         await new InstallAction().execute({}, undefined);
@@ -998,14 +993,14 @@ describe("InstallAction", () => {
           Deno.readTextFileSync("./../test_data/external-dim.json"),
         );
         await Deno.writeTextFile(
-          DEFAULT_DIM_FILE_PATH,
+          "./dim.json",
           JSON.stringify(dimData, null, 2),
         );
         const dimLockData: DimJSON = JSON.parse(
           Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
         );
         await Deno.writeTextFile(
-          DEFAULT_DIM_FILE_PATH,
+          "./dim.json",
           JSON.stringify(dimLockData, null, 2),
         );
         await new InstallAction().execute({ force: true }, undefined);
@@ -1092,7 +1087,7 @@ describe("InstallAction", () => {
             ],
           };
           await Deno.writeTextFile(
-            DEFAULT_DIM_FILE_PATH,
+            "./dim.json",
             JSON.stringify(dimData, null, 2),
           );
           await new InstallAction().execute(
