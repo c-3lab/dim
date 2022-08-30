@@ -931,46 +931,43 @@ describe("InstallAction", () => {
       }
     });
 
-    //  install済みのデータがある状態で-Fを指定し実行
-    it("Run with no differences between dim.json and dim-lock.json and check that a forced re-download is performed.", async () => {
-      const kyGetStub = createKyGetStub("dummy");
+    it("run with a difference in dim.json and dim-lock.json and check that the missing dim-lock.json is downloaded.", async () => {
+      const kyGetStub = createKyGetStub("dummy", {
+        headers: {
+          "etag": '"12345-1234567890abc"',
+          "last-modified": "Thu, 3 Feb 2022 04:05:06 GMT",
+        },
+      });
       try {
-        const dimData: DimJSON = {
-          "fileVersion": "1.1",
-          "contents": [
-            {
-              name: "test1",
-              url: "https://example.com/dummy.txt",
-              catalogUrl: null,
-              catalogResourceId: null,
-              postProcesses: [
-                "encoding-utf-8",
-              ],
-              headers: {},
-            },
-            {
-              name: "test2",
-              url: "https://example.com/dummy.csv",
-              catalogUrl: null,
-              catalogResourceId: null,
-              postProcesses: [],
-              headers: {},
-            },
-            {
-              url: "https://example.com/dummy.zip",
-              name: "test3",
-              catalogUrl: null,
-              catalogResourceId: null,
-              postProcesses: [],
-              headers: {},
-            },
-          ],
-        };
+        const dimData = JSON.parse(
+          Deno.readTextFileSync("./../test_data/test-dim.json"),
+        );
         await Deno.writeTextFile(
-          DEFAULT_DIM_FILE_PATH,
+          "./dim.json",
           JSON.stringify(dimData, null, 2),
         );
-        await new InstallAction().execute({ force: true }, undefined);
+        const dimLockData = {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "test1",
+            path: "./data_files/test1/dummy.txt",
+            postProcesses: ["encoding utf-8"],
+            url: "https://example.com/dummy.txt",
+          }],
+        };
+        await Deno.writeTextFile(
+          "./dim-lock.json",
+          JSON.stringify(dimLockData, null, 2),
+        );
+
+        await new InstallAction().execute({}, undefined);
         const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
         assertEquals(dimLockJson, {
           lockFileVersion: "1.1",
@@ -984,16 +981,16 @@ describe("InstallAction", () => {
             lastModified: null,
             name: "test1",
             path: "./data_files/test1/dummy.txt",
-            postProcesses: ["encoding-utf-8"],
+            postProcesses: ["encoding utf-8"],
             url: "https://example.com/dummy.txt",
           }, {
             catalogResourceId: null,
             catalogUrl: null,
-            eTag: null,
+            eTag: "12345-1234567890abc",
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
-            lastModified: null,
+            lastModified: "2022-02-03T04:05:06.000Z",
             name: "test2",
             path: "./data_files/test2/dummy.csv",
             postProcesses: [],
@@ -1001,11 +998,80 @@ describe("InstallAction", () => {
           }, {
             catalogResourceId: null,
             catalogUrl: null,
-            eTag: null,
+            eTag: "12345-1234567890abc",
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
-            lastModified: null,
+            lastModified: "2022-02-03T04:05:06.000Z",
+            name: "test3",
+            path: "./data_files/test3/dummy.zip",
+            postProcesses: [],
+            url: "https://example.com/dummy.zip",
+          }],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("run with no differences between dim.json and dim-lock.json and check that a forced re-download is performed.", async () => {
+      const kyGetStub = createKyGetStub("dummy", {
+        headers: {
+          "etag": '"12345-1234567890abc"',
+          "last-modified": "Thu, 3 Feb 2022 04:05:06 GMT",
+        },
+      });
+      try {
+        const dimData: DimJSON = JSON.parse(
+          Deno.readTextFileSync("./../test_data/test-dim.json"),
+        );
+        await Deno.writeTextFile(
+          DEFAULT_DIM_FILE_PATH,
+          JSON.stringify(dimData, null, 2),
+        );
+        const dimLockData: DimJSON = JSON.parse(
+          Deno.readTextFileSync("./../test_data/test-lock.json"),
+        );
+        await Deno.writeTextFile(
+          DEFAULT_DIM_FILE_PATH,
+          JSON.stringify(dimLockData, null, 2),
+        );
+        await new InstallAction().execute({ force: true }, undefined);
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: "12345-1234567890abc",
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: "2022-02-03T04:05:06.000Z",
+            name: "test1",
+            path: "./data_files/test1/dummy.txt",
+            postProcesses: ["encoding utf-8"],
+            url: "https://example.com/dummy.txt",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: "12345-1234567890abc",
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: "2022-02-03T04:05:06.000Z",
+            name: "test2",
+            path: "./data_files/test2/dummy.csv",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: "12345-1234567890abc",
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: "2022-02-03T04:05:06.000Z",
             name: "test3",
             path: "./data_files/test3/dummy.zip",
             postProcesses: [],
