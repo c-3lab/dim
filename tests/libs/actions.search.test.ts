@@ -495,13 +495,7 @@ describe("SearchAction", () => {
           "避難所",
         );
 
-        const searchParams = new URLSearchParams(
-          {
-            fq: `xckan_title:*避難所* OR tags:*避難所* OR x_ckan_description:*避難所*`,
-            rows: "1",
-          },
-        );
-        assertEquals(kyStub.calls[0].args[1].searchParams, searchParams);
+        assertEquals(kyStub.calls[0].args[1].searchParams.get("rows"), "1");
       } finally {
         kyStub.restore();
       }
