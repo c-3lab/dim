@@ -240,7 +240,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("when specify headers option download using request headers and check that they are recorded in dim.json and dim-lock.json.", async () => {
+    it("download using request headers and check that they are recorded in dim.json and dim-lock.json when specify headers option ", async () => {
       createEmptyDimJson();
 
       const kyGetStub = createKyGetStub("dummy");
@@ -403,7 +403,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("if the OS is linux, confirm that the command to extract the downloaded file is entered and that it is recorded in dim.json and dim-lock.json.", async () => {
+    it("check that the command to extract the downloaded file is entered and recorded in dim.json and dim-lock.json.", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       const denoRunStub = stub(Deno, "run");
@@ -444,7 +444,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('convert downloaded file from xlsx to csv and record in dim.json and dim-lock.json when specify "xlsx-to-csv" as postProcesses', async () => {
+    it.only('convert downloaded file from xlsx to csv and record in dim.json and dim-lock.json when specify "xlsx-to-csv" as postProcesses', async () => {
       createEmptyDimJson();
       const testXlsx = Deno.readFileSync("../test_data/test.xlsx");
       const kyGetStub = createKyGetStub(testXlsx);
@@ -457,7 +457,7 @@ describe("InstallAction", () => {
         const testData = Deno.readTextFileSync(
           "data_files/xlsx-to-csv/dummy.csv",
         );
-        assertEquals(testData, "a,b,c\n");
+        assertEquals(testData, "a,b\nc,d\ne,f\n");
         assertSpyCall(consoleLogStub, 0, { args: ["Convert xlsx to csv."] });
       } finally {
         kyGetStub.restore();
@@ -991,156 +991,147 @@ describe("InstallAction", () => {
       }
     });
 
-    it(
-      "check whether the asyncinstall option installs successfully",
-      async () => {
-        const kyGetStub = createKyGetStub("dummy");
-        try {
-          const dimData: DimJSON = {
-            "fileVersion": "1.1",
-            "contents": [
-              {
-                name: "test1",
-                url: "https://example.com/dummy.txt",
-                catalogUrl: null,
-                catalogResourceId: null,
-                postProcesses: [
-                  "encoding utf-8",
-                ],
-                headers: {},
-              },
-              {
-                name: "test2",
-                url: "https://example.com/dummy.csv",
-                catalogUrl: null,
-                catalogResourceId: null,
-                postProcesses: [],
-                headers: {},
-              },
-              {
-                url: "https://example.com/dummy.zip",
-                name: "test3",
-                catalogUrl: null,
-                catalogResourceId: null,
-                postProcesses: [],
-                headers: {},
-              },
-            ],
-          };
-          await Deno.writeTextFile(
-            "./dim.json",
-            JSON.stringify(dimData, null, 2),
-          );
-          await new InstallAction().execute(
-            { force: true, asyncInstall: true },
-            undefined,
-          );
-          const dimLockJson = JSON.parse(
-            Deno.readTextFileSync("dim-lock.json"),
-          );
-          assertEquals(dimLockJson, {
-            lockFileVersion: "1.1",
-            contents: [{
-              catalogResourceId: null,
-              catalogUrl: null,
-              eTag: null,
-              headers: {},
-              integrity: "",
-              lastDownloaded: "2022-01-02T03:04:05.678Z",
-              lastModified: null,
+    it("check whether the asyncinstall option installs successfully", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        const dimData: DimJSON = {
+          "fileVersion": "1.1",
+          "contents": [
+            {
               name: "test1",
-              path: "./data_files/test1/dummy.txt",
-              postProcesses: ["encoding utf-8"],
               url: "https://example.com/dummy.txt",
-            }, {
-              catalogResourceId: null,
               catalogUrl: null,
-              eTag: null,
+              catalogResourceId: null,
+              postProcesses: [
+                "encoding utf-8",
+              ],
               headers: {},
-              integrity: "",
-              lastDownloaded: "2022-01-02T03:04:05.678Z",
-              lastModified: null,
+            },
+            {
               name: "test2",
-              path: "./data_files/test2/dummy.csv",
-              postProcesses: [],
               url: "https://example.com/dummy.csv",
-            }, {
-              catalogResourceId: null,
               catalogUrl: null,
-              eTag: null,
-              headers: {},
-              integrity: "",
-              lastDownloaded: "2022-01-02T03:04:05.678Z",
-              lastModified: null,
-              name: "test3",
-              path: "./data_files/test3/dummy.zip",
+              catalogResourceId: null,
               postProcesses: [],
+              headers: {},
+            },
+            {
               url: "https://example.com/dummy.zip",
-            }],
-          });
-        } finally {
-          kyGetStub.restore();
-        }
-      },
-    );
-
-    it(
-      "download and record in dim.json, dim-lock.json when specified file path on Internet",
-      async () => {
-        const dimJson = Deno.readTextFileSync(
-          "./../test_data/external-dim.json",
+              name: "test3",
+              catalogUrl: null,
+              catalogResourceId: null,
+              postProcesses: [],
+              headers: {},
+            },
+          ],
+        };
+        await Deno.writeTextFile(
+          "./dim.json",
+          JSON.stringify(dimData, null, 2),
         );
-        const kyGetStub = createKyGetStub(dimJson);
-        try {
-          createEmptyDimJson();
-          await new InstallAction().execute(
-            {
-              file: "https://example.com/dim.json",
-            },
-            undefined,
-          );
-          const dimJson = JSON.parse(
-            Deno.readTextFileSync("./../test_data/external-dim.json"),
-          );
-          assertEquals(
-            dimJson,
-            JSON.parse(Deno.readTextFileSync("./dim.json")),
-          );
-          const dimLockJson = JSON.parse(
-            Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
-          );
-          assertEquals(
-            dimLockJson,
-            JSON.parse(Deno.readTextFileSync("./dim-lock.json")),
-          );
-          assert(fileExists("./data_files/test1/dummy.txt"));
-        } finally {
-          kyGetStub.restore();
-        }
-      },
-    );
+        await new InstallAction().execute(
+          { force: true, asyncInstall: true },
+          undefined,
+        );
+        const dimLockJson = JSON.parse(
+          Deno.readTextFileSync("dim-lock.json"),
+        );
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "test1",
+            path: "./data_files/test1/dummy.txt",
+            postProcesses: ["encoding utf-8"],
+            url: "https://example.com/dummy.txt",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "test2",
+            path: "./data_files/test2/dummy.csv",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "test3",
+            path: "./data_files/test3/dummy.zip",
+            postProcesses: [],
+            url: "https://example.com/dummy.zip",
+          }],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
 
-    it(
-      "exit with error when specify non-dim.json file path on Internet",
-      async () => {
-        const kyGetStub = createKyGetStub("dummy");
-        try {
-          await new InstallAction().execute(
-            {
-              file: "https://example.com/dummy.txt",
-            },
-            undefined,
-          );
-          assertSpyCall(consoleLogStub, 0, {
-            args: [
-              Colors.red("Selecting other than json."),
-            ],
-          });
-        } finally {
-          kyGetStub.restore();
-        }
-      },
-    );
+    it("download and record in dim.json, dim-lock.json when specified file path on Internet", async () => {
+      const dimJson = Deno.readTextFileSync(
+        "./../test_data/external-dim.json",
+      );
+      const kyGetStub = createKyGetStub(dimJson);
+      try {
+        createEmptyDimJson();
+        await new InstallAction().execute(
+          {
+            file: "https://example.com/dim.json",
+          },
+          undefined,
+        );
+        const dimJson = JSON.parse(
+          Deno.readTextFileSync("./../test_data/external-dim.json"),
+        );
+        assertEquals(
+          dimJson,
+          JSON.parse(Deno.readTextFileSync("./dim.json")),
+        );
+        const dimLockJson = JSON.parse(
+          Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
+        );
+        assertEquals(
+          dimLockJson,
+          JSON.parse(Deno.readTextFileSync("./dim-lock.json")),
+        );
+        assert(fileExists("./data_files/test1/dummy.txt"));
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when specify non-dim.json file path on Internet", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        await new InstallAction().execute(
+          {
+            file: "https://example.com/dummy.txt",
+          },
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.red("Selecting other than json."),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
 
     it("call dim.ts and execute it in command line form.", async () => {
       createEmptyDimJson();
