@@ -731,7 +731,16 @@ describe("SearchAction", () => {
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data);
 
-      const denoRunStub = stub(Deno, "run");
+      const denoRunStub = stub(
+        Deno,
+        "run",
+        () => ({
+          status: () => Promise.resolve({ success: true }),
+          rid: 1,
+        } as Deno.Process),
+      );
+      const denoCloseStub = stub(Deno, "close");
+
       try {
         await new SearchAction().execute(
           { number: 10, install: true },
@@ -743,15 +752,6 @@ describe("SearchAction", () => {
             cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./"],
           }],
         });
-      } finally {
-        denoRunStub.restore();
-      }
-
-      try {
-        await new SearchAction().execute(
-          { number: 10, install: true },
-          "避難所",
-        );
 
         assertEquals(
           await fileExists(
@@ -791,6 +791,8 @@ describe("SearchAction", () => {
           }],
         });
       } finally {
+        denoCloseStub.restore();
+        denoRunStub.restore();
         numberStub.restore();
         inputStub.restore();
         confirmStub.restore();
