@@ -20,7 +20,6 @@ export const createKyGetStub = (body: string, options?: ResponseInit): Stub => {
   return stub(ky, "get", mockedKy.get);
 };
 
-//  テスト中の生成物を削除
 export const removeTemporaryFiles = () => {
   //  Skip removing process when temporary directory does not exist
   try {
@@ -32,4 +31,24 @@ export const removeTemporaryFiles = () => {
   for (const path of Deno.readDirSync(temporaryDirectory)) {
     Deno.removeSync(temporaryDirectory + path.name, { recursive: true });
   }
+};
+
+export function fileExists(filePath: string): boolean {
+  try {
+    Deno.statSync(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export const createEmptyDimJson = () => {
+  Deno.writeTextFileSync(
+    "dim.json",
+    JSON.stringify({ fileVersion: "1.1", contents: [] }),
+  );
+  Deno.writeTextFileSync(
+    "dim-lock.json",
+    JSON.stringify({ lockfileVersion: "1.1", contents: [] }),
+  );
 };

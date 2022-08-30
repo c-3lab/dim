@@ -12,7 +12,7 @@
       "name": "test1",
       "path": "./data_files/test1/dummy.txt",
       "postProcesses": [
-        "encoding-utf-8"
+        "encoding utf-8"
       ],
       "url": "https://example.com/dummy.txt"
     },

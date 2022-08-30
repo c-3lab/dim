@@ -1,10 +1,12 @@
-import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
+import {
+  assertEquals,
+  assertFalse,
+} from "https://deno.land/std@0.152.0/testing/asserts.ts";
 import {
   assertSpyCall,
   Stub,
   stub,
 } from "https://deno.land/std@0.152.0/testing/mock.ts";
-import { FakeTime } from "https://deno.land/std@0.152.0/testing/time.ts";
 import {
   afterEach,
   beforeEach,
@@ -18,39 +20,27 @@ import {
   DEFAULT_DIM_LOCK_FILE_PATH,
 } from "../../libs/consts.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
-import { removeTemporaryFiles, temporaryDirectory } from "../helper.ts";
-
-function fileExists(filePath: string): boolean {
-  try {
-    Deno.statSync(filePath);
-    return true;
-  } catch (e) {
-    console.log(e.message);
-    return false;
-  }
-}
+import {
+  fileExists,
+  removeTemporaryFiles,
+  temporaryDirectory,
+} from "../helper.ts";
 
 describe("UninstallAction", () => {
   let consoleLogStub: Stub;
   let consoleErrorStub: Stub;
   let denoExitStub: Stub;
-  let denoStdoutStub: Stub;
-  let fakeTime: FakeTime;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
     consoleErrorStub = stub(console, "error");
     denoExitStub = stub(Deno, "exit");
-    denoStdoutStub = stub(Deno.stdout, "write");
-    fakeTime = new FakeTime("2022-01-02 03:04:05.678Z");
     Deno.chdir(temporaryDirectory);
   });
 
   afterEach(() => {
     removeTemporaryFiles();
-    fakeTime.restore();
     denoExitStub.restore();
-    denoStdoutStub.restore();
     consoleErrorStub.restore();
     consoleLogStub.restore();
   });
@@ -86,19 +76,19 @@ describe("UninstallAction", () => {
       }],
     };
     await Deno.writeTextFile(
-      DEFAULT_DIM_LOCK_FILE_PATH,
-      JSON.stringify(dimLockData, null, 2),
-    );
-    await Deno.writeTextFile(
       DEFAULT_DIM_FILE_PATH,
       JSON.stringify(dimData, null, 2),
     );
+    await Deno.writeTextFile(
+      DEFAULT_DIM_LOCK_FILE_PATH,
+      JSON.stringify(dimLockData, null, 2),
+    );
     Deno.mkdirSync("data_files/test1", { recursive: true });
     Deno.writeTextFileSync("./data_files/test1/dummy.txt", "dummy");
-    let _: void;
-    await new UninstallAction().execute(_, "test1");
 
-    assertEquals(fileExists("./data_files/test1/dummy.txt"), false);
+    await new UninstallAction().execute(undefined as void, "test1");
+
+    assertFalse(fileExists("./data_files/test1/dummy.txt"));
     const dimJson = JSON.parse(Deno.readTextFileSync(DEFAULT_DIM_FILE_PATH));
     assertEquals(dimJson, {
       fileVersion: "1.1",
@@ -144,15 +134,15 @@ describe("UninstallAction", () => {
       }],
     };
     await Deno.writeTextFile(
-      DEFAULT_DIM_LOCK_FILE_PATH,
-      JSON.stringify(dimLockData, null, 2),
-    );
-    await Deno.writeTextFile(
       DEFAULT_DIM_FILE_PATH,
       JSON.stringify(dimData, null, 2),
     );
-    let _: void;
-    await new UninstallAction().execute(_, "example");
+    await Deno.writeTextFile(
+      DEFAULT_DIM_LOCK_FILE_PATH,
+      JSON.stringify(dimLockData, null, 2),
+    );
+
+    await new UninstallAction().execute(undefined as void, "example");
 
     assertSpyCall(consoleLogStub, 0, {
       args: [

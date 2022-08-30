@@ -1,6 +1,6 @@
 import {
+  assert,
   assertEquals,
-  assertMatch,
 } from "https://deno.land/std@0.152.0/testing/asserts.ts";
 import {
   assertSpyCall,
@@ -18,31 +18,12 @@ import { Colors, encoding } from "../../deps.ts";
 import { InstallAction } from "../../libs/actions.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
 import {
+  createEmptyDimJson,
   createKyGetStub,
+  fileExists,
   removeTemporaryFiles,
   temporaryDirectory,
 } from "../helper.ts";
-
-function fileExists(filePath: string): boolean {
-  try {
-    Deno.statSync(filePath);
-    return true;
-  } catch (e) {
-    console.log(e.message);
-    return false;
-  }
-}
-
-const createEmptyDimJson = () => {
-  Deno.writeTextFileSync(
-    "dim.json",
-    JSON.stringify({ fileVersion: "1.1", contents: [] }),
-  );
-  Deno.writeTextFileSync(
-    "dim-lock.json",
-    JSON.stringify({ lockfileVersion: "1.1", contents: [] }),
-  );
-};
 
 describe("InstallAction", () => {
   let consoleLogStub: Stub;
@@ -63,8 +44,8 @@ describe("InstallAction", () => {
   afterEach(() => {
     removeTemporaryFiles();
     fakeTime.restore();
-    denoExitStub.restore();
     denoStdoutStub.restore();
+    denoExitStub.restore();
     consoleErrorStub.restore();
     consoleLogStub.restore();
   });
@@ -79,7 +60,7 @@ describe("InstallAction", () => {
           "https://example.com/dummy.txt",
         );
         assertEquals(
-          await fileExists(
+          fileExists(
             "data_files/example/dummy.txt",
           ),
           true,
@@ -275,8 +256,8 @@ describe("InstallAction", () => {
         );
 
         assertEquals(kyGetStub.calls[0].args[1].headers, { "key": "value" });
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/Header/dummy.csv",
           ),
           true,
@@ -321,19 +302,12 @@ describe("InstallAction", () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("テストデータ");
       try {
-        const utf8Bytes = new TextEncoder().encode("テストデータ");
-        const sjisBytesArray = encoding.convert(utf8Bytes, {
-          from: "UTF8",
-          to: "SJIS",
-        });
-        Deno.writeFileSync("test.txt", Uint8Array.from(sjisBytesArray));
-
         await new InstallAction().execute(
           { name: "encodeSjis", postProcesses: ["encode sjis"] },
           "https://example.com/dummy.txt",
         );
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/encodeSjis/dummy.txt",
           ),
           true,
@@ -351,11 +325,16 @@ describe("InstallAction", () => {
             ),
           ],
         });
-        const testTxt = Deno.readTextFileSync("test.txt");
+        const utf8Bytes = new TextEncoder().encode("テストデータ");
+        const sjisBytesArray = encoding.convert(utf8Bytes, {
+          from: "UTF8",
+          to: "SJIS",
+        });
         const downloadTxt = Deno.readTextFileSync(
           "data_files/encodeSjis/dummy.txt",
         );
-        assertEquals(testTxt, downloadTxt);
+        const test = new TextDecoder().decode(Uint8Array.from(sjisBytesArray));
+        assertEquals(test, downloadTxt);
 
         const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
         assertEquals(dimJson, {
@@ -411,8 +390,8 @@ describe("InstallAction", () => {
             ),
           ],
         });
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/encodeUtf8Sjis/dummy.txt",
           ),
           true,
@@ -438,8 +417,8 @@ describe("InstallAction", () => {
             ),
           ],
         });
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/encode/dummy.txt",
           ),
           true,
@@ -458,8 +437,8 @@ describe("InstallAction", () => {
           { name: "unzip", postProcesses: ["unzip"] },
           "https://example.com/dummy.zip",
         );
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/unzip/dummy.zip",
           ),
           true,
@@ -485,8 +464,8 @@ describe("InstallAction", () => {
           { name: "unzip", postProcesses: ["unzip"] },
           "https://example.com/dummy.zip",
         );
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/unzip/dummy.zip",
           ),
           true,
@@ -518,8 +497,14 @@ describe("InstallAction", () => {
           "https://example.com/dummy.zip",
         );
         assertSpyCall(denoExitStub, 0, { args: [1] });
-        assertEquals(
-          await fileExists(
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.red("error: Too many arguments:"),
+            Colors.red("unzip a"),
+          ],
+        });
+        assert(
+          fileExists(
             "data_files/unzipa/dummy.zip",
           ),
           true,
@@ -537,8 +522,8 @@ describe("InstallAction", () => {
           { name: "xlsx-to-csv", postProcesses: ["xlsx-to-csv"] },
           "https://example.com/dummy.xlsx",
         );
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/xlsx-to-csv/dummy.csv",
           ),
           true,
@@ -554,13 +539,13 @@ describe("InstallAction", () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         await new InstallAction().execute(
-          { name: "xlsx-to-csv a", postProcesses: ["xlsx-to-csv a"] },
+          { name: "xlsx-to-csva", postProcesses: ["xlsx-to-csv a"] },
           "https://example.com/dummy.xlsx",
         );
         assertSpyCall(denoExitStub, 0, { args: [1] });
-        assertEquals(
-          await fileExists(
-            "data_files/xlsx-to-csv a/dummy.xlsx",
+        assert(
+          fileExists(
+            "data_files/xlsx-to-csva/dummy.xlsx",
           ),
           true,
         );
@@ -588,8 +573,8 @@ describe("InstallAction", () => {
           { name: "cmdecho", postProcesses: ["cmd echo"] },
           "https://example.com/dummy.txt",
         );
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/cmdecho/dummy.txt",
           ),
           true,
@@ -599,6 +584,13 @@ describe("InstallAction", () => {
             cmd: ["echo", "./data_files/cmdecho/dummy.txt"],
             stdout: "piped",
           }],
+        });
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            "Execute Command: ",
+            ["echo"],
+            "./data_files/cmdecho/dummy.txt",
+          ],
         });
       } finally {
         kyGetStub.restore();
@@ -615,8 +607,8 @@ describe("InstallAction", () => {
           { name: "cmdechoa", postProcesses: ["cmd echo a"] },
           "https://example.com/dummy.txt",
         );
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/cmdechoa/dummy.txt",
           ),
           true,
@@ -626,6 +618,13 @@ describe("InstallAction", () => {
             cmd: ["echo", "a", "./data_files/cmdechoa/dummy.txt"],
             stdout: "piped",
           }],
+        });
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            "Execute Command: ",
+            ["echo", "a"],
+            "./data_files/cmdechoa/dummy.txt",
+          ],
         });
       } finally {
         kyGetStub.restore();
@@ -641,8 +640,8 @@ describe("InstallAction", () => {
           { name: "cmd", postProcesses: ["cmd"] },
           "https://example.com/dummy.txt",
         );
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/cmd/dummy.txt",
           ),
           true,
@@ -664,12 +663,12 @@ describe("InstallAction", () => {
       try {
         createEmptyDimJson();
         await new InstallAction().execute(
-          { name: "ecmd aaa", postProcesses: ["cmd aaa"] },
+          { name: "ecmdaaa", postProcesses: ["cmd aaa"] },
           "https://example.com/dummy.txt",
         );
-        assertEquals(
-          await fileExists(
-            "data_files/ecmd aaa/dummy.txt",
+        assert(
+          fileExists(
+            "data_files/ecmdaaa/dummy.txt",
           ),
           true,
         );
@@ -679,7 +678,13 @@ describe("InstallAction", () => {
             [
               "aaa",
             ],
-            "./data_files/ecmd aaa/dummy.txt",
+            "./data_files/ecmdaaa/dummy.txt",
+          ],
+        });
+        assertSpyCall(consoleLogStub, 1, {
+          args: [
+            Colors.red(`Failed to execute the "aaa"\n`),
+            Colors.red(`NotFound: No such file or directory (os error 2)`),
           ],
         });
       } finally {
@@ -695,8 +700,8 @@ describe("InstallAction", () => {
           { name: "aaa", postProcesses: ["aaa"] },
           "https://example.com/dummy.txt",
         );
-        assertEquals(
-          await fileExists(
+        assert(
+          fileExists(
             "data_files/aaa/dummy.txt",
           ),
           true,
@@ -748,10 +753,7 @@ describe("InstallAction", () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
-        await new InstallAction().execute(
-          {},
-          undefined,
-        );
+        await new InstallAction().execute({}, undefined);
         assertSpyCall(consoleLogStub, 0, {
           args: [
             "No contents.\nYou should run a 'dim install <data url>'. ",
@@ -769,7 +771,7 @@ describe("InstallAction", () => {
         assertSpyCall(denoExitStub, 0, { args: [1] });
         assertSpyCall(consoleLogStub, 0, {
           args: [
-            "Not found a dim.json. You should run a 'dim init'. ",
+            Colors.red("Not found a dim.json. You should run a 'dim init'. "),
           ],
         });
       } finally {
@@ -794,7 +796,9 @@ describe("InstallAction", () => {
         );
         assertEquals(
           dimLockJson,
-          JSON.parse(Deno.readTextFileSync("./../test_data/installed-dim-lock.json")),
+          JSON.parse(
+            Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
+          ),
         );
       } finally {
         kyGetStub.restore();
@@ -838,12 +842,15 @@ describe("InstallAction", () => {
         );
         assertSpyCall(denoExitStub, 0, { args: [1] });
         assertSpyCall(consoleLogStub, 0, {
-          args: ["Not found a dim.json. You should run a 'dim init'. "],
+          args: [
+            Colors.red("Not found a dim.json. You should run a 'dim init'. "),
+          ],
         });
       } finally {
         kyGetStub.restore();
       }
     });
+
     it("exits with error when run with no difference between dim.json and dim-lock.json", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -877,12 +884,12 @@ describe("InstallAction", () => {
           }],
         };
         await Deno.writeTextFile(
-          "./dim-lock.json",
-          JSON.stringify(dimLockData, null, 2),
-        );
-        await Deno.writeTextFile(
           "./dim.json",
           JSON.stringify(dimData, null, 2),
+        );
+        await Deno.writeTextFile(
+          "./dim-lock.json",
+          JSON.stringify(dimLockData, null, 2),
         );
         await new InstallAction().execute({}, undefined);
         assertSpyCall(consoleLogStub, 0, {
@@ -1064,7 +1071,7 @@ describe("InstallAction", () => {
                 catalogUrl: null,
                 catalogResourceId: null,
                 postProcesses: [
-                  "encoding-utf-8",
+                  "encoding utf-8",
                 ],
                 headers: {},
               },
@@ -1146,13 +1153,15 @@ describe("InstallAction", () => {
     it(
       "download the difference between the dim.json that exists on the Internet and the dim.json that exists in the current directory and check that it is recorded in dim.json, dim-lock.json.",
       async () => {
-        const dimJson = Deno.readTextFileSync("./../test_data/external-dim.json");
-        const kyGetStub = createKyGetStub(dimJson.replace(/[\n\s]/g, ""));
+        const dimJson = Deno.readTextFileSync(
+          "./../test_data/external-dim.json",
+        );
+        const kyGetStub = createKyGetStub(dimJson);
         try {
           createEmptyDimJson();
           await new InstallAction().execute(
             {
-              file: "https://example.com/dummy.json",
+              file: "https://example.com/dim.json",
             },
             undefined,
           );
@@ -1162,6 +1171,17 @@ describe("InstallAction", () => {
           assertEquals(
             dimJson,
             JSON.parse(Deno.readTextFileSync("./dim.json")),
+          );
+          const dimLockJson = JSON.parse(
+            Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
+          );
+          assertEquals(
+            dimLockJson,
+            JSON.parse(Deno.readTextFileSync("./dim-lock.json")),
+          );
+          assertEquals(
+            fileExists("./data_files/test1/dummy.txt"),
+            true,
           );
         } finally {
           kyGetStub.restore();
@@ -1174,16 +1194,17 @@ describe("InstallAction", () => {
       async () => {
         const kyGetStub = createKyGetStub("dummy");
         try {
-          let error = "";
           await new InstallAction().execute(
             {
-              file: "https://example.com/dummy.json",
+              file: "https://example.com/dummy.txt",
             },
             undefined,
-          ).catch((e) => {
-            error = e.message;
+          );
+          assertSpyCall(consoleLogStub, 0, {
+            args: [
+              Colors.red("Selecting other than json."),
+            ],
           });
-          assertMatch(error, /.*(is not valid JSON)$/);
         } finally {
           kyGetStub.restore();
         }
@@ -1206,8 +1227,12 @@ describe("InstallAction", () => {
           ],
           stdout: "piped",
         });
-        console.log(new TextDecoder().decode(await p.output()));
+        const result = await p.output();
         p.close();
+        assertEquals(
+          new TextDecoder().decode(result),
+          "No contents.\nYou should run a 'dim install <data url>'. \n",
+        );
       } finally {
         kyGetStub.restore();
       }

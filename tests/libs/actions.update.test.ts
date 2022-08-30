@@ -1,7 +1,4 @@
-import {
-  assertEquals,
-  assertMatch,
-} from "https://deno.land/std@0.152.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
 import {
   assertSpyCall,
   Stub,
@@ -28,16 +25,6 @@ import {
   removeTemporaryFiles,
   temporaryDirectory,
 } from "../helper.ts";
-
-function fileExists(filePath: string): boolean {
-  try {
-    Deno.statSync(filePath);
-    return true;
-  } catch (e) {
-    console.log(e.message);
-    return false;
-  }
-}
 
 const createEmptyDimJson = () => {
   Deno.writeTextFileSync(
@@ -98,7 +85,7 @@ describe("UpdateAction", () => {
           eTag: null,
           headers: {},
           integrity: "",
-          lastDownloaded: new Date("2022-01-02T03:04:05.678Z"),
+          lastDownloaded: new Date("2020-01-02T03:04:05.678Z"),
           lastModified: null,
           name: "example",
           path: "./data_files/example/dummy.csv",
@@ -181,8 +168,8 @@ describe("UpdateAction", () => {
         kyGetStub.restore();
       }
     });
+
     it('exit with error when run with "name" not listed in dim-lock.json', async () => {
-      denoExitStub.restore;
       createEmptyDimJson();
       await new UpdateAction().execute({}, "example2").catch(() => {
         assertSpyCall(consoleErrorStub, 0, {
@@ -192,9 +179,11 @@ describe("UpdateAction", () => {
             ),
           ],
         });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
       });
     });
   });
+
   describe("without name", () => {
     it("check that all data recorded in dim-lock.json is updated.", async () => {
       const kyGetStub = createKyGetStub("after", {
@@ -293,6 +282,7 @@ describe("UpdateAction", () => {
         kyGetStub.restore();
       }
     });
+
     it("check that all data recorded in dim-lock.json is updated asynchronously.", async () => {
       const kyGetStub = createKyGetStub("after", {
         headers: {
