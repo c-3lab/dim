@@ -7,7 +7,7 @@
       "catalogUrl": null,
       "catalogResourceId": null,
       "postProcesses": [
-        "encoding-utf-8"
+        "encoding utf-8"
       ],
       "headers": {}
     },

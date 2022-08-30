@@ -1,0 +1,46 @@
+{
+  "lockFileVersion": "1.1",
+  "contents": [
+    {
+      "catalogResourceId": null,
+      "catalogUrl": null,
+      "eTag": null,
+      "headers": {},
+      "integrity": "",
+      "lastDownloaded": "2022-01-02T03:04:05.678Z",
+      "lastModified": null,
+      "name": "test1",
+      "path": "./data_files/test1/dummy.txt",
+      "postProcesses": [
+        "encoding-utf-8"
+      ],
+      "url": "https://example.com/dummy.txt"
+    },
+    {
+      "catalogResourceId": null,
+      "catalogUrl": null,
+      "eTag": null,
+      "headers": {},
+      "integrity": "",
+      "lastDownloaded": "2022-01-02T03:04:05.678Z",
+      "lastModified": null,
+      "name": "test2",
+      "path": "./data_files/test2/dummy.csv",
+      "postProcesses": [],
+      "url": "https://example.com/dummy.csv"
+    },
+    {
+      "catalogResourceId": null,
+      "catalogUrl": null,
+      "eTag": null,
+      "headers": {},
+      "integrity": "",
+      "lastDownloaded": "2022-01-02T03:04:05.678Z",
+      "lastModified": null,
+      "name": "test3",
+      "path": "./data_files/test3/dummy.zip",
+      "postProcesses": [],
+      "url": "https://example.com/dummy.zip"
+    }
+  ]
+}

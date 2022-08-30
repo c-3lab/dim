@@ -735,7 +735,7 @@ describe("InstallAction", () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         await new InstallAction().execute(
-          { file: "./../test-dim.json" },
+          { file: "./../test_data/external-dim.json" },
           "https://example.com/dummy.txt",
         );
         assertSpyCall(denoExitStub, 0, { args: [1] });
@@ -787,11 +787,20 @@ describe("InstallAction", () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         await new InstallAction().execute(
-          { file: "./../test-dim.json" },
+          { file: "./../test_data/external-dim.json" },
           undefined,
         );
-        const dimJson = JSON.parse(Deno.readTextFileSync("./../test-dim.json"));
+        const dimJson = JSON.parse(
+          Deno.readTextFileSync("./../test_data/external-dim.json"),
+        );
         assertEquals(dimJson, JSON.parse(Deno.readTextFileSync("./dim.json")));
+        const dimLockJson = JSON.parse(
+          Deno.readTextFileSync("./dim-lock.json"),
+        );
+        assertEquals(
+          dimLockJson,
+          JSON.parse(Deno.readTextFileSync("./../test_data/installed-dim-lock.json")),
+        );
       } finally {
         kyGetStub.restore();
       }
@@ -801,52 +810,15 @@ describe("InstallAction", () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
-        const dimLockData: DimLockJSON = {
-          lockFileVersion: "1.1",
-          contents: [{
-            catalogResourceId: null,
-            catalogUrl: null,
-            eTag: null,
-            headers: {},
-            integrity: "",
-            lastDownloaded: new Date(),
-            lastModified: null,
-            name: "test1",
-            path: "./data_files/test1/dummy.txt",
-            postProcesses: ["encoding-utf-8"],
-            url: "https://example.com/dummy.txt",
-          }, {
-            catalogResourceId: null,
-            catalogUrl: null,
-            eTag: null,
-            headers: {},
-            integrity: "",
-            lastDownloaded: new Date(),
-            lastModified: null,
-            name: "test2",
-            path: "./data_files/test2/dummy.csv",
-            postProcesses: [],
-            url: "https://example.com/dummy.csv",
-          }, {
-            catalogResourceId: null,
-            catalogUrl: null,
-            eTag: null,
-            headers: {},
-            integrity: "",
-            lastDownloaded: new Date(),
-            lastModified: null,
-            name: "test3",
-            path: "./data_files/test3/dummy.zip",
-            postProcesses: [],
-            url: "https://example.com/dummy.zip",
-          }],
-        };
+        const dimLockData: DimLockJSON = JSON.parse(
+          Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
+        );
         await Deno.writeTextFile(
           DEFAULT_DIM_LOCK_FILE_PATH,
           JSON.stringify(dimLockData, null, 2),
         );
         await new InstallAction().execute(
-          { file: "./../test-dim.json" },
+          { file: "./../test_data/external-dim.json" },
           undefined,
         );
         assertSpyCall(consoleLogStub, 0, {
@@ -866,7 +838,7 @@ describe("InstallAction", () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         await new InstallAction().execute(
-          { file: "./../helper.ts" },
+          { file: "./../test_data/invalid.txt" },
           undefined,
         );
         assertSpyCall(denoExitStub, 0, { args: [1] });
@@ -905,7 +877,7 @@ describe("InstallAction", () => {
             lastModified: null,
             name: "test1",
             path: "./data_files/test1/dummy.txt",
-            postProcesses: ["encoding-utf-8"],
+            postProcesses: ["encoding utf-8"],
             url: "https://example.com/dummy.txt",
           }],
         };
@@ -940,7 +912,7 @@ describe("InstallAction", () => {
       });
       try {
         const dimData = JSON.parse(
-          Deno.readTextFileSync("./../test_data/test-dim.json"),
+          Deno.readTextFileSync("./../test_data/external-dim.json"),
         );
         await Deno.writeTextFile(
           "./dim.json",
@@ -1023,14 +995,14 @@ describe("InstallAction", () => {
       });
       try {
         const dimData: DimJSON = JSON.parse(
-          Deno.readTextFileSync("./../test_data/test-dim.json"),
+          Deno.readTextFileSync("./../test_data/external-dim.json"),
         );
         await Deno.writeTextFile(
           DEFAULT_DIM_FILE_PATH,
           JSON.stringify(dimData, null, 2),
         );
         const dimLockData: DimJSON = JSON.parse(
-          Deno.readTextFileSync("./../test_data/test-lock.json"),
+          Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
         );
         await Deno.writeTextFile(
           DEFAULT_DIM_FILE_PATH,
@@ -1142,7 +1114,7 @@ describe("InstallAction", () => {
               lastModified: null,
               name: "test1",
               path: "./data_files/test1/dummy.txt",
-              postProcesses: ["encoding-utf-8"],
+              postProcesses: ["encoding utf-8"],
               url: "https://example.com/dummy.txt",
             }, {
               catalogResourceId: null,
@@ -1179,7 +1151,7 @@ describe("InstallAction", () => {
     it(
       "download the difference between the dim.json that exists on the Internet and the dim.json that exists in the current directory and check that it is recorded in dim.json, dim-lock.json.",
       async () => {
-        const dimJson = Deno.readTextFileSync("./../test-dim.json");
+        const dimJson = Deno.readTextFileSync("./../test_data/external-dim.json");
         const kyGetStub = createKyGetStub(dimJson.replace(/[\n\s]/g, ""));
         try {
           createEmptyDimJson();
@@ -1190,7 +1162,7 @@ describe("InstallAction", () => {
             undefined,
           );
           const dimJson = JSON.parse(
-            Deno.readTextFileSync("./../test-dim.json"),
+            Deno.readTextFileSync("./../test_data/external-dim.json"),
           );
           assertEquals(
             dimJson,
