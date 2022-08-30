@@ -119,7 +119,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("exit with error when specified name is already installed", async () => {
+    it('exit with error when run with "name" not recorded in dim.json', async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         const dimData: DimJSON = {
