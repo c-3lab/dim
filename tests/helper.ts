@@ -6,7 +6,10 @@ const currentDirectory = new URL(".", import.meta.url).pathname;
 export const temporaryDirectory = resolve(currentDirectory, "temporary") + "/";
 Deno.mkdirSync(temporaryDirectory, { recursive: true });
 
-export const createKyGetStub = (body: string, options?: ResponseInit): Stub => {
+export const createKyGetStub = (
+  body: BodyInit,
+  options?: ResponseInit,
+): Stub => {
   const mockedKy = ky.extend({
     hooks: {
       beforeRequest: [
