@@ -915,6 +915,7 @@ describe("InstallAction", () => {
 
         const testData = Deno.readTextFileSync("./data_files/test1/dummy.txt");
         assertEquals(testData, "before");
+        assert(fileExists("./data_files/test3/dummy.zip"));
       } finally {
         kyGetStub.restore();
       }
@@ -984,8 +985,6 @@ describe("InstallAction", () => {
             url: "https://example.com/dummy.zip",
           }],
         });
-
-        assert(fileExists("./data_files/test3/dummy.zip"));
       } finally {
         kyGetStub.restore();
       }
