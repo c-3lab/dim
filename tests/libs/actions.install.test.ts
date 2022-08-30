@@ -164,7 +164,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('check whether existing files are overwritten if "name" is duplicated in the "force" option.', async () => {
+    it("Overwrite existing files when specified name is duplicated and force is true", async () => {
       const dimData: DimJSON = {
         fileVersion: "1.1",
         contents: [
@@ -245,7 +245,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("download using request headers and check that they are recorded in dim.json and dim-lock.json.", async () => {
+    it("when specify headers option download using request headers and check that they are recorded in dim.json and dim-lock.json.", async () => {
       createEmptyDimJson();
 
       const kyGetStub = createKyGetStub("dummy");
@@ -260,7 +260,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/Header/dummy.csv",
           ),
-          true,
         );
 
         const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
@@ -298,7 +297,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('after downloading, encode the file to "utf-8" and check that it is recorded in dim.json, dim-lock.json', async () => {
+    it('encode downloaded file to Shift-JIS and record in dim.json, dim-lock.json when specify "encode sjis" as postProcesses', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("テストデータ");
       try {
@@ -310,7 +309,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/encodeSjis/dummy.txt",
           ),
-          true,
         );
         assertSpyCall(consoleLogStub, 0, {
           args: [
@@ -371,7 +369,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('exit with error when specify "encode utf-8 sjis" in "postProcess", and download', async () => {
+    it('exit with error when specify "encode utf-8 sjis" as postProcesses, and download', async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -394,14 +392,13 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/encodeUtf8Sjis/dummy.txt",
           ),
-          true,
         );
       } finally {
         kyGetStub.restore();
       }
     });
 
-    it('exit with error when specify "encode" in "postProcess", and download.', async () => {
+    it('exit with error when specify "encode" as postProcesses, and download.', async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -421,7 +418,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/encode/dummy.txt",
           ),
-          true,
         );
       } finally {
         kyGetStub.restore();
@@ -441,7 +437,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/unzip/dummy.zip",
           ),
-          true,
         );
         assertSpyCall(denoRunStub, 0, {
           args: [{
@@ -468,7 +463,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/unzip/dummy.zip",
           ),
-          true,
         );
         assertSpyCall(denoRunStub, 0, {
           args: [{
@@ -488,7 +482,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('exit with error when specify "unzip a" in "postProcess" and download', async () => {
+    it.only('exit with error when specify "unzip a" as postProcess and download', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -507,14 +501,13 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/unzipa/dummy.zip",
           ),
-          true,
         );
       } finally {
         kyGetStub.restore();
       }
     });
 
-    it("after downloading, convert the xlsx file to a csv file and check that it is recorded in dim.json and dim-lock.json.", async () => {
+    it('convert downloaded file from xlsx to csv and record in dim.json and dim-lock.json when specify "xlsx-to-csv" as postProcesses', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -526,7 +519,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/xlsx-to-csv/dummy.csv",
           ),
-          true,
         );
         assertSpyCall(consoleLogStub, 0, { args: ["Convert xlsx to csv."] });
       } finally {
@@ -534,7 +526,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('exit with error when specify "xlsx-to-csv a" in "postProcess" and download', async () => {
+    it('exit with error when specify "xlsx-to-csv a" as postProcesses and download', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -547,7 +539,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/xlsx-to-csva/dummy.xlsx",
           ),
-          true,
         );
         assertSpyCall(consoleLogStub, 0, {
           args: [
@@ -564,7 +555,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("confirm that when a file is downloaded, the path to the downloaded data is recorded in the standard output in data_files, dim.json and dim-lock.json.", async () => {
+    it('download file and execute echo command with downloaded file path as standard output when specify "cmd echo" as postProcesses', async () => {
       const kyGetStub = createKyGetStub("dummy");
       const denoRunStub = stub(Deno, "run");
       try {
@@ -577,7 +568,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/cmdecho/dummy.txt",
           ),
-          true,
         );
         assertSpyCall(denoRunStub, 0, {
           args: [{
@@ -598,7 +588,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('download the file and verify that the path to the downloaded data, prefixed with "a", is output to standard output and record in dim.json, dim-lock.json', async () => {
+    it.only('download file and execute echo command with "a" and downloaded file path as standard output when specify "cmd echo a" as postProcesses', async () => {
       const denoRunStub = stub(Deno, "run");
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -611,7 +601,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/cmdechoa/dummy.txt",
           ),
-          true,
         );
         assertSpyCall(denoRunStub, 0, {
           args: [{
@@ -632,7 +621,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('exit with error when specify "cmd" for "postProcess" and download', async () => {
+    it('exit with error when specify "cmd" as postProcesses and download', async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -644,7 +633,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/cmd/dummy.txt",
           ),
-          true,
         );
         assertSpyCall(consoleLogStub, 0, {
           args: [
@@ -658,7 +646,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('exit with error when specify "cmd aaa" for "postProcess" and download', async () => {
+    it('output log and ignore error when specify error command such as "cmd aaa" for "postProcesses"', async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -670,7 +658,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/ecmdaaa/dummy.txt",
           ),
-          true,
         );
         assertSpyCall(consoleLogStub, 0, {
           args: [
@@ -692,7 +679,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('exit with error when specify "aaa" in "postProcess" and download', async () => {
+    it('exit with error when specify "aaa" as postProcess and download', async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -704,7 +691,6 @@ describe("InstallAction", () => {
           fileExists(
             "data_files/aaa/dummy.txt",
           ),
-          true,
         );
         assertSpyCall(consoleLogStub, 0, {
           args: ["No support a postprocess 'aaa' ''."],
@@ -714,7 +700,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("exit with error when failed to download", async () => {
+    it("exit with error when if the URL is incorrectly described.", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -731,7 +717,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("exit with error when execute with URL and -f ", async () => {
+    it("exit with error when execute with URL and file path ", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         await new InstallAction().execute(
@@ -749,7 +735,7 @@ describe("InstallAction", () => {
   });
 
   describe("without URL", () => {
-    it("Run with an empty dim.json and confirm that you are asked to download data", async () => {
+    it("output the message for asking to download data when installed data is not exist and don't specify file path", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -764,7 +750,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("exit with error when Runs without dim.json", async () => {
+    it("exit with error when runs without dim.json", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         await new InstallAction().execute({}, undefined);
@@ -779,7 +765,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("download the data from the locally existing dim.json and ensure that it is recorded in dim.json and dim-lock.json.", async () => {
+    it("download data from locally existing dim.json and record in dim.json and dim-lock.json when specify file path", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -805,7 +791,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("download from locally existing all-data-installed dim.json and check that it is recorded in dim.json and dim-lock.json.", async () => {
+    it("download from locally existing all data installed dim.json and check that it is recorded in dim.json and dim-lock.json.", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -833,7 +819,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("exits with error when If a path other than the locally existing dim.json is specified, the program", async () => {
+    it("exits with error when specify non-existent file path", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         await new InstallAction().execute(
@@ -851,7 +837,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("exits with error when run with no difference between dim.json and dim-lock.json", async () => {
+    it("exits with error when installed data is exist", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         const dimData: DimJSON = {
@@ -988,7 +974,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("run with no differences between dim.json and dim-lock.json and check that a forced re-download is performed.", async () => {
+    it("forced re-download when installed data is exist and force is true", async () => {
       const kyGetStub = createKyGetStub("dummy", {
         headers: {
           "etag": '"12345-1234567890abc"',
@@ -1058,7 +1044,7 @@ describe("InstallAction", () => {
     });
 
     it(
-      "ensure asynchronous processing during multiple data installations.",
+      "check whether the asyncinstall option installs successfully",
       async () => {
         const kyGetStub = createKyGetStub("dummy");
         try {
@@ -1151,7 +1137,7 @@ describe("InstallAction", () => {
     );
 
     it(
-      "download the difference between the dim.json that exists on the Internet and the dim.json that exists in the current directory and check that it is recorded in dim.json, dim-lock.json.",
+      "download and record in dim.json, dim-lock.json when specified file path on Internet",
       async () => {
         const dimJson = Deno.readTextFileSync(
           "./../test_data/external-dim.json",
@@ -1190,7 +1176,7 @@ describe("InstallAction", () => {
     );
 
     it(
-      "exit with error when run by specifying a non-dim.json file that exists on the Internet",
+      "exit with error when specify non-dim.json file path on Internet",
       async () => {
         const kyGetStub = createKyGetStub("dummy");
         try {
