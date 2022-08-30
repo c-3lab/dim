@@ -13,12 +13,6 @@ import {
 } from "https://deno.land/std@0.152.0/testing/bdd.ts";
 import { Colors } from "../../deps.ts";
 import { UpdateAction } from "../../libs/actions.ts";
-import {
-  DEFAULT_DIM_FILE_PATH,
-  DEFAULT_DIM_LOCK_FILE_PATH,
-  DIM_FILE_VERSION,
-  DIM_LOCK_FILE_VERSION,
-} from "../../libs/consts.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
 import {
   createKyGetStub,
@@ -28,12 +22,12 @@ import {
 
 const createEmptyDimJson = () => {
   Deno.writeTextFileSync(
-    DEFAULT_DIM_FILE_PATH,
-    JSON.stringify({ fileVersion: DIM_FILE_VERSION, contents: [] }),
+    "./dim.json",
+    JSON.stringify({ fileVersion: "1.1", contents: [] }),
   );
   Deno.writeTextFileSync(
-    DEFAULT_DIM_LOCK_FILE_PATH,
-    JSON.stringify({ lockfileVersion: DIM_LOCK_FILE_VERSION, contents: [] }),
+    "./dim-lock.json",
+    JSON.stringify({ lockfileVersion: "1.1", contents: [] }),
   );
 };
 
@@ -62,7 +56,7 @@ describe("UpdateAction", () => {
   describe("with name", () => {
     it("check if data_file, dim.json and dim-lock.json have been updated given the name of the installed", async () => {
       const dimData: DimJSON = {
-        fileVersion: DIM_FILE_VERSION,
+        fileVersion: "1.1",
         contents: [
           {
             name: "example",
@@ -75,7 +69,7 @@ describe("UpdateAction", () => {
         ],
       };
       const dimLockData: DimLockJSON = {
-        lockFileVersion: DIM_LOCK_FILE_VERSION,
+        lockFileVersion: "1.1",
         contents: [{
           catalogResourceId: null,
           catalogUrl: null,
@@ -91,11 +85,11 @@ describe("UpdateAction", () => {
         }],
       };
       await Deno.writeTextFile(
-        DEFAULT_DIM_FILE_PATH,
+        "./dim.json",
         JSON.stringify(dimData, null, 2),
       );
       await Deno.writeTextFile(
-        DEFAULT_DIM_LOCK_FILE_PATH,
+        "./dim-lock.json",
         JSON.stringify(dimLockData, null, 2),
       );
       Deno.mkdirSync("data_files/example", { recursive: true });
@@ -116,10 +110,10 @@ describe("UpdateAction", () => {
         assertEquals(fileContent, "after");
 
         const dimJson = JSON.parse(
-          Deno.readTextFileSync(DEFAULT_DIM_FILE_PATH),
+          Deno.readTextFileSync("./dim.json"),
         );
         assertEquals(dimJson, {
-          fileVersion: DIM_FILE_VERSION,
+          fileVersion: "1.1",
           contents: [{
             catalogResourceId: null,
             catalogUrl: null,
@@ -131,10 +125,10 @@ describe("UpdateAction", () => {
         });
 
         const dimLockJson = JSON.parse(
-          Deno.readTextFileSync(DEFAULT_DIM_LOCK_FILE_PATH),
+          Deno.readTextFileSync("./dim-lock.json"),
         );
         assertEquals(dimLockJson, {
-          lockFileVersion: DIM_LOCK_FILE_VERSION,
+          lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: null,
             catalogUrl: null,
@@ -193,7 +187,7 @@ describe("UpdateAction", () => {
         Deno.mkdirSync("data_files/test1", { recursive: true });
         Deno.writeTextFileSync("data_files/test1/dummy.txt", "before");
         const dimData: DimJSON = {
-          "fileVersion": DIM_FILE_VERSION,
+          "fileVersion": "1.1",
           "contents": [
             {
               name: "test1",
@@ -224,15 +218,15 @@ describe("UpdateAction", () => {
           ],
         };
         await Deno.writeTextFile(
-          DEFAULT_DIM_FILE_PATH,
+          "./dim.json",
           JSON.stringify(dimData, null, 2),
         );
         await new UpdateAction().execute({}, undefined);
         const dimLockJson = JSON.parse(
-          Deno.readTextFileSync(DEFAULT_DIM_LOCK_FILE_PATH),
+          Deno.readTextFileSync("./dim-lock.json"),
         );
         assertEquals(dimLockJson, {
-          lockFileVersion: DIM_LOCK_FILE_VERSION,
+          lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: null,
             catalogUrl: null,
@@ -291,7 +285,7 @@ describe("UpdateAction", () => {
         Deno.mkdirSync("data_files/test1", { recursive: true });
         Deno.writeTextFileSync("data_files/test1/dummy.txt", "before");
         const dimData: DimJSON = {
-          "fileVersion": DIM_FILE_VERSION,
+          "fileVersion": "1.1",
           "contents": [
             {
               name: "test1",
@@ -322,15 +316,15 @@ describe("UpdateAction", () => {
           ],
         };
         await Deno.writeTextFile(
-          DEFAULT_DIM_FILE_PATH,
+          "./dim.json",
           JSON.stringify(dimData, null, 2),
         );
         await new UpdateAction().execute({ asyncInstall: true }, undefined);
         const dimLockJson = JSON.parse(
-          Deno.readTextFileSync(DEFAULT_DIM_LOCK_FILE_PATH),
+          Deno.readTextFileSync("./dim-lock.json"),
         );
         assertEquals(dimLockJson, {
-          lockFileVersion: DIM_LOCK_FILE_VERSION,
+          lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: null,
             catalogUrl: null,
