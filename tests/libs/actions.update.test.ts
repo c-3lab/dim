@@ -15,21 +15,11 @@ import { Colors } from "../../deps.ts";
 import { UpdateAction } from "../../libs/actions.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
 import {
+  createEmptyDimJson,
   createKyGetStub,
   removeTemporaryFiles,
   temporaryDirectory,
 } from "../helper.ts";
-
-const createEmptyDimJson = () => {
-  Deno.writeTextFileSync(
-    "./dim.json",
-    JSON.stringify({ fileVersion: "1.1", contents: [] }),
-  );
-  Deno.writeTextFileSync(
-    "./dim-lock.json",
-    JSON.stringify({ lockfileVersion: "1.1", contents: [] }),
-  );
-};
 
 describe("UpdateAction", () => {
   let consoleLogStub: Stub;
