@@ -5,9 +5,7 @@ import {
 } from "https://deno.land/std@0.152.0/testing/asserts.ts";
 import {
   assertSpyCall,
-  assertSpyCalls,
   returnsNext,
-  spy,
   Stub,
   stub,
 } from "https://deno.land/std@0.152.0/testing/mock.ts";
@@ -25,9 +23,7 @@ import {
   temporaryDirectory,
 } from "../helper.ts";
 import { Confirm, Input, Number } from "../../deps.ts";
-import { Downloader } from "../../libs/downloader.ts";
-import { DimFileAccessor, DimLockFileAccessor } from "../../libs/accessor.ts";
-import { CkanApiClient } from "../../libs/ckan_api_client.ts";
+import { DimFileAccessor } from "../../libs/accessor.ts";
 import { Colors } from "../../deps.ts";
 
 function fileExists(filePath: string): boolean {
