@@ -59,12 +59,7 @@ describe("InstallAction", () => {
           { name: "example" },
           "https://example.com/dummy.txt",
         );
-        assertEquals(
-          fileExists(
-            "data_files/example/dummy.txt",
-          ),
-          true,
-        );
+        assert(fileExists("data_files/example/dummy.txt"));
         const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
         assertEquals(dimJson, {
           fileVersion: "1.1",
@@ -256,11 +251,7 @@ describe("InstallAction", () => {
         );
 
         assertEquals(kyGetStub.calls[0].args[1].headers, { "key": "value" });
-        assert(
-          fileExists(
-            "data_files/Header/dummy.csv",
-          ),
-        );
+        assert(fileExists("data_files/Header/dummy.csv"));
 
         const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
         assertEquals(dimJson, {
@@ -305,11 +296,7 @@ describe("InstallAction", () => {
           { name: "encodeSjis", postProcesses: ["encode sjis"] },
           "https://example.com/dummy.txt",
         );
-        assert(
-          fileExists(
-            "data_files/encodeSjis/dummy.txt",
-          ),
-        );
+        assert(fileExists("data_files/encodeSjis/dummy.txt"));
         assertSpyCall(consoleLogStub, 0, {
           args: [
             "Converted encoding to",
@@ -388,11 +375,7 @@ describe("InstallAction", () => {
             ),
           ],
         });
-        assert(
-          fileExists(
-            "data_files/encodeUtf8Sjis/dummy.txt",
-          ),
-        );
+        assert(fileExists("data_files/encodeUtf8Sjis/dummy.txt"));
       } finally {
         kyGetStub.restore();
       }
@@ -414,11 +397,7 @@ describe("InstallAction", () => {
             ),
           ],
         });
-        assert(
-          fileExists(
-            "data_files/encode/dummy.txt",
-          ),
-        );
+        assert(fileExists("data_files/encode/dummy.txt"));
       } finally {
         kyGetStub.restore();
       }
@@ -433,11 +412,7 @@ describe("InstallAction", () => {
           { name: "unzip", postProcesses: ["unzip"] },
           "https://example.com/dummy.zip",
         );
-        assert(
-          fileExists(
-            "data_files/unzip/dummy.zip",
-          ),
-        );
+        assert(fileExists("data_files/unzip/dummy.zip"));
         assertSpyCall(denoRunStub, 0, {
           args: [{
             cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./"],
@@ -459,11 +434,7 @@ describe("InstallAction", () => {
           { name: "unzip", postProcesses: ["unzip"] },
           "https://example.com/dummy.zip",
         );
-        assert(
-          fileExists(
-            "data_files/unzip/dummy.zip",
-          ),
-        );
+        assert(fileExists("data_files/unzip/dummy.zip"));
         assertSpyCall(denoRunStub, 0, {
           args: [{
             cmd: [
@@ -497,11 +468,7 @@ describe("InstallAction", () => {
             Colors.red("unzip a"),
           ],
         });
-        assert(
-          fileExists(
-            "data_files/unzipa/dummy.zip",
-          ),
-        );
+        assert(fileExists("data_files/unzipa/dummy.zip"));
       } finally {
         kyGetStub.restore();
       }
@@ -515,11 +482,7 @@ describe("InstallAction", () => {
           { name: "xlsx-to-csv", postProcesses: ["xlsx-to-csv"] },
           "https://example.com/dummy.xlsx",
         );
-        assert(
-          fileExists(
-            "data_files/xlsx-to-csv/dummy.csv",
-          ),
-        );
+        assert(fileExists("data_files/xlsx-to-csv/dummy.csv"));
         assertSpyCall(consoleLogStub, 0, { args: ["Convert xlsx to csv."] });
       } finally {
         kyGetStub.restore();
@@ -535,11 +498,7 @@ describe("InstallAction", () => {
           "https://example.com/dummy.xlsx",
         );
         assertSpyCall(denoExitStub, 0, { args: [1] });
-        assert(
-          fileExists(
-            "data_files/xlsx-to-csva/dummy.xlsx",
-          ),
-        );
+        assert(fileExists("data_files/xlsx-to-csva/dummy.xlsx"));
         assertSpyCall(consoleLogStub, 0, {
           args: [
             Colors.red(
@@ -564,11 +523,7 @@ describe("InstallAction", () => {
           { name: "cmdecho", postProcesses: ["cmd echo"] },
           "https://example.com/dummy.txt",
         );
-        assert(
-          fileExists(
-            "data_files/cmdecho/dummy.txt",
-          ),
-        );
+        assert(fileExists("data_files/cmdecho/dummy.txt"));
         assertSpyCall(denoRunStub, 0, {
           args: [{
             cmd: ["echo", "./data_files/cmdecho/dummy.txt"],
@@ -597,11 +552,7 @@ describe("InstallAction", () => {
           { name: "cmdechoa", postProcesses: ["cmd echo a"] },
           "https://example.com/dummy.txt",
         );
-        assert(
-          fileExists(
-            "data_files/cmdechoa/dummy.txt",
-          ),
-        );
+        assert(fileExists("data_files/cmdechoa/dummy.txt"));
         assertSpyCall(denoRunStub, 0, {
           args: [{
             cmd: ["echo", "a", "./data_files/cmdechoa/dummy.txt"],
@@ -629,11 +580,7 @@ describe("InstallAction", () => {
           { name: "cmd", postProcesses: ["cmd"] },
           "https://example.com/dummy.txt",
         );
-        assert(
-          fileExists(
-            "data_files/cmd/dummy.txt",
-          ),
-        );
+        assert(fileExists("data_files/cmd/dummy.txt"));
         assertSpyCall(consoleLogStub, 0, {
           args: [
             Colors.red(
@@ -654,11 +601,7 @@ describe("InstallAction", () => {
           { name: "ecmdaaa", postProcesses: ["cmd aaa"] },
           "https://example.com/dummy.txt",
         );
-        assert(
-          fileExists(
-            "data_files/ecmdaaa/dummy.txt",
-          ),
-        );
+        assert(fileExists("data_files/ecmdaaa/dummy.txt"));
         assertSpyCall(consoleLogStub, 0, {
           args: [
             "Execute Command: ",
@@ -687,11 +630,7 @@ describe("InstallAction", () => {
           { name: "aaa", postProcesses: ["aaa"] },
           "https://example.com/dummy.txt",
         );
-        assert(
-          fileExists(
-            "data_files/aaa/dummy.txt",
-          ),
-        );
+        assert(fileExists("data_files/aaa/dummy.txt"));
         assertSpyCall(consoleLogStub, 0, {
           args: ["No support a postprocess 'aaa' ''."],
         });
@@ -1165,10 +1104,7 @@ describe("InstallAction", () => {
             dimLockJson,
             JSON.parse(Deno.readTextFileSync("./dim-lock.json")),
           );
-          assertEquals(
-            fileExists("./data_files/test1/dummy.txt"),
-            true,
-          );
+          assert(fileExists("./data_files/test1/dummy.txt"));
         } finally {
           kyGetStub.restore();
         }

@@ -41,14 +41,12 @@ describe("UpdateAction", () => {
   let consoleLogStub: Stub;
   let consoleErrorStub: Stub;
   let denoExitStub: Stub;
-  let denoStdoutStub: Stub;
   let fakeTime: FakeTime;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
     consoleErrorStub = stub(console, "error");
     denoExitStub = stub(Deno, "exit");
-    denoStdoutStub = stub(Deno.stdout, "write");
     fakeTime = new FakeTime("2022-01-02 03:04:05.678Z");
     Deno.chdir(temporaryDirectory);
   });
@@ -57,7 +55,6 @@ describe("UpdateAction", () => {
     removeTemporaryFiles();
     fakeTime.restore();
     denoExitStub.restore();
-    denoStdoutStub.restore();
     consoleErrorStub.restore();
     consoleLogStub.restore();
   });

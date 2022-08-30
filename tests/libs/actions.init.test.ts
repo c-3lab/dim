@@ -1,6 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
 import { Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
-import { FakeTime } from "https://deno.land/std@0.152.0/testing/time.ts";
 import {
   afterEach,
   beforeEach,
@@ -15,23 +14,17 @@ describe("InitAction", () => {
   let consoleLogStub: Stub;
   let consoleErrorStub: Stub;
   let denoExitStub: Stub;
-  let denoStdoutStub: Stub;
-  let fakeTime: FakeTime;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
     consoleErrorStub = stub(console, "error");
     denoExitStub = stub(Deno, "exit");
-    denoStdoutStub = stub(Deno.stdout, "write");
-    fakeTime = new FakeTime("2022-01-02 03:04:05.678Z");
     Deno.chdir(temporaryDirectory);
   });
 
   afterEach(() => {
     removeTemporaryFiles();
-    fakeTime.restore();
     denoExitStub.restore();
-    denoStdoutStub.restore();
     consoleErrorStub.restore();
     consoleLogStub.restore();
   });
