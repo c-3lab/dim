@@ -159,7 +159,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("Overwrite existing files when specified name is duplicated and force is true", async () => {
+    it("overwrite existing files when specified name is duplicated and force is true", async () => {
       const dimData: DimJSON = {
         fileVersion: "1.1",
         contents: [
@@ -423,36 +423,6 @@ describe("InstallAction", () => {
         kyGetStub.restore();
       }
     });
-    //darwin
-    it.ignore("if the OS is darwin, confirm that the command to extract the downloaded file is entered and that it is recorded in dim.json and dim-lock.json.", async () => {
-      createEmptyDimJson();
-      const kyGetStub = createKyGetStub("dummy");
-      const denoRunStub = stub(Deno, "run");
-      const denoBuildOsStub = stub(Deno.build, "os");
-      try {
-        await new InstallAction().execute(
-          { name: "unzip", postProcesses: ["unzip"] },
-          "https://example.com/dummy.zip",
-        );
-        assert(fileExists("data_files/unzip/dummy.zip"));
-        assertSpyCall(denoRunStub, 0, {
-          args: [{
-            cmd: [
-              "ditto",
-              "-xk",
-              "--sequesterRsrc",
-              "data_files/unzip/dummy.zip",
-              "data_files/unzip",
-            ],
-          }],
-        });
-      } finally {
-        kyGetStub.restore();
-        denoRunStub.restore();
-        denoBuildOsStub.restore();
-      }
-    });
-
     it('exit with error when specify "unzip a" as postProcess and download', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
@@ -476,13 +446,18 @@ describe("InstallAction", () => {
 
     it('convert downloaded file from xlsx to csv and record in dim.json and dim-lock.json when specify "xlsx-to-csv" as postProcesses', async () => {
       createEmptyDimJson();
-      const kyGetStub = createKyGetStub("dummy");
+      const testXlsx = Deno.readFileSync("../test_data/test.xlsx");
+      const kyGetStub = createKyGetStub(testXlsx);
       try {
         await new InstallAction().execute(
           { name: "xlsx-to-csv", postProcesses: ["xlsx-to-csv"] },
           "https://example.com/dummy.xlsx",
         );
-        assert(fileExists("data_files/xlsx-to-csv/dummy.csv"));
+        assert(fileExists("data_files/xlsx-to-csv/dummy.xlsx"));
+        const testData = Deno.readTextFileSync(
+          "data_files/xlsx-to-csv/dummy.csv",
+        );
+        assertEquals(testData, "a,b,c\n");
         assertSpyCall(consoleLogStub, 0, { args: ["Convert xlsx to csv."] });
       } finally {
         kyGetStub.restore();
@@ -593,7 +568,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it('output log and ignore error when specify error command such as "cmd aaa" for "postProcesses"', async () => {
+    it('output log and ignore error when specify error command such as "cmd aaa" as postProcesses', async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
@@ -676,7 +651,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("exit with error when execute with URL and file path ", async () => {
+    it("exit with error when execute with URL and file path", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         await new InstallAction().execute(
@@ -733,9 +708,12 @@ describe("InstallAction", () => {
           undefined,
         );
         const dimJson = JSON.parse(
-          Deno.readTextFileSync("./../test_data/external-dim.json"),
+          Deno.readTextFileSync("./dim.json"),
         );
-        assertEquals(dimJson, JSON.parse(Deno.readTextFileSync("./dim.json")));
+        assertEquals(
+          dimJson,
+          JSON.parse(Deno.readTextFileSync("./../test_data/external-dim.json")),
+        );
         const dimLockJson = JSON.parse(
           Deno.readTextFileSync("./dim-lock.json"),
         );
@@ -881,6 +859,12 @@ describe("InstallAction", () => {
             url: "https://example.com/dummy.txt",
           }],
         };
+        Deno.mkdirSync("data_files/test1", { recursive: true });
+        await Deno.writeTextFile(
+          "./data_files/test1/dummy.txt",
+          "before",
+        );
+
         await Deno.writeTextFile(
           "./dim-lock.json",
           JSON.stringify(dimLockData, null, 2),
@@ -928,6 +912,9 @@ describe("InstallAction", () => {
             url: "https://example.com/dummy.zip",
           }],
         });
+
+        const testData = Deno.readTextFileSync("./data_files/test1/dummy.txt");
+        assertEquals(testData, "before");
       } finally {
         kyGetStub.restore();
       }
@@ -948,11 +935,11 @@ describe("InstallAction", () => {
           "./dim.json",
           JSON.stringify(dimData, null, 2),
         );
-        const dimLockData: DimJSON = JSON.parse(
+        const dimLockData: DimLockJSON = JSON.parse(
           Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
         );
         await Deno.writeTextFile(
-          "./dim.json",
+          "./dim-lock.json",
           JSON.stringify(dimLockData, null, 2),
         );
         await new InstallAction().execute({ force: true }, undefined);
@@ -997,6 +984,8 @@ describe("InstallAction", () => {
             url: "https://example.com/dummy.zip",
           }],
         });
+
+        assert(fileExists("./data_files/test3/dummy.zip"));
       } finally {
         kyGetStub.restore();
       }
