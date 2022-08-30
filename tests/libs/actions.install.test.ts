@@ -444,7 +444,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it.only('convert downloaded file from xlsx to csv and record in dim.json and dim-lock.json when specify "xlsx-to-csv" as postProcesses', async () => {
+    it('convert downloaded file from xlsx to csv and record in dim.json and dim-lock.json when specify "xlsx-to-csv" as postProcesses', async () => {
       createEmptyDimJson();
       const testXlsx = Deno.readFileSync("../test_data/test.xlsx");
       const kyGetStub = createKyGetStub(testXlsx);
@@ -732,12 +732,9 @@ describe("InstallAction", () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
         createEmptyDimJson();
-        const dimLockData: DimLockJSON = JSON.parse(
-          Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
-        );
-        await Deno.writeTextFile(
-          "./dim-lock.json",
-          JSON.stringify(dimLockData, null, 2),
+        Deno.copyFileSync(
+          "../test_data/installed-dim-lock.json",
+          "dim-lock.json",
         );
         await new InstallAction().execute(
           { file: "./../test_data/external-dim.json" },
@@ -936,12 +933,9 @@ describe("InstallAction", () => {
           "./dim.json",
           JSON.stringify(dimData, null, 2),
         );
-        const dimLockData: DimLockJSON = JSON.parse(
-          Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
-        );
-        await Deno.writeTextFile(
-          "./dim-lock.json",
-          JSON.stringify(dimLockData, null, 2),
+        Deno.copyFileSync(
+          "../test_data/installed-dim-lock.json",
+          "dim-lock.json",
         );
         await new InstallAction().execute({ force: true }, undefined);
         const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
