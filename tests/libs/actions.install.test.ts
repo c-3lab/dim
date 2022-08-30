@@ -453,7 +453,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it.only('exit with error when specify "unzip a" as postProcess and download', async () => {
+    it('exit with error when specify "unzip a" as postProcess and download', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
@@ -543,7 +543,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it.only('download file and execute echo command with "a" and downloaded file path as standard output when specify "cmd echo a" as postProcesses', async () => {
+    it('download file and execute echo command with "a" and downloaded file path as standard output when specify "cmd echo a" as postProcesses', async () => {
       const denoRunStub = stub(Deno, "run");
       const kyGetStub = createKyGetStub("dummy");
       try {
