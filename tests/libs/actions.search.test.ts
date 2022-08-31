@@ -282,7 +282,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("exit with error when No results were obtained.", async () => {
+    it("exit with error when no results were obtained.", async () => {
       const denoExitStub = stub(Deno, "exit");
       const kyStub = createKyGetStub(
         JSON.stringify({ "result": { "results": [] } }),
@@ -682,7 +682,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("after downloading, save as csv file and check that it is recorded in dim.json and dim-lock.json.", async () => {
+    it("after downloading, save as csv file and record in dim.json and dim-lock.json.", async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -750,7 +750,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it('after downloading, encode the file to "euc-jp" and check that it is recorded in dim.json, dim-lock.json', async () => {
+    it('after downloading, encode the file to "euc-jp" and record in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -830,7 +830,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it('after downloading, encode the file to "iso-2022-jp" and check that it is recorded in dim.json, dim-lock.json', async () => {
+    it('after downloading, encode the file to "iso-2022-jp" and record in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -910,7 +910,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it('after downloading, encode the file to "shift_jis" and check that it is recorded in dim.json, dim-lock.json', async () => {
+    it('after downloading, encode the file to "shift_jis" and record in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -990,7 +990,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it('after downloading, encode the file to "utf-8" and check that it is recorded in dim.json, dim-lock.json', async () => {
+    it('after downloading, encode the file to "utf-8" and record in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -1070,7 +1070,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it('after downloading, encode the file to "utf-16" and check that it is recorded in dim.json, dim-lock.json', async () => {
+    it('after downloading, encode the file to "utf-16" and record in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -1150,7 +1150,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it('after downloading, encode the file to "utf-16be" and check that it is recorded in dim.json, dim-lock.json', async () => {
+    it('after downloading, encode the file to "utf-16be" and record in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -1230,7 +1230,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it('after downloading, encode the file to "utf-16le" and check that it is recorded in dim.json, dim-lock.json', async () => {
+    it('after downloading, encode the file to "utf-16le" and record in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -1310,7 +1310,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it('after downloading, encode the file to "encode unicode" and check that it is recorded in dim.json, dim-lock.json', async () => {
+    it('after downloading, encode the file to "encode unicode" and record in dim.json, dim-lock.json', async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
