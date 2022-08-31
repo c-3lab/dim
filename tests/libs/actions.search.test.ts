@@ -2,6 +2,7 @@ import {
   assert,
   assertEquals,
   assertFalse,
+  assertStringIncludes,
 } from "https://deno.land/std@0.152.0/testing/asserts.ts";
 import {
   assertSpyCall,
@@ -336,6 +337,30 @@ describe("SearchAction", () => {
       });
       assertSpyCall(denoExitSpy, 0, { args: [1] });
       denoExitSpy.restore();
+    });
+  });
+
+  describe("without keyword", () => {
+    it("exit with error when no keyword is specified.", async () => {
+      const p = Deno.run({
+        cmd: [
+          "deno",
+          "run",
+          "--allow-read",
+          "--allow-write",
+          "--allow-net",
+          "../../dim.ts",
+          "search",
+        ],
+        stdout: "null",
+        stderr: "piped",
+      });
+
+      const stderrOutput = await p.stderrOutput();
+      const actual = new TextDecoder().decode(stderrOutput);
+
+      assertStringIncludes(actual, "Missing argument(s): keyword");
+      p.close();
     });
   });
 
