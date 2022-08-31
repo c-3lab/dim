@@ -26,7 +26,9 @@ import {
 } from "../helper.ts";
 import { Confirm, encoding, Input, Number } from "../../deps.ts";
 import { DimFileAccessor } from "../../libs/accessor.ts";
+import { Downloader } from "../../libs/downloader.ts";
 import { Colors } from "../../deps.ts";
+import { DownlodedResult } from "../../libs/types.ts";
 
 describe("SearchAction", () => {
   let consoleLogStub: Stub;
@@ -1726,6 +1728,52 @@ describe("SearchAction", () => {
         numberStub.restore();
         inputStub.restore();
         confirmStub.restore();
+        kyStub.restore();
+      }
+    });
+
+    it("check whether to terminate in the event of a communication error", async () => {
+      createEmptyDimJson();
+      const numberStub = stub(
+        Number,
+        "prompt",
+        () => Promise<number>.resolve(1),
+      );
+      const inputStub = stub(
+        Input,
+        "prompt",
+        () => Promise<string>.resolve(""),
+      );
+      const confirmStub = stub(
+        Confirm,
+        "prompt",
+        () => Promise<boolean>.resolve(false),
+      );
+      const downloaderStub = stub(
+        Downloader.prototype,
+        "download",
+        (
+          _url: URL,
+          _name: string,
+          _headers?: Record<string, string>,
+        ): Promise<DownlodedResult> => {
+          throw new Error("Error in install process");
+        },
+      );
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data);
+      try {
+        await new SearchAction().execute(
+          { number: 10, install: true },
+          "避難所",
+        );
+        assertSpyCall(consoleErrorStub, 0);
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        numberStub.restore();
+        inputStub.restore();
+        confirmStub.restore();
+        downloaderStub.restore();
         kyStub.restore();
       }
     });
