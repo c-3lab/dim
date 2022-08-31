@@ -240,7 +240,7 @@ describe("InstallAction", () => {
       }
     });
 
-    it("download using request headers and check that they are recorded in dim.json and dim-lock.json when specify headers option ", async () => {
+    it("download using request headers and check that they are recorded in dim.json and dim-lock.json when specify headers option", async () => {
       createEmptyDimJson();
 
       const kyGetStub = createKyGetStub("dummy");
@@ -425,6 +425,7 @@ describe("InstallAction", () => {
         kyGetStub.restore();
       }
     });
+
     it('exit with error when specify "unzip a" as postProcess and download', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
