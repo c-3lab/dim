@@ -6,6 +6,7 @@ import {
 import {
   assertSpyCall,
   returnsNext,
+  spy,
   Stub,
   stub,
 } from "https://deno.land/std@0.152.0/testing/mock.ts";
@@ -24,7 +25,7 @@ import {
   removeTemporaryFiles,
   temporaryDirectory,
 } from "../helper.ts";
-import { Confirm, encoding, Input, Number } from "../../deps.ts";
+import { Confirm, encoding, Input, ky, Number } from "../../deps.ts";
 import { DimFileAccessor } from "../../libs/accessor.ts";
 import { Downloader } from "../../libs/downloader.ts";
 import { Colors } from "../../deps.ts";
@@ -33,14 +34,12 @@ import { DownlodedResult } from "../../libs/types.ts";
 describe("SearchAction", () => {
   let consoleLogStub: Stub;
   let consoleErrorStub: Stub;
-  let denoExitStub: Stub;
   let denoStdoutStub: Stub;
   let fakeTime: FakeTime;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
     consoleErrorStub = stub(console, "error");
-    denoExitStub = stub(Deno, "exit");
     denoStdoutStub = stub(Deno.stdout, "write");
     fakeTime = new FakeTime("2022-01-02 03:04:05.678Z");
     Deno.chdir(temporaryDirectory);
@@ -50,7 +49,6 @@ describe("SearchAction", () => {
     removeTemporaryFiles();
     fakeTime.restore();
     denoStdoutStub.restore();
-    denoExitStub.restore();
     consoleErrorStub.restore();
     consoleLogStub.restore();
   });
@@ -284,6 +282,7 @@ describe("SearchAction", () => {
     });
 
     it("exit with error when No results were obtained.", async () => {
+      const denoExitStub = stub(Deno, "exit");
       const kyStub = createKyGetStub(
         JSON.stringify({ "result": { "results": [] } }),
       );
@@ -306,7 +305,37 @@ describe("SearchAction", () => {
         assertSpyCall(denoExitStub, 0, { args: [1] });
       } finally {
         kyStub.restore();
+        denoExitStub.restore();
       }
+    });
+
+    it("exit with error when failed to fetch search results", async () => {
+      const denoExitSpy = spy(Deno, "exit");
+      const kyStub = stub(
+        ky,
+        "get",
+        () => {
+          throw new Error("error in search process");
+        },
+      );
+      try {
+        await new SearchAction().execute(
+          { number: 1 },
+          "避難所",
+        );
+      } catch {
+        //  Ignore exception from Deno.exit(1)
+      } finally {
+        kyStub.restore();
+      }
+      assertSpyCall(consoleErrorStub, 0, {
+        args: [
+          Colors.red("Failed to search."),
+          Colors.red("error in search process"),
+        ],
+      });
+      assertSpyCall(denoExitSpy, 0, { args: [1] });
+      denoExitSpy.restore();
     });
   });
 
@@ -327,6 +356,7 @@ describe("SearchAction", () => {
     });
 
     it('exit with error when if the value of "-n" is 0', async () => {
+      const denoExitStub = stub(Deno, "exit");
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data);
       try {
@@ -344,10 +374,12 @@ describe("SearchAction", () => {
         assertSpyCall(denoExitStub, 0, { args: [1] });
       } finally {
         kyStub.restore();
+        denoExitStub.restore();
       }
     });
 
     it('exit with error when if the value of "-n" is -1', async () => {
+      const denoExitStub = stub(Deno, "exit");
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data);
       try {
@@ -365,10 +397,12 @@ describe("SearchAction", () => {
         assertSpyCall(denoExitStub, 0, { args: [1] });
       } finally {
         kyStub.restore();
+        denoExitStub.restore();
       }
     });
 
     it('exit with error when if the value of "-n" is 101', async () => {
+      const denoExitStub = stub(Deno, "exit");
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data);
       try {
@@ -386,6 +420,7 @@ describe("SearchAction", () => {
         assertSpyCall(denoExitStub, 0, { args: [1] });
       } finally {
         kyStub.restore();
+        denoExitStub.restore();
       }
     });
   });
@@ -1450,6 +1485,7 @@ describe("SearchAction", () => {
     );
 
     it("exit with error when duplicate names.", async () => {
+      const denoExitStub = stub(Deno, "exit");
       createEmptyDimJson();
       await new DimFileAccessor().addContent(
         "http://example.com",
@@ -1496,6 +1532,7 @@ describe("SearchAction", () => {
         inputStub.restore();
         confirmStub.restore();
         kyStub.restore();
+        denoExitStub.restore();
       }
     });
 
@@ -1733,6 +1770,7 @@ describe("SearchAction", () => {
     });
 
     it("check whether to terminate in the event of a communication error", async () => {
+      const denoExitStub = stub(Deno, "exit");
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -1775,6 +1813,7 @@ describe("SearchAction", () => {
         confirmStub.restore();
         downloaderStub.restore();
         kyStub.restore();
+        denoExitStub.restore();
       }
     });
   });
