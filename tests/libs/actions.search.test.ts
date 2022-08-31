@@ -1794,7 +1794,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("check whether to terminate in the event of a communication error", async () => {
+    it.only("check whether to terminate in the event of a communication error", async () => {
       const denoExitStub = stub(Deno, "exit");
       createEmptyDimJson();
       const numberStub = stub(
@@ -1830,7 +1830,12 @@ describe("SearchAction", () => {
           { number: 10, install: true },
           "避難所",
         );
-        assertSpyCall(consoleErrorStub, 0);
+        assertSpyCall(consoleErrorStub, 0, {
+          args: [
+            Colors.red("Failed to install."),
+            Colors.red("Error in install process"),
+          ],
+        });
         assertSpyCall(denoExitStub, 0, { args: [1] });
       } finally {
         numberStub.restore();
