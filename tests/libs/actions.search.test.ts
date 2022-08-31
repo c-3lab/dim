@@ -18,34 +18,15 @@ import {
 import { FakeTime } from "https://deno.land/std@0.152.0/testing/time.ts";
 import { SearchAction } from "../../libs/actions.ts";
 import {
+  createEmptyDimJson,
   createKyGetStub,
+  fileExists,
   removeTemporaryFiles,
   temporaryDirectory,
 } from "../helper.ts";
-import { Confirm, Input, Number } from "../../deps.ts";
+import { Confirm, encoding, Input, Number } from "../../deps.ts";
 import { DimFileAccessor } from "../../libs/accessor.ts";
 import { Colors } from "../../deps.ts";
-
-function fileExists(filePath: string): boolean {
-  try {
-    Deno.statSync(filePath);
-    return true;
-  } catch (e) {
-    console.log(e.message);
-    return false;
-  }
-}
-
-const createEmptyDimJson = () => {
-  Deno.writeTextFileSync(
-    "dim.json",
-    JSON.stringify({ fileVersion: "1.1", contents: [] }),
-  );
-  Deno.writeTextFileSync(
-    "dim-lock.json",
-    JSON.stringify({ lockfileVersion: "1.1", contents: [] }),
-  );
-};
 
 describe("SearchAction", () => {
   let consoleLogStub: Stub;
@@ -66,14 +47,14 @@ describe("SearchAction", () => {
   afterEach(() => {
     removeTemporaryFiles();
     fakeTime.restore();
-    denoExitStub.restore();
     denoStdoutStub.restore();
+    denoExitStub.restore();
     consoleErrorStub.restore();
     consoleLogStub.restore();
   });
 
   describe("with keyword", () => {
-    it("check that the results are displayed on the standard output.", async () => {
+    it("output results on the standard output.", async () => {
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data);
       try {
@@ -82,46 +63,53 @@ describe("SearchAction", () => {
           "避難所",
         );
 
-        const searchParams = new URLSearchParams(
-          {
-            fq: `xckan_title:*避難所* OR tags:*避難所* OR x_ckan_description:*避難所*`,
-            rows: "10",
-          },
-        );
-        assertEquals(kyStub.calls[0].args[1].searchParams, searchParams);
+        assertSpyCall(kyStub, 0, {
+          args: [
+            "https://search.ckan.jp/backend/api/package_search",
+            {
+              searchParams: new URLSearchParams(
+                {
+                  fq:
+                    `xckan_title:*避難所* OR tags:*避難所* OR x_ckan_description:*避難所*`,
+                  rows: "10",
+                },
+              ),
+            },
+          ],
+        });
 
-        assertSpyCall(consoleLogStub, 0, { args: ["xckan_title"] });
+        assertSpyCall(consoleLogStub, 0, { args: ["catalog_title1"] });
         assertSpyCall(consoleLogStub, 1, {
           args: [
             "  - Catalog URL        :",
-            Colors.green("https://example.com"),
+            Colors.green("https://example1.com"),
           ],
         });
         assertSpyCall(consoleLogStub, 2, {
           args: [
             "  - Catalog Description:",
-            Colors.green("xckan_description"),
+            Colors.green("catalog_description1"),
           ],
         });
         assertSpyCall(consoleLogStub, 3, {
           args: [
             "  - Catalog License    :",
-            Colors.green("license_title"),
+            Colors.green("license_title1"),
           ],
         });
         assertSpyCall(consoleLogStub, 4, {
-          args: ["    1.", "name"],
+          args: ["    1.", "name1-1"],
         });
         assertSpyCall(consoleLogStub, 5, {
           args: [
             "      * Resource URL        :",
-            Colors.green("https://example.com/dummy.csv"),
+            Colors.green("https://example1-1.com/dummy.csv"),
           ],
         });
         assertSpyCall(consoleLogStub, 6, {
           args: [
             "      * Resource Description:",
-            Colors.green("description"),
+            Colors.green("description1-1"),
           ],
         });
         assertSpyCall(consoleLogStub, 7, {
@@ -138,38 +126,38 @@ describe("SearchAction", () => {
         });
         assertSpyCall(consoleLogStub, 9, { args: [] });
 
-        assertSpyCall(consoleLogStub, 10, { args: ["xckan_title"] });
+        assertSpyCall(consoleLogStub, 10, { args: ["catalog_title2"] });
         assertSpyCall(consoleLogStub, 11, {
           args: [
             "  - Catalog URL        :",
-            Colors.green("https://example.com"),
+            Colors.green("https://example2.com"),
           ],
         });
         assertSpyCall(consoleLogStub, 12, {
           args: [
             "  - Catalog Description:",
-            Colors.green("xckan_description"),
+            Colors.green("catalog_description2"),
           ],
         });
         assertSpyCall(consoleLogStub, 13, {
           args: [
             "  - Catalog License    :",
-            Colors.green("license_title"),
+            Colors.green("license_title2"),
           ],
         });
         assertSpyCall(consoleLogStub, 14, {
-          args: ["    2.", "name"],
+          args: ["    2.", "name2-1"],
         });
         assertSpyCall(consoleLogStub, 15, {
           args: [
             "      * Resource URL        :",
-            Colors.green("https://example.com/dummy.zip"),
+            Colors.green("https://example2-1.com/dummy.zip"),
           ],
         });
         assertSpyCall(consoleLogStub, 16, {
           args: [
             "      * Resource Description:",
-            Colors.green("description"),
+            Colors.green("description2-1"),
           ],
         });
         assertSpyCall(consoleLogStub, 17, {
@@ -185,18 +173,18 @@ describe("SearchAction", () => {
           ],
         });
         assertSpyCall(consoleLogStub, 19, {
-          args: ["    3.", "name"],
+          args: ["    3.", "name2-2"],
         });
         assertSpyCall(consoleLogStub, 20, {
           args: [
             "      * Resource URL        :",
-            Colors.green("https://example.com/dummy.zip"),
+            Colors.green("https://example2-2.com/dummy.zip"),
           ],
         });
         assertSpyCall(consoleLogStub, 21, {
           args: [
             "      * Resource Description:",
-            Colors.green("description"),
+            Colors.green("description2-2"),
           ],
         });
         assertSpyCall(consoleLogStub, 22, {
@@ -213,38 +201,38 @@ describe("SearchAction", () => {
         });
         assertSpyCall(consoleLogStub, 24, { args: [] });
 
-        assertSpyCall(consoleLogStub, 25, { args: ["xckan_title"] });
+        assertSpyCall(consoleLogStub, 25, { args: ["catalog_title3"] });
         assertSpyCall(consoleLogStub, 26, {
           args: [
             "  - Catalog URL        :",
-            Colors.green("https://example.com"),
+            Colors.green("https://example3.com"),
           ],
         });
         assertSpyCall(consoleLogStub, 27, {
           args: [
             "  - Catalog Description:",
-            Colors.green("xckan_description"),
+            Colors.green("catalog_description3"),
           ],
         });
         assertSpyCall(consoleLogStub, 28, {
           args: [
             "  - Catalog License    :",
-            Colors.green("license_title"),
+            Colors.green("license_title3"),
           ],
         });
         assertSpyCall(consoleLogStub, 29, {
-          args: ["    4.", "name"],
+          args: ["    4.", "name3-1"],
         });
         assertSpyCall(consoleLogStub, 30, {
           args: [
             "      * Resource URL        :",
-            Colors.green("https://example.com/dummy.xlsx"),
+            Colors.green("https://example3-1.com/dummy.xlsx"),
           ],
         });
         assertSpyCall(consoleLogStub, 31, {
           args: [
             "      * Resource Description:",
-            Colors.green("description"),
+            Colors.green("description3-1"),
           ],
         });
         assertSpyCall(consoleLogStub, 32, {
@@ -265,7 +253,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("check whether results are displayed in the standard output when multiple keywords are specified.", async () => {
+    it("output results on the standard output when multiple keywords are specified.", async () => {
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data);
       try {
@@ -274,191 +262,26 @@ describe("SearchAction", () => {
           "避難所 東京",
         );
 
-        const searchParams = new URLSearchParams(
-          {
-            fq:
-              `xckan_title:(*避難所* AND *東京*) OR tags:(*避難所* AND *東京*) OR x_ckan_description:(*避難所* AND *東京*)`,
-            rows: "10",
-          },
-        );
-        assertEquals(kyStub.calls[0].args[1].searchParams, searchParams);
-
-        assertSpyCall(consoleLogStub, 0, { args: ["xckan_title"] });
-        assertSpyCall(consoleLogStub, 1, {
+        assertSpyCall(kyStub, 0, {
           args: [
-            "  - Catalog URL        :",
-            Colors.green("https://example.com"),
+            "https://search.ckan.jp/backend/api/package_search",
+            {
+              searchParams: new URLSearchParams(
+                {
+                  fq:
+                    `xckan_title:(*避難所* AND *東京*) OR tags:(*避難所* AND *東京*) OR x_ckan_description:(*避難所* AND *東京*)`,
+                  rows: "10",
+                },
+              ),
+            },
           ],
         });
-        assertSpyCall(consoleLogStub, 2, {
-          args: [
-            "  - Catalog Description:",
-            Colors.green("xckan_description"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 3, {
-          args: [
-            "  - Catalog License    :",
-            Colors.green("license_title"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 4, {
-          args: ["    1.", "name"],
-        });
-        assertSpyCall(consoleLogStub, 5, {
-          args: [
-            "      * Resource URL        :",
-            Colors.green("https://example.com/dummy.csv"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 6, {
-          args: [
-            "      * Resource Description:",
-            Colors.green("description"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 7, {
-          args: [
-            "      * Created             :",
-            Colors.green("2018-10-26T05:45:55.266946"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 8, {
-          args: [
-            "      * Format              :",
-            Colors.green("CSV"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 9, { args: [] });
-
-        assertSpyCall(consoleLogStub, 10, { args: ["xckan_title"] });
-        assertSpyCall(consoleLogStub, 11, {
-          args: [
-            "  - Catalog URL        :",
-            Colors.green("https://example.com"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 12, {
-          args: [
-            "  - Catalog Description:",
-            Colors.green("xckan_description"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 13, {
-          args: [
-            "  - Catalog License    :",
-            Colors.green("license_title"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 14, {
-          args: ["    2.", "name"],
-        });
-        assertSpyCall(consoleLogStub, 15, {
-          args: [
-            "      * Resource URL        :",
-            Colors.green("https://example.com/dummy.zip"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 16, {
-          args: [
-            "      * Resource Description:",
-            Colors.green("description"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 17, {
-          args: [
-            "      * Created             :",
-            Colors.green("2018-10-26T05:45:55.266946"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 18, {
-          args: [
-            "      * Format              :",
-            Colors.green("ZIP"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 19, {
-          args: ["    3.", "name"],
-        });
-        assertSpyCall(consoleLogStub, 20, {
-          args: [
-            "      * Resource URL        :",
-            Colors.green("https://example.com/dummy.zip"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 21, {
-          args: [
-            "      * Resource Description:",
-            Colors.green("description"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 22, {
-          args: [
-            "      * Created             :",
-            Colors.green("2018-10-26T05:45:55.266946"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 23, {
-          args: [
-            "      * Format              :",
-            Colors.green("ZIP"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 24, { args: [] });
-
-        assertSpyCall(consoleLogStub, 25, { args: ["xckan_title"] });
-        assertSpyCall(consoleLogStub, 26, {
-          args: [
-            "  - Catalog URL        :",
-            Colors.green("https://example.com"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 27, {
-          args: [
-            "  - Catalog Description:",
-            Colors.green("xckan_description"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 28, {
-          args: [
-            "  - Catalog License    :",
-            Colors.green("license_title"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 29, {
-          args: ["    4.", "name"],
-        });
-        assertSpyCall(consoleLogStub, 30, {
-          args: [
-            "      * Resource URL        :",
-            Colors.green("https://example.com/dummy.xlsx"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 31, {
-          args: [
-            "      * Resource Description:",
-            Colors.green("description"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 32, {
-          args: [
-            "      * Created             :",
-            Colors.green("2018-10-26T05:45:55.266946"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 33, {
-          args: [
-            "      * Format              :",
-            Colors.green("XLSX"),
-          ],
-        });
-        assertSpyCall(consoleLogStub, 34, { args: [] });
       } finally {
         kyStub.restore();
       }
     });
 
-    it("exit with error when display on stdout that results could not be obtained", async () => {
+    it("exit with error when No results were obtained.", async () => {
       const kyStub = createKyGetStub(
         JSON.stringify({ "result": { "results": [] } }),
       );
@@ -486,7 +309,7 @@ describe("SearchAction", () => {
   });
 
   describe("with n option", () => {
-    it("specify 1 for the n option", async () => {
+    it("get one result when specify 1 for the n option", async () => {
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data);
       try {
@@ -567,7 +390,7 @@ describe("SearchAction", () => {
 
   describe("with i option", () => {
     it(
-      "check that the installation is performed correctly when there is a catalog with multiple resources in the search results",
+      "install when the search results contain catalogs with multiple resources",
       async () => {
         createEmptyDimJson();
         const numberStub = stub(
@@ -600,11 +423,11 @@ describe("SearchAction", () => {
             fileVersion: "1.1",
             contents: [{
               catalogResourceId: "resource3-1",
-              catalogUrl: "https://example.com",
+              catalogUrl: "https://example3.com",
               headers: {},
-              name: "xckan_title_name",
+              name: "catalog_title3_name3-1",
               postProcesses: [],
-              url: "https://example.com/dummy.xlsx",
+              url: "https://example3-1.com/dummy.xlsx",
             }],
           });
 
@@ -615,16 +438,16 @@ describe("SearchAction", () => {
             lockFileVersion: "1.1",
             contents: [{
               catalogResourceId: "resource3-1",
-              catalogUrl: "https://example.com",
+              catalogUrl: "https://example3.com",
               eTag: null,
               headers: {},
               integrity: "",
               lastDownloaded: "2022-01-02T03:04:05.678Z",
               lastModified: null,
-              name: "xckan_title_name",
-              path: "./data_files/xckan_title_name/dummy.xlsx",
+              name: "catalog_title3_name3-1",
+              path: "./data_files/catalog_title3_name3-1/dummy.xlsx",
               postProcesses: [],
-              url: "https://example.com/dummy.xlsx",
+              url: "https://example3-1.com/dummy.xlsx",
             }],
           });
         } finally {
@@ -636,7 +459,7 @@ describe("SearchAction", () => {
       },
     );
 
-    it("entered name is set to the name in dim.json, dim-lock.json", async () => {
+    it("set the name to dim.json, dim-lock.json When enter a name", async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -671,11 +494,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             headers: {},
             name: "entered name",
             postProcesses: [],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
 
@@ -684,7 +507,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             eTag: null,
             headers: {},
             integrity: "",
@@ -693,7 +516,7 @@ describe("SearchAction", () => {
             name: "entered name",
             path: "./data_files/entered name/dummy.csv",
             postProcesses: [],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
       } finally {
@@ -704,7 +527,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("ensure that the command to extract the downloaded files is entered and recorded in dim.json and dim-lock.json.", async () => {
+    it("recorded in dim.json and dim-lock.json if install is true that the command to extract the downloaded files is entered.", async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -714,7 +537,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("unzip"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("unzip"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -743,27 +569,27 @@ describe("SearchAction", () => {
 
         assertSpyCall(denoRunStub, 0, {
           args: [{
-            cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./"],
+            cmd: [
+              "unzip",
+              "./data_files/catalog_title2_name2-1/dummy.zip",
+              "-d",
+              "./",
+            ],
           }],
         });
 
-        assertEquals(
-          await fileExists(
-            "data_files/unzip/dummy.zip",
-          ),
-          true,
-        );
+        assert(fileExists("data_files/catalog_title2_name2-1/dummy.zip"));
 
         const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
         assertEquals(dimJson, {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource2-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example2.com",
             headers: {},
-            name: "unzip",
+            name: "catalog_title2_name2-1",
             postProcesses: ["unzip"],
-            url: "https://example.com/dummy.zip",
+            url: "https://example2-1.com/dummy.zip",
           }],
         });
 
@@ -772,16 +598,16 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource2-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example2.com",
             eTag: null,
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
             lastModified: null,
-            name: "unzip",
-            path: "./data_files/unzip/dummy.zip",
+            name: "catalog_title2_name2-1",
+            path: "./data_files/catalog_title2_name2-1/dummy.zip",
             postProcesses: ["unzip"],
-            url: "https://example.com/dummy.zip",
+            url: "https://example2-1.com/dummy.zip",
           }],
         });
       } finally {
@@ -794,7 +620,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("after downloading, convert the xlsx file to a csv file and check that it is recorded in dim.json and dim-lock.json.", async () => {
+    it("after downloading, save as csv file and check that it is recorded in dim.json and dim-lock.json.", async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -804,7 +630,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("xlsx-to-csv"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("xlsx-to-csv"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -826,11 +655,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource3-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example3.com",
             headers: {},
-            name: "xlsx-to-csv",
+            name: "catalog_title3_name3-1",
             postProcesses: ["xlsx-to-csv"],
-            url: "https://example.com/dummy.xlsx",
+            url: "https://example3-1.com/dummy.xlsx",
           }],
         });
 
@@ -839,16 +668,16 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource3-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example3.com",
             eTag: null,
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
             lastModified: null,
-            name: "xlsx-to-csv",
-            path: "./data_files/xlsx-to-csv/dummy.xlsx",
+            name: "catalog_title3_name3-1",
+            path: "./data_files/catalog_title3_name3-1/dummy.xlsx",
             postProcesses: ["xlsx-to-csv"],
-            url: "https://example.com/dummy.xlsx",
+            url: "https://example3-1.com/dummy.xlsx",
           }],
         });
       } finally {
@@ -869,7 +698,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("encode euc-jp"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("encode euc-jp"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -891,11 +723,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             headers: {},
-            name: "encode euc-jp",
+            name: "catalog_title1_name1-1",
             postProcesses: ["encode euc-jp"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
 
@@ -904,18 +736,30 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             eTag: null,
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
             lastModified: null,
-            name: "encode euc-jp",
-            path: "./data_files/encode euc-jp/dummy.csv",
+            name: "catalog_title1_name1-1",
+            path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode euc-jp"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
+
+        const uint8Array = new TextEncoder().encode(data);
+        const eucjpBytesArray = encoding.convert(uint8Array, {
+          from: "AUTO",
+          to: "EUCJP",
+        });
+        assertEquals(
+          Deno.readTextFileSync(
+            "data_files/catalog_title1_name1-1/dummy.csv",
+          ),
+          new TextDecoder().decode(Uint8Array.from(eucjpBytesArray)),
+        );
       } finally {
         numberStub.restore();
         inputStub.restore();
@@ -934,7 +778,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("encode iso-2022-jp"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("encode iso-2022-jp"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -956,11 +803,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             headers: {},
-            name: "encode iso-2022-jp",
+            name: "catalog_title1_name1-1",
             postProcesses: ["encode iso-2022-jp"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
 
@@ -969,18 +816,30 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             eTag: null,
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
             lastModified: null,
-            name: "encode iso-2022-jp",
-            path: "./data_files/encode iso-2022-jp/dummy.csv",
+            name: "catalog_title1_name1-1",
+            path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode iso-2022-jp"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
+
+        const uint8Array = new TextEncoder().encode(data);
+        const jisBytesArray = encoding.convert(uint8Array, {
+          from: "AUTO",
+          to: "JIS",
+        });
+        assertEquals(
+          Deno.readTextFileSync(
+            "data_files/catalog_title1_name1-1/dummy.csv",
+          ),
+          new TextDecoder().decode(Uint8Array.from(jisBytesArray)),
+        );
       } finally {
         numberStub.restore();
         inputStub.restore();
@@ -999,7 +858,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("encode shift_jis"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("encode shift_jis"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -1021,11 +883,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             headers: {},
-            name: "encode shift_jis",
+            name: "catalog_title1_name1-1",
             postProcesses: ["encode shift_jis"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
 
@@ -1034,18 +896,30 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             eTag: null,
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
             lastModified: null,
-            name: "encode shift_jis",
-            path: "./data_files/encode shift_jis/dummy.csv",
+            name: "catalog_title1_name1-1",
+            path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode shift_jis"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
+
+        const uint8Array = new TextEncoder().encode(data);
+        const sjisBytesArray = encoding.convert(uint8Array, {
+          from: "AUTO",
+          to: "SJIS",
+        });
+        assertEquals(
+          Deno.readTextFileSync(
+            "data_files/catalog_title1_name1-1/dummy.csv",
+          ),
+          new TextDecoder().decode(Uint8Array.from(sjisBytesArray)),
+        );
       } finally {
         numberStub.restore();
         inputStub.restore();
@@ -1064,7 +938,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("encode utf-8"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("encode utf-8"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -1086,11 +963,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             headers: {},
-            name: "encode utf-8",
+            name: "catalog_title1_name1-1",
             postProcesses: ["encode utf-8"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
 
@@ -1099,18 +976,30 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             eTag: null,
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
             lastModified: null,
-            name: "encode utf-8",
-            path: "./data_files/encode utf-8/dummy.csv",
+            name: "catalog_title1_name1-1",
+            path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode utf-8"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
+
+        const uint8Array = new TextEncoder().encode(data);
+        const utf8BytesArray = encoding.convert(uint8Array, {
+          from: "AUTO",
+          to: "UTF8",
+        });
+        assertEquals(
+          Deno.readTextFileSync(
+            "data_files/catalog_title1_name1-1/dummy.csv",
+          ),
+          new TextDecoder().decode(Uint8Array.from(utf8BytesArray)),
+        );
       } finally {
         numberStub.restore();
         inputStub.restore();
@@ -1129,7 +1018,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("encode utf-16"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("encode utf-16"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -1151,11 +1043,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             headers: {},
-            name: "encode utf-16",
+            name: "catalog_title1_name1-1",
             postProcesses: ["encode utf-16"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
 
@@ -1164,18 +1056,30 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             eTag: null,
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
             lastModified: null,
-            name: "encode utf-16",
-            path: "./data_files/encode utf-16/dummy.csv",
+            name: "catalog_title1_name1-1",
+            path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode utf-16"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
+
+        const uint8Array = new TextEncoder().encode(data);
+        const utf16BytesArray = encoding.convert(uint8Array, {
+          from: "AUTO",
+          to: "UTF16",
+        });
+        assertEquals(
+          Deno.readTextFileSync(
+            "data_files/catalog_title1_name1-1/dummy.csv",
+          ),
+          new TextDecoder().decode(Uint8Array.from(utf16BytesArray)),
+        );
       } finally {
         numberStub.restore();
         inputStub.restore();
@@ -1194,7 +1098,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("encode utf-16be"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("encode utf-16be"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -1216,11 +1123,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             headers: {},
-            name: "encode utf-16be",
+            name: "catalog_title1_name1-1",
             postProcesses: ["encode utf-16be"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
 
@@ -1229,18 +1136,30 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             eTag: null,
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
             lastModified: null,
-            name: "encode utf-16be",
-            path: "./data_files/encode utf-16be/dummy.csv",
+            name: "catalog_title1_name1-1",
+            path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode utf-16be"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
+
+        const uint8Array = new TextEncoder().encode(data);
+        const utf16beBytesArray = encoding.convert(uint8Array, {
+          from: "AUTO",
+          to: "UTF16BE",
+        });
+        assertEquals(
+          Deno.readTextFileSync(
+            "data_files/catalog_title1_name1-1/dummy.csv",
+          ),
+          new TextDecoder().decode(Uint8Array.from(utf16beBytesArray)),
+        );
       } finally {
         numberStub.restore();
         inputStub.restore();
@@ -1259,7 +1178,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("encode utf-16le"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("encode utf-16le"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -1281,11 +1203,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             headers: {},
-            name: "encode utf-16le",
+            name: "catalog_title1_name1-1",
             postProcesses: ["encode utf-16le"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
 
@@ -1294,18 +1216,30 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             eTag: null,
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
             lastModified: null,
-            name: "encode utf-16le",
-            path: "./data_files/encode utf-16le/dummy.csv",
+            name: "catalog_title1_name1-1",
+            path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode utf-16le"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
+
+        const uint8Array = new TextEncoder().encode(data);
+        const utf16leBytesArray = encoding.convert(uint8Array, {
+          from: "AUTO",
+          to: "UTF16LE",
+        });
+        assertEquals(
+          Deno.readTextFileSync(
+            "data_files/catalog_title1_name1-1/dummy.csv",
+          ),
+          new TextDecoder().decode(Uint8Array.from(utf16leBytesArray)),
+        );
       } finally {
         numberStub.restore();
         inputStub.restore();
@@ -1324,7 +1258,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("encode unicode"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("encode unicode"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -1346,11 +1283,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             headers: {},
-            name: "encode unicode",
+            name: "catalog_title1_name1-1",
             postProcesses: ["encode unicode"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
 
@@ -1359,18 +1296,30 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             eTag: null,
             headers: {},
             integrity: "",
             lastDownloaded: "2022-01-02T03:04:05.678Z",
             lastModified: null,
-            name: "encode unicode",
-            path: "./data_files/encode unicode/dummy.csv",
+            name: "catalog_title1_name1-1",
+            path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode unicode"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
+
+        const uint8Array = new TextEncoder().encode(data);
+        const unicodeBytesArray = encoding.convert(uint8Array, {
+          from: "AUTO",
+          to: "UNICODE",
+        });
+        assertEquals(
+          Deno.readTextFileSync(
+            "data_files/catalog_title1_name1-1/dummy.csv",
+          ),
+          new TextDecoder().decode(Uint8Array.from(unicodeBytesArray)),
+        );
       } finally {
         numberStub.restore();
         inputStub.restore();
@@ -1391,7 +1340,10 @@ describe("SearchAction", () => {
         const inputStub = stub(
           Input,
           "prompt",
-          () => Promise<string>.resolve("cmd test"),
+          returnsNext([
+            Promise<string>.resolve(""),
+            Promise<string>.resolve("cmd echo dummy"),
+          ]),
         );
         const confirmStub = stub(
           Confirm,
@@ -1401,6 +1353,22 @@ describe("SearchAction", () => {
 
         const data = Deno.readTextFileSync("../test_data/searchData.json");
         const kyStub = createKyGetStub(data);
+
+        const denoProcess = Deno.run({
+          cmd: [
+            "echo",
+            "dummy",
+            "./data_files/catalog_title1_name1-1/dummy.csv",
+          ],
+          stdout: "piped",
+        });
+
+        const denoRunStub = stub(
+          Deno,
+          "run",
+          () => denoProcess,
+        );
+        const denoCloseStub = stub(Deno, "close");
 
         try {
           await new SearchAction().execute(
@@ -1413,11 +1381,11 @@ describe("SearchAction", () => {
             fileVersion: "1.1",
             contents: [{
               catalogResourceId: "resource1-1",
-              catalogUrl: "https://example.com",
+              catalogUrl: "https://example1.com",
               headers: {},
-              name: "cmd test",
-              postProcesses: ["cmd test"],
-              url: "https://example.com/dummy.csv",
+              name: "catalog_title1_name1-1",
+              postProcesses: ["cmd echo dummy"],
+              url: "https://example1-1.com/dummy.csv",
             }],
           });
 
@@ -1428,16 +1396,27 @@ describe("SearchAction", () => {
             lockFileVersion: "1.1",
             contents: [{
               catalogResourceId: "resource1-1",
-              catalogUrl: "https://example.com",
+              catalogUrl: "https://example1.com",
               eTag: null,
               headers: {},
               integrity: "",
               lastDownloaded: "2022-01-02T03:04:05.678Z",
               lastModified: null,
-              name: "cmd test",
-              path: "./data_files/cmd test/dummy.csv",
-              postProcesses: ["cmd test"],
-              url: "https://example.com/dummy.csv",
+              name: "catalog_title1_name1-1",
+              path: "./data_files/catalog_title1_name1-1/dummy.csv",
+              postProcesses: ["cmd echo dummy"],
+              url: "https://example1-1.com/dummy.csv",
+            }],
+          });
+
+          assertSpyCall(denoRunStub, 0, {
+            args: [{
+              cmd: [
+                "echo",
+                "dummy",
+                "./data_files/catalog_title1_name1-1/dummy.csv",
+              ],
+              stdout: "piped",
             }],
           });
 
@@ -1445,9 +1424,16 @@ describe("SearchAction", () => {
             args: [
               "Execute Command: ",
               [
-                "test",
+                "echo",
+                "dummy",
               ],
-              "./data_files/cmd test/dummy.csv",
+              "./data_files/catalog_title1_name1-1/dummy.csv",
+            ],
+          });
+
+          assertSpyCall(consoleLogStub, 36, {
+            args: [
+              "dummy ./data_files/catalog_title1_name1-1/dummy.csv\n",
             ],
           });
         } finally {
@@ -1455,6 +1441,8 @@ describe("SearchAction", () => {
           inputStub.restore();
           confirmStub.restore();
           kyStub.restore();
+          denoRunStub.restore();
+          denoCloseStub.restore();
         }
       },
     );
@@ -1475,7 +1463,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("name duplication check"),
+        returnsNext([
+          Promise<string>.resolve("name duplication check"),
+          Promise<string>.resolve(""),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -1533,10 +1524,15 @@ describe("SearchAction", () => {
           "避難所",
         );
 
-        const [message, min, max] = Object.values(numberStub.calls[0].args[0]);
-        assertEquals(message, "Enter the number of the data to install");
-        assertEquals(min, 1);
-        assertEquals(max, 4);
+        assertSpyCall(numberStub, 0, {
+          args: [
+            {
+              message: "Enter the number of the data to install",
+              min: 1,
+              max: 4,
+            },
+          ],
+        });
       } finally {
         numberStub.restore();
         inputStub.restore();
@@ -1626,7 +1622,10 @@ describe("SearchAction", () => {
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve("encode utf-8"),
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("encode utf-8"),
+        ]),
       );
       const confirmStub = stub(
         Confirm,
@@ -1643,15 +1642,14 @@ describe("SearchAction", () => {
           "避難所",
         );
 
-        const [message, defaultValue] = Object.values(
-          confirmStub.calls[0].args[0],
-        );
-
-        assertEquals(
-          message,
-          "Is there a post-processing you would like to add next?",
-        );
-        assertEquals(defaultValue, true);
+        assertSpyCall(confirmStub, 0, {
+          args: [
+            {
+              message: "Is there a post-processing you would like to add next?",
+              default: true,
+            },
+          ],
+        });
       } finally {
         numberStub.restore();
         inputStub.restore();
@@ -1660,7 +1658,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it("checking that processing is performed correctly when confirm.prompt is set to yes or no", async () => {
+    it("checking that processing is performed correctly when specify multiple postprocesses", async () => {
       createEmptyDimJson();
       const numberStub = stub(
         Number,
@@ -1699,11 +1697,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             headers: {},
             name: "entered name",
             postProcesses: ["encode utf-8", "encode utf-16"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
 
@@ -1712,7 +1710,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example.com",
+            catalogUrl: "https://example1.com",
             eTag: null,
             headers: {},
             integrity: "",
@@ -1721,7 +1719,7 @@ describe("SearchAction", () => {
             name: "entered name",
             path: "./data_files/entered name/dummy.csv",
             postProcesses: ["encode utf-8", "encode utf-16"],
-            url: "https://example.com/dummy.csv",
+            url: "https://example1-1.com/dummy.csv",
           }],
         });
       } finally {

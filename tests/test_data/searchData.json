@@ -1,52 +1,52 @@
 {
   "result": {
     "results": [{
-      "xckan_id": "xckan_id",
-      "xckan_title": "xckan_title",
-      "xckan_site_url": "https://example.com",
-      "xckan_description": "xckan_description",
-      "license_title": "license_title",
+      "xckan_id": "catalog1",
+      "xckan_title": "catalog_title1",
+      "xckan_site_url": "https://example1.com",
+      "xckan_description": "catalog_description1",
+      "license_title": "license_title1",
       "resources": [{
-        "description": "description",
+        "description": "description1-1",
         "created": "2018-10-26T05:45:55.266946",
-        "url": "https://example.com/dummy.csv",
+        "url": "https://example1-1.com/dummy.csv",
         "format": "CSV",
-        "name": "name",
+        "name": "name1-1",
         "id": "resource1-1"
       }]
     }, {
-      "xckan_id": "xckan_id",
-      "xckan_title": "xckan_title",
-      "xckan_site_url": "https://example.com",
-      "xckan_description": "xckan_description",
-      "license_title": "license_title",
+      "xckan_id": "catalog2",
+      "xckan_title": "catalog_title2",
+      "xckan_site_url": "https://example2.com",
+      "xckan_description": "catalog_description2",
+      "license_title": "license_title2",
       "resources": [{
-        "description": "description",
+        "description": "description2-1",
         "created": "2018-10-26T05:45:55.266946",
-        "url": "https://example.com/dummy.zip",
+        "url": "https://example2-1.com/dummy.zip",
         "format": "ZIP",
-        "name": "name",
+        "name": "name2-1",
         "id": "resource2-1"
       }, {
-        "description": "description",
+        "description": "description2-2",
         "created": "2018-10-26T05:45:55.266946",
-        "url": "https://example.com/dummy.zip",
+        "url": "https://example2-2.com/dummy.zip",
         "format": "ZIP",
-        "name": "name",
+        "name": "name2-2",
         "id": "resource2-2"
       }]
     }, {
-      "xckan_id": "xckan_id",
-      "xckan_title": "xckan_title",
-      "xckan_site_url": "https://example.com",
-      "xckan_description": "xckan_description",
-      "license_title": "license_title",
+      "xckan_id": "catalog3",
+      "xckan_title": "catalog_title3",
+      "xckan_site_url": "https://example3.com",
+      "xckan_description": "catalog_description3",
+      "license_title": "license_title3",
       "resources": [{
-        "description": "description",
+        "description": "description3-1",
         "created": "2018-10-26T05:45:55.266946",
-        "url": "https://example.com/dummy.xlsx",
+        "url": "https://example3-1.com/dummy.xlsx",
         "format": "XLSX",
-        "name": "name",
+        "name": "name3-1",
         "id": "resource3-1"
       }]
     }]
