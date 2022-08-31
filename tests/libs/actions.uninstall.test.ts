@@ -28,17 +28,14 @@ import {
 
 describe("UninstallAction", () => {
   let consoleLogStub: Stub;
-  let denoExitStub: Stub;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
-    denoExitStub = stub(Deno, "exit");
     Deno.chdir(temporaryDirectory);
   });
 
   afterEach(() => {
     removeTemporaryFiles();
-    denoExitStub.restore();
     consoleLogStub.restore();
   });
 
