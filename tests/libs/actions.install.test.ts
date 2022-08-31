@@ -1089,19 +1089,22 @@ describe("InstallAction", () => {
           },
           undefined,
         );
-        const dimJson = JSON.parse(
-          Deno.readTextFileSync("./../test_data/external-dim.json"),
-        );
+        const dimJson = JSON.parse(Deno.readTextFileSync("./dim.json"));
         assertEquals(
-          JSON.parse(Deno.readTextFileSync("./dim.json")),
           dimJson,
+          JSON.parse(
+            Deno.readTextFileSync("./../test_data/external-dim.json"),
+          ),
         );
+
         const dimLockJson = JSON.parse(
-          Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
+          Deno.readTextFileSync("./dim-lock.json"),
         );
         assertEquals(
-          JSON.parse(Deno.readTextFileSync("./dim-lock.json")),
           dimLockJson,
+          JSON.parse(
+            Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
+          ),
         );
         assert(fileExists("./data_files/test1/dummy.txt"));
       } finally {
