@@ -1776,7 +1776,7 @@ describe("SearchAction", () => {
       }
     });
 
-    it.only("check whether to terminate in the event of a communication error", async () => {
+    it("check whether to terminate in the event of a communication error", async () => {
       const denoExitStub = stub(Deno, "exit");
       createEmptyDimJson();
       const numberStub = stub(
