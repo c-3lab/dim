@@ -315,11 +315,13 @@ describe("InstallAction", () => {
           from: "UTF8",
           to: "SJIS",
         });
-        const downloadTxt = Deno.readTextFileSync(
+        const downloadedText = Deno.readTextFileSync(
           "data_files/encodeSjis/dummy.txt",
         );
-        const test = new TextDecoder().decode(Uint8Array.from(sjisBytesArray));
-        assertEquals(test, downloadTxt);
+        const expectedText = new TextDecoder().decode(
+          Uint8Array.from(sjisBytesArray),
+        );
+        assertEquals(downloadedText, expectedText);
 
         const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
         assertEquals(dimJson, {
@@ -1091,15 +1093,15 @@ describe("InstallAction", () => {
           Deno.readTextFileSync("./../test_data/external-dim.json"),
         );
         assertEquals(
-          dimJson,
           JSON.parse(Deno.readTextFileSync("./dim.json")),
+          dimJson,
         );
         const dimLockJson = JSON.parse(
           Deno.readTextFileSync("./../test_data/installed-dim-lock.json"),
         );
         assertEquals(
-          dimLockJson,
           JSON.parse(Deno.readTextFileSync("./dim-lock.json")),
+          dimLockJson,
         );
         assert(fileExists("./data_files/test1/dummy.txt"));
       } finally {
