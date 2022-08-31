@@ -1390,124 +1390,106 @@ describe("SearchAction", () => {
       }
     });
 
-    it(
-      "ensure that the specified string and the path to the downloaded data are displayed on standard output and recorded in data_files, dim.json and dim-lock.json when the file is downloaded.",
-      async () => {
-        createEmptyDimJson();
-        const numberStub = stub(
-          Number,
-          "prompt",
-          () => Promise<number>.resolve(1),
-        );
-        const inputStub = stub(
-          Input,
-          "prompt",
-          returnsNext([
-            Promise<string>.resolve(""),
-            Promise<string>.resolve("cmd echo dummy"),
-          ]),
-        );
-        const confirmStub = stub(
-          Confirm,
-          "prompt",
-          () => Promise<boolean>.resolve(false),
+    it("execute specified command and display stdout as is when specify postprocess", async () => {
+      createEmptyDimJson();
+      const numberStub = stub(
+        Number,
+        "prompt",
+        () => Promise<number>.resolve(1),
+      );
+      const inputStub = stub(
+        Input,
+        "prompt",
+        returnsNext([
+          Promise<string>.resolve(""),
+          Promise<string>.resolve("cmd echo dummy"),
+        ]),
+      );
+      const confirmStub = stub(
+        Confirm,
+        "prompt",
+        () => Promise<boolean>.resolve(false),
+      );
+
+      const data = Deno.readTextFileSync("../test_data/searchData.json");
+      const kyStub = createKyGetStub(data);
+
+      const denoRunSpy = spy(Deno, "run");
+
+      try {
+        await new SearchAction().execute(
+          { number: 10, install: true },
+          "避難所",
         );
 
-        const data = Deno.readTextFileSync("../test_data/searchData.json");
-        const kyStub = createKyGetStub(data);
-
-        const denoProcess = Deno.run({
-          cmd: [
-            "echo",
-            "dummy",
-            "./data_files/catalog_title1_name1-1/dummy.csv",
-          ],
-          stdout: "piped",
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: "resource1-1",
+            catalogUrl: "https://example1.com",
+            headers: {},
+            name: "catalog_title1_name1-1",
+            postProcesses: ["cmd echo dummy"],
+            url: "https://example1-1.com/dummy.csv",
+          }],
         });
 
-        const denoRunStub = stub(
-          Deno,
-          "run",
-          () => denoProcess,
+        const dimLockJson = JSON.parse(
+          Deno.readTextFileSync("dim-lock.json"),
         );
-        const denoCloseStub = stub(Deno, "close");
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: "resource1-1",
+            catalogUrl: "https://example1.com",
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "catalog_title1_name1-1",
+            path: "./data_files/catalog_title1_name1-1/dummy.csv",
+            postProcesses: ["cmd echo dummy"],
+            url: "https://example1-1.com/dummy.csv",
+          }],
+        });
 
-        try {
-          await new SearchAction().execute(
-            { number: 10, install: true },
-            "避難所",
-          );
-
-          const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
-          assertEquals(dimJson, {
-            fileVersion: "1.1",
-            contents: [{
-              catalogResourceId: "resource1-1",
-              catalogUrl: "https://example1.com",
-              headers: {},
-              name: "catalog_title1_name1-1",
-              postProcesses: ["cmd echo dummy"],
-              url: "https://example1-1.com/dummy.csv",
-            }],
-          });
-
-          const dimLockJson = JSON.parse(
-            Deno.readTextFileSync("dim-lock.json"),
-          );
-          assertEquals(dimLockJson, {
-            lockFileVersion: "1.1",
-            contents: [{
-              catalogResourceId: "resource1-1",
-              catalogUrl: "https://example1.com",
-              eTag: null,
-              headers: {},
-              integrity: "",
-              lastDownloaded: "2022-01-02T03:04:05.678Z",
-              lastModified: null,
-              name: "catalog_title1_name1-1",
-              path: "./data_files/catalog_title1_name1-1/dummy.csv",
-              postProcesses: ["cmd echo dummy"],
-              url: "https://example1-1.com/dummy.csv",
-            }],
-          });
-
-          assertSpyCall(denoRunStub, 0, {
-            args: [{
-              cmd: [
-                "echo",
-                "dummy",
-                "./data_files/catalog_title1_name1-1/dummy.csv",
-              ],
-              stdout: "piped",
-            }],
-          });
-
-          assertSpyCall(consoleLogStub, 35, {
-            args: [
-              "Execute Command: ",
-              [
-                "echo",
-                "dummy",
-              ],
+        assertSpyCall(denoRunSpy, 0, {
+          args: [{
+            cmd: [
+              "echo",
+              "dummy",
               "./data_files/catalog_title1_name1-1/dummy.csv",
             ],
-          });
+            stdout: "piped",
+          }],
+        });
 
-          assertSpyCall(consoleLogStub, 36, {
-            args: [
-              "dummy ./data_files/catalog_title1_name1-1/dummy.csv\n",
+        assertSpyCall(consoleLogStub, 35, {
+          args: [
+            "Execute Command: ",
+            [
+              "echo",
+              "dummy",
             ],
-          });
-        } finally {
-          numberStub.restore();
-          inputStub.restore();
-          confirmStub.restore();
-          kyStub.restore();
-          denoRunStub.restore();
-          denoCloseStub.restore();
-        }
-      },
-    );
+            "./data_files/catalog_title1_name1-1/dummy.csv",
+          ],
+        });
+
+        assertSpyCall(consoleLogStub, 36, {
+          args: [
+            "dummy ./data_files/catalog_title1_name1-1/dummy.csv\n",
+          ],
+        });
+      } finally {
+        numberStub.restore();
+        inputStub.restore();
+        confirmStub.restore();
+        kyStub.restore();
+        denoRunSpy.restore();
+      }
+    });
 
     it("exit with error when duplicate names.", async () => {
       const denoExitStub = stub(Deno, "exit");
