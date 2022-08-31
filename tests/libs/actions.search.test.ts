@@ -37,12 +37,14 @@ describe("SearchAction", () => {
   let consoleErrorStub: Stub;
   let denoStdoutStub: Stub;
   let fakeTime: FakeTime;
+  let originalDirectory: string;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
     consoleErrorStub = stub(console, "error");
     denoStdoutStub = stub(Deno.stdout, "write");
     fakeTime = new FakeTime("2022-01-02 03:04:05.678Z");
+    originalDirectory = Deno.cwd();
     Deno.chdir(temporaryDirectory);
   });
 
@@ -52,6 +54,7 @@ describe("SearchAction", () => {
     denoStdoutStub.restore();
     consoleErrorStub.restore();
     consoleLogStub.restore();
+    Deno.chdir(originalDirectory);
   });
 
   describe("with keyword", () => {

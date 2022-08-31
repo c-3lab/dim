@@ -22,15 +22,18 @@ import { Colors } from "../../deps.ts";
 
 describe("ListAction", () => {
   let consoleLogStub: Stub;
+  let originalDirectory: string;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
+    originalDirectory = Deno.cwd();
     Deno.chdir(temporaryDirectory);
   });
 
   afterEach(() => {
     removeTemporaryFiles();
     consoleLogStub.restore();
+    Deno.chdir(originalDirectory);
   });
 
   it("display formatted information about installed data", async () => {

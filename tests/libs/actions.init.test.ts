@@ -12,15 +12,18 @@ import { removeTemporaryFiles, temporaryDirectory } from "../helper.ts";
 
 describe("InitAction", () => {
   let consoleLogStub: Stub;
+  let originalDirectory: string;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
+    originalDirectory = Deno.cwd();
     Deno.chdir(temporaryDirectory);
   });
 
   afterEach(() => {
     removeTemporaryFiles();
     consoleLogStub.restore();
+    Deno.chdir(originalDirectory);
   });
 
   it("ensure that empty data directories, dim.json and dim-lock.json are created.", async () => {

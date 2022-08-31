@@ -31,6 +31,7 @@ describe("InstallAction", () => {
   let denoExitStub: Stub;
   let denoStdoutStub: Stub;
   let fakeTime: FakeTime;
+  let originalDirectory: string;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
@@ -38,6 +39,7 @@ describe("InstallAction", () => {
     denoExitStub = stub(Deno, "exit");
     denoStdoutStub = stub(Deno.stdout, "write");
     fakeTime = new FakeTime("2022-01-02T03:04:05.678Z");
+    originalDirectory = Deno.cwd();
     Deno.chdir(temporaryDirectory);
   });
 
@@ -48,6 +50,7 @@ describe("InstallAction", () => {
     denoExitStub.restore();
     consoleErrorStub.restore();
     consoleLogStub.restore();
+    Deno.chdir(originalDirectory);
   });
 
   describe("with URL", () => {
