@@ -86,7 +86,7 @@ describe("SearchAction", () => {
         assertSpyCall(consoleLogStub, 1, {
           args: [
             "  - Catalog URL        :",
-            Colors.green("https://example1.com"),
+            Colors.green("https://example.com/catalog1"),
           ],
         });
         assertSpyCall(consoleLogStub, 2, {
@@ -107,7 +107,7 @@ describe("SearchAction", () => {
         assertSpyCall(consoleLogStub, 5, {
           args: [
             "      * Resource URL        :",
-            Colors.green("https://example1-1.com/dummy.csv"),
+            Colors.green("https://example.com/resource1-1/dummy.csv"),
           ],
         });
         assertSpyCall(consoleLogStub, 6, {
@@ -134,7 +134,7 @@ describe("SearchAction", () => {
         assertSpyCall(consoleLogStub, 11, {
           args: [
             "  - Catalog URL        :",
-            Colors.green("https://example2.com"),
+            Colors.green("https://example.com/catalog2"),
           ],
         });
         assertSpyCall(consoleLogStub, 12, {
@@ -155,7 +155,7 @@ describe("SearchAction", () => {
         assertSpyCall(consoleLogStub, 15, {
           args: [
             "      * Resource URL        :",
-            Colors.green("https://example2-1.com/dummy.zip"),
+            Colors.green("https://example.com/resource2-1/dummy.zip"),
           ],
         });
         assertSpyCall(consoleLogStub, 16, {
@@ -182,7 +182,7 @@ describe("SearchAction", () => {
         assertSpyCall(consoleLogStub, 20, {
           args: [
             "      * Resource URL        :",
-            Colors.green("https://example2-2.com/dummy.zip"),
+            Colors.green("https://example.com/resource2-2/dummy.zip"),
           ],
         });
         assertSpyCall(consoleLogStub, 21, {
@@ -209,7 +209,7 @@ describe("SearchAction", () => {
         assertSpyCall(consoleLogStub, 26, {
           args: [
             "  - Catalog URL        :",
-            Colors.green("https://example3.com"),
+            Colors.green("https://example.com/catalog3"),
           ],
         });
         assertSpyCall(consoleLogStub, 27, {
@@ -230,7 +230,7 @@ describe("SearchAction", () => {
         assertSpyCall(consoleLogStub, 30, {
           args: [
             "      * Resource URL        :",
-            Colors.green("https://example3-1.com/dummy.xlsx"),
+            Colors.green("https://example.com/resource3-1/dummy.xlsx"),
           ],
         });
         assertSpyCall(consoleLogStub, 31, {
@@ -488,11 +488,11 @@ describe("SearchAction", () => {
             fileVersion: "1.1",
             contents: [{
               catalogResourceId: "resource3-1",
-              catalogUrl: "https://example3.com",
+              catalogUrl: "https://example.com/catalog3",
               headers: {},
               name: "catalog_title3_name3-1",
               postProcesses: [],
-              url: "https://example3-1.com/dummy.xlsx",
+              url: "https://example.com/resource3-1/dummy.xlsx",
             }],
           });
 
@@ -503,7 +503,7 @@ describe("SearchAction", () => {
             lockFileVersion: "1.1",
             contents: [{
               catalogResourceId: "resource3-1",
-              catalogUrl: "https://example3.com",
+              catalogUrl: "https://example.com/catalog3",
               eTag: null,
               headers: {},
               integrity: "",
@@ -512,7 +512,7 @@ describe("SearchAction", () => {
               name: "catalog_title3_name3-1",
               path: "./data_files/catalog_title3_name3-1/dummy.xlsx",
               postProcesses: [],
-              url: "https://example3-1.com/dummy.xlsx",
+              url: "https://example.com/resource3-1/dummy.xlsx",
             }],
           });
         } finally {
@@ -559,11 +559,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "entered name",
             postProcesses: [],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -572,7 +572,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -581,7 +581,7 @@ describe("SearchAction", () => {
             name: "entered name",
             path: "./data_files/entered name/dummy.csv",
             postProcesses: [],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
       } finally {
@@ -650,11 +650,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource2-1",
-            catalogUrl: "https://example2.com",
+            catalogUrl: "https://example.com/catalog2",
             headers: {},
             name: "catalog_title2_name2-1",
             postProcesses: ["unzip"],
-            url: "https://example2-1.com/dummy.zip",
+            url: "https://example.com/resource2-1/dummy.zip",
           }],
         });
 
@@ -663,7 +663,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource2-1",
-            catalogUrl: "https://example2.com",
+            catalogUrl: "https://example.com/catalog2",
             eTag: null,
             headers: {},
             integrity: "",
@@ -672,7 +672,7 @@ describe("SearchAction", () => {
             name: "catalog_title2_name2-1",
             path: "./data_files/catalog_title2_name2-1/dummy.zip",
             postProcesses: ["unzip"],
-            url: "https://example2-1.com/dummy.zip",
+            url: "https://example.com/resource2-1/dummy.zip",
           }],
         });
       } finally {
@@ -720,11 +720,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource3-1",
-            catalogUrl: "https://example3.com",
+            catalogUrl: "https://example.com/catalog3",
             headers: {},
             name: "catalog_title3_name3-1",
             postProcesses: ["xlsx-to-csv"],
-            url: "https://example3-1.com/dummy.xlsx",
+            url: "https://example.com/resource3-1/dummy.xlsx",
           }],
         });
 
@@ -733,7 +733,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource3-1",
-            catalogUrl: "https://example3.com",
+            catalogUrl: "https://example.com/catalog3",
             eTag: null,
             headers: {},
             integrity: "",
@@ -742,7 +742,7 @@ describe("SearchAction", () => {
             name: "catalog_title3_name3-1",
             path: "./data_files/catalog_title3_name3-1/dummy.xlsx",
             postProcesses: ["xlsx-to-csv"],
-            url: "https://example3-1.com/dummy.xlsx",
+            url: "https://example.com/resource3-1/dummy.xlsx",
           }],
         });
       } finally {
@@ -788,11 +788,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "catalog_title1_name1-1",
             postProcesses: ["encode euc-jp"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -801,7 +801,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -810,7 +810,7 @@ describe("SearchAction", () => {
             name: "catalog_title1_name1-1",
             path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode euc-jp"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -868,11 +868,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "catalog_title1_name1-1",
             postProcesses: ["encode iso-2022-jp"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -881,7 +881,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -890,7 +890,7 @@ describe("SearchAction", () => {
             name: "catalog_title1_name1-1",
             path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode iso-2022-jp"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -948,11 +948,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "catalog_title1_name1-1",
             postProcesses: ["encode shift_jis"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -961,7 +961,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -970,7 +970,7 @@ describe("SearchAction", () => {
             name: "catalog_title1_name1-1",
             path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode shift_jis"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1028,11 +1028,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "catalog_title1_name1-1",
             postProcesses: ["encode utf-8"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1041,7 +1041,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -1050,7 +1050,7 @@ describe("SearchAction", () => {
             name: "catalog_title1_name1-1",
             path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode utf-8"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1108,11 +1108,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "catalog_title1_name1-1",
             postProcesses: ["encode utf-16"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1121,7 +1121,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -1130,7 +1130,7 @@ describe("SearchAction", () => {
             name: "catalog_title1_name1-1",
             path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode utf-16"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1188,11 +1188,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "catalog_title1_name1-1",
             postProcesses: ["encode utf-16be"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1201,7 +1201,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -1210,7 +1210,7 @@ describe("SearchAction", () => {
             name: "catalog_title1_name1-1",
             path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode utf-16be"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1268,11 +1268,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "catalog_title1_name1-1",
             postProcesses: ["encode utf-16le"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1281,7 +1281,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -1290,7 +1290,7 @@ describe("SearchAction", () => {
             name: "catalog_title1_name1-1",
             path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode utf-16le"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1348,11 +1348,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "catalog_title1_name1-1",
             postProcesses: ["encode unicode"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1361,7 +1361,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -1370,7 +1370,7 @@ describe("SearchAction", () => {
             name: "catalog_title1_name1-1",
             path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["encode unicode"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1430,11 +1430,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "catalog_title1_name1-1",
             postProcesses: ["cmd echo dummy"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1445,7 +1445,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -1454,7 +1454,7 @@ describe("SearchAction", () => {
             name: "catalog_title1_name1-1",
             path: "./data_files/catalog_title1_name1-1/dummy.csv",
             postProcesses: ["cmd echo dummy"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1746,11 +1746,11 @@ describe("SearchAction", () => {
           fileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             headers: {},
             name: "entered name",
             postProcesses: ["encode utf-8", "encode utf-16"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
 
@@ -1759,7 +1759,7 @@ describe("SearchAction", () => {
           lockFileVersion: "1.1",
           contents: [{
             catalogResourceId: "resource1-1",
-            catalogUrl: "https://example1.com",
+            catalogUrl: "https://example.com/catalog1",
             eTag: null,
             headers: {},
             integrity: "",
@@ -1768,7 +1768,7 @@ describe("SearchAction", () => {
             name: "entered name",
             path: "./data_files/entered name/dummy.csv",
             postProcesses: ["encode utf-8", "encode utf-16"],
-            url: "https://example1-1.com/dummy.csv",
+            url: "https://example.com/resource1-1/dummy.csv",
           }],
         });
       } finally {
