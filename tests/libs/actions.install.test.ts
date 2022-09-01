@@ -418,11 +418,27 @@ describe("InstallAction", () => {
           "https://example.com/dummy.zip",
         );
         assert(fileExists("data_files/unzip/dummy.zip"));
-        assertSpyCall(denoRunStub, 0, {
-          args: [{
-            cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./"],
-          }],
-        });
+        if (Deno.build.os === "darwin") {
+          assertSpyCall(denoRunStub, 0, {
+            args: [{
+              cmd: [
+                "ditto",
+                "-xk",
+                "--sequesterRsrc",
+                "./data_files/unzip/dummy.zip",
+                "./data_files/unzip",
+              ],
+              stdout: "piped",
+              stderr: "piped",
+            }],
+          });
+        } else {
+          assertSpyCall(denoRunStub, 0, {
+            args: [{
+              cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./"],
+            }],
+          });
+        }
       } finally {
         denoRunStub.restore();
         kyGetStub.restore();
