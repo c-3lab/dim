@@ -329,14 +329,13 @@ $ deno install --unstable --allow-read --allow-write --allow-run --allow-net dim
 
 # Upgrade the dim version
 
-You need to be able to run Deno in a local environment.  
-If you don't have an execution environment of Deno, please re-install.  
+You need to be able to run Deno in a local environment.\
+If you don't have an execution environment of Deno, please re-install.\
 [Install the dim from binary files](#install-the-dim-from-binary-files)
 
 ```
 $ dim upgrade
 ```
-
 
 # Contributers
 

@@ -1,19 +1,7 @@
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std@0.152.0/testing/asserts.ts";
-import {
-  assertSpyCall,
-  Stub,
-  stub,
-} from "https://deno.land/std@0.152.0/testing/mock.ts";
+import { assert, assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
+import { assertSpyCall, Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
 import { FakeTime } from "https://deno.land/std@0.152.0/testing/time.ts";
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  it,
-} from "https://deno.land/std@0.152.0/testing/bdd.ts";
+import { afterEach, beforeEach, describe, it } from "https://deno.land/std@0.152.0/testing/bdd.ts";
 import { Colors, encoding } from "../../deps.ts";
 import { InstallAction } from "../../libs/actions.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
