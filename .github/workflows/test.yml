@@ -1,0 +1,38 @@
+name: Automate the collection of coverage
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git Checkout Module
+        uses: actions/checkout@v2
+        
+      - name: Use Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Check format
+        run: deno fmt --check
+  
+      - name: Do lint
+        run: deno lint
+ 
+      - name: Check type
+        run: deno test --no-run $(find . -regex '.*\.\(js\|ts\|jsx\|tsx\|mjs\|mjsx\)' -printf '%p ')
+
+      - name: Test and collect coverage
+        run: deno test -A --coverage=coverage
+
+      - name: Create coverage report
+        run: |
+          deno coverage ./coverage --lcov > coverage.lcov
+          ls | grep coverage.lcov
+
+      # - name: Upload to codecov
+      #   uses: codecov/codecov-action@v1.5.2
+      #   with:
+      #     file: ./coverage.lcov
+      #     fail_ci_if_error: true
