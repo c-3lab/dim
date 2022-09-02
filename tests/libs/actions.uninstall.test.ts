@@ -1,30 +1,11 @@
-import {
-  assertEquals,
-  assertFalse,
-} from "https://deno.land/std@0.152.0/testing/asserts.ts";
-import {
-  assertSpyCall,
-  Stub,
-  stub,
-} from "https://deno.land/std@0.152.0/testing/mock.ts";
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  it,
-} from "https://deno.land/std@0.152.0/testing/bdd.ts";
+import { assertEquals, assertFalse } from "https://deno.land/std@0.152.0/testing/asserts.ts";
+import { assertSpyCall, Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
+import { afterEach, beforeEach, describe, it } from "https://deno.land/std@0.152.0/testing/bdd.ts";
 import { Colors } from "../../deps.ts";
 import { UninstallAction } from "../../libs/actions.ts";
-import {
-  DEFAULT_DIM_FILE_PATH,
-  DEFAULT_DIM_LOCK_FILE_PATH,
-} from "../../libs/consts.ts";
+import { DEFAULT_DIM_FILE_PATH, DEFAULT_DIM_LOCK_FILE_PATH } from "../../libs/consts.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
-import {
-  fileExists,
-  removeTemporaryFiles,
-  temporaryDirectory,
-} from "../helper.ts";
+import { fileExists, removeTemporaryFiles, temporaryDirectory } from "../helper.ts";
 
 describe("UninstallAction", () => {
   let consoleLogStub: Stub;
