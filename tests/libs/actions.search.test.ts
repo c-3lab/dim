@@ -620,6 +620,7 @@ describe("SearchAction", () => {
         Deno,
         "run",
         () => ({
+          output: () => {},
           status: () => Promise.resolve({ success: true }),
           rid: 1,
         } as Deno.Process),
@@ -632,16 +633,32 @@ describe("SearchAction", () => {
           "避難所",
         );
 
-        assertSpyCall(denoRunStub, 0, {
-          args: [{
-            cmd: [
-              "unzip",
-              "./data_files/catalog_title2_name2-1/dummy.zip",
-              "-d",
-              "./",
-            ],
-          }],
-        });
+        if (Deno.build.os === "darwin") {
+          assertSpyCall(denoRunStub, 0, {
+            args: [{
+              cmd: [
+                "ditto",
+                "-xk",
+                "--sequesterRsrc",
+                "./data_files/catalog_title2_name2-1/dummy.zip",
+                "./data_files/catalog_title2_name2-1",
+              ],
+              stdout: "piped",
+              stderr: "piped",
+            }],
+          });
+        } else {
+          assertSpyCall(denoRunStub, 0, {
+            args: [{
+              cmd: [
+                "unzip",
+                "./data_files/catalog_title2_name2-1/dummy.zip",
+                "-d",
+                "./",
+              ],
+            }],
+          });
+        }
 
         assert(fileExists("data_files/catalog_title2_name2-1/dummy.zip"));
 
