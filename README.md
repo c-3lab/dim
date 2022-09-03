@@ -116,6 +116,8 @@ $ dim init
 
 ### Install the all data.
 
+Install all data written to `dim.json`.
+
 ```
 $ dim install
 ```
