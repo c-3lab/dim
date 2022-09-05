@@ -1,0 +1,31 @@
+{
+  "fileVersion": "1.1",
+  "contents": [
+    {
+      "name": "test1",
+      "url": "https://example.com/dummy.txt",
+      "catalogUrl": null,
+      "catalogResourceId": null,
+      "postProcesses": [
+        "encoding utf-8"
+      ],
+      "headers": {}
+    },
+    {
+      "name": "test2",
+      "url": "https://example.com/dummy.csv",
+      "catalogUrl": null,
+      "catalogResourceId": null,
+      "postProcesses": [],
+      "headers": {}
+    },
+    {
+      "url": "https://example.com/dummy.zip",
+      "name": "test3",
+      "catalogUrl": null,
+      "catalogResourceId": null,
+      "postProcesses": [],
+      "headers": {}
+    }
+  ]
+}

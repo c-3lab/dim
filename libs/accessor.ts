@@ -5,6 +5,7 @@ import {
   DIM_FILE_VERSION,
   DIM_LOCK_FILE_VERSION,
 } from "./consts.ts";
+import { Colors } from "../deps.ts";
 
 export class DimFileAccessor {
   private dimJSON: DimJSON | undefined;
@@ -13,7 +14,9 @@ export class DimFileAccessor {
       Deno.statSync(path);
       this.dimJSON = JSON.parse(Deno.readTextFileSync(path));
     } catch {
-      console.log("Not found a dim.json. You should run a 'dim init'. ");
+      console.log(
+        Colors.red("Not found a dim.json. You should run a 'dim init'. "),
+      );
       Deno.exit(1);
     }
   }

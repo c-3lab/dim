@@ -72,7 +72,8 @@ const installFromURL = async (
     headers: headers,
   };
   const responseHeaders = result.response.headers;
-  lockContent.eTag = responseHeaders.get("etag");
+  lockContent.eTag = responseHeaders.get("etag")?.replace(/^"(.*)"$/, "$1") ??
+    null;
   if (responseHeaders.has("last-modified")) {
     lockContent.lastModified = new Date(responseHeaders.get("last-modified")!);
   }
@@ -156,7 +157,7 @@ const installFromDimFile = async (
             catalogUrl: null,
             catalogResourceId: null,
             lastModified: lastModified,
-            eTag: headers.get("etag"),
+            eTag: headers.get("etag")?.replace(/^"(.*)"$/, "$1") ?? null,
             lastDownloaded: new Date(),
             integrity: "",
             postProcesses: content.postProcesses,
@@ -298,9 +299,11 @@ export class InstallAction {
       }
       const targetContent = new DimFileAccessor().getContents().find((c) => c.name === options.name);
       if (targetContent !== undefined && !options.force) {
-        console.log("The name already exists.");
+        console.log(Colors.red("The name already exists."));
         console.log(
-          "Use the -F option to force installation and overwrite existing files.",
+          Colors.red(
+            "Use the -F option to force installation and overwrite existing files.",
+          ),
         );
         Deno.exit(1);
       }
@@ -326,7 +329,10 @@ export class InstallAction {
         options.file || DEFAULT_DIM_FILE_PATH,
         options.asyncInstall,
         options.force,
-      );
+      ).catch(() => {
+        console.log(Colors.red("Selecting other than json."));
+        Deno.exit(1);
+      });
       if (lockContentList !== undefined) {
         if (lockContentList.length != 0) {
           console.log(
