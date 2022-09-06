@@ -4,19 +4,8 @@ import {
   assertFalse,
   assertStringIncludes,
 } from "https://deno.land/std@0.152.0/testing/asserts.ts";
-import {
-  assertSpyCall,
-  returnsNext,
-  spy,
-  Stub,
-  stub,
-} from "https://deno.land/std@0.152.0/testing/mock.ts";
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  it,
-} from "https://deno.land/std@0.152.0/testing/bdd.ts";
+import { assertSpyCall, returnsNext, spy, Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
+import { afterEach, beforeEach, describe, it } from "https://deno.land/std@0.152.0/testing/bdd.ts";
 import { FakeTime } from "https://deno.land/std@0.152.0/testing/time.ts";
 import { SearchAction } from "../../libs/actions.ts";
 import {
@@ -73,8 +62,7 @@ describe("SearchAction", () => {
             {
               searchParams: new URLSearchParams(
                 {
-                  fq:
-                    `xckan_title:*避難所* OR tags:*避難所* OR x_ckan_description:*避難所*`,
+                  fq: `xckan_title:*避難所* OR tags:*避難所* OR x_ckan_description:*避難所*`,
                   rows: "10",
                 },
               ),
@@ -272,8 +260,7 @@ describe("SearchAction", () => {
             {
               searchParams: new URLSearchParams(
                 {
-                  fq:
-                    `xckan_title:(*避難所* AND *東京*) OR tags:(*避難所* AND *東京*) OR x_ckan_description:(*避難所* AND *東京*)`,
+                  fq: `xckan_title:(*避難所* AND *東京*) OR tags:(*避難所* AND *東京*) OR x_ckan_description:(*避難所* AND *東京*)`,
                   rows: "10",
                 },
               ),

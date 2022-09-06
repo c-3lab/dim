@@ -1,11 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
 import { Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  it,
-} from "https://deno.land/std@0.152.0/testing/bdd.ts";
+import { afterEach, beforeEach, describe, it } from "https://deno.land/std@0.152.0/testing/bdd.ts";
 
 import { InitAction } from "../../libs/actions.ts";
 import { removeTemporaryFiles, temporaryDirectory } from "../helper.ts";
