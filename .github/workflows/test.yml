@@ -1,6 +1,6 @@
 name: Automate the collection of coverage
 
-on: 
+on:
   push:
     branches:
       - main
@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Setup Deno runtime
         uses: denoland/setup-deno@v1
         with:
@@ -26,10 +26,10 @@ jobs:
 
       - name: Check format
         run: deno fmt --check
-  
+
       - name: Do lint
         run: deno lint
- 
+
       - name: Check type
         run: deno check $(find . -regex '.*\.\(js\|ts\|jsx\|tsx\|mjs\|mjsx\)' -printf '%p ')
 
@@ -39,8 +39,8 @@ jobs:
       - name: Create coverage report
         run: deno coverage ./tests/coverage --lcov > tests/coverage.lcov
 
-      # - name: Upload to codecov
-      #   uses: codecov/codecov-action@v3.1.0
-      #   with:
-      #     file: ./tests/coverage.lcov
-      #     fail_ci_if_error: true
+      - name: Upload to codecov
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          file: ./tests/coverage.lcov
+          fail_ci_if_error: true
