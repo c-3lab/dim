@@ -6,7 +6,7 @@ on:
       - main
   pull_request:
     types:
-      - open
+      - opened
       - synchronize
       - reopened
 
@@ -19,25 +19,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         
-      - name: Setup Deno runtimeo
+      - name: Setup Deno runtime
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
 
       - name: Check format
-        run: deno check $(find . -regex '.*\.\(js\|ts\|jsx\|tsx\|mjs\|mjsx\)' -printf '%p ')
+        run: deno fmt --check
   
       - name: Do lint
         run: deno lint
  
       - name: Check type
-        run: deno test --no-run $(find . -regex '.*\.\(js\|ts\|jsx\|tsx\|mjs\|mjsx\)' -printf '%p ')
+        run: deno check $(find . -regex '.*\.\(js\|ts\|jsx\|tsx\|mjs\|mjsx\)' -printf '%p ')
 
       - name: Test and collect coverage
         run: deno test -A --coverage=tests/coverage
 
       - name: Create coverage report
-        run: deno coverage ./test/coverage --lcov > tests/coverage.lcov
+        run: deno coverage ./tests/coverage --lcov > tests/coverage.lcov
 
       # - name: Upload to codecov
       #   uses: codecov/codecov-action@v3.1.0
