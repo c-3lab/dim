@@ -423,7 +423,7 @@ describe("InstallAction", () => {
         } else {
           assertSpyCall(denoRunStub, 0, {
             args: [{
-              cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./"],
+              cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./data_files/unzip"],
             }],
           });
         }

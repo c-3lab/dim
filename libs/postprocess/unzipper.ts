@@ -14,7 +14,7 @@ export class Unzipper extends BasePostprocess {
       const rawOutput = await process.output();
       Deno.stdout.write(rawOutput);
     } else {
-      await decompress(targetPath);
+      await decompress(targetPath, targetDir);
     }
     return targetDir;
   }
