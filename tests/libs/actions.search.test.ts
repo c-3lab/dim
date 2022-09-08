@@ -641,7 +641,7 @@ describe("SearchAction", () => {
                 "unzip",
                 "./data_files/catalog_title2_name2-1/dummy.zip",
                 "-d",
-                "./",
+                "./data_files/catalog_title2_name2-1",
               ],
             }],
           });
