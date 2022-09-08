@@ -9,7 +9,7 @@ Data Installation Manager: Manage the open data in your project like a package m
 # Features
 
 - 📀 Record the source url and post-processing, etc., of downloaded open-data
-- 🔧 Prepare all open data in one command by using files recorded by someone else
+- 🔧 Prepare all open data needed for the project in one command by using the `dim.json` recorded by someone else
 - 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
 - 🔍 Search open-data from CKAN
 
