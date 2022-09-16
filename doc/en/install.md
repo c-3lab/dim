@@ -15,38 +15,36 @@ dim install [options] <URL>
 
 ### Options
 
-#### -n, --name \<name>
+#### -n, --name \<name\>
 
-**required entry**
-Specify a unique name to identify data.
-Used in `update` and `uninstall` commands to specify the data to be processed.
-Also used as name of a subdirectory when storing data under the `data_files` directory.
+**required**
+Specify a unique name to identify data. The specified name will be used in update and uninstall commands to specify the data to be processed. Also used as name of a subdirectory when storing data under the data_files directory.
 
 In dim, if the name specified by the -n option duplicates an existing name,
 it is regarded as the same data and data re-downloading is restricted.
 
-#### -p, --postProcesses \<process name>
+#### -p, --postProcesses \<process name\>
 
-**optional entry**
+**optional**
 Specify post-processing for downloaded files.
-Multiple designations possible
+(Multiple designations possible)
 
-| process name   | description                                                                                                                                             |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| unzip          | Unzip the downloaded zip file in the current directory.                                                                                                 |
-| encode \<code> | Change the character encoding of the downloaded file.<br>Corresponding code：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
-| xlsx-to-csv    | Generate downloaded xlsx files converted to csv files under the data_files distribution.                                                                |
-| cmd \<command> | Execute the command with the path of the downloaded file as an argument.                                                                                |
+| process name    | description                                                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| unzip           | Unzip the downloaded zip file in the current directory.                                                                                                 |
+| encode \<code\> | Change the character encoding of the downloaded file.<br>Corresponding code：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
+| xlsx-to-csv     | Generate downloaded xlsx files converted to csv files under the data_files distribution.                                                                |
+| cmd \<command\> | Execute the command with the path of the downloaded file as an argument.                                                                                |
 
-#### -H, --headers \<header>
+#### -H, --headers \<header\>
 
-**optional entry**
+**optional**
 Specify request headers for downloads.
-Multiple designations possible
+(Multiple designations possible)
 
 #### -F, --force
 
-**optional entry**
+**optional**
 Specify `-F` if you want to ignore the re-download restriction and force the data to be downloaded.
 Re-downloading with `-F` will overwrite the original data.
 
@@ -93,22 +91,22 @@ dim install [options]
 
 ### Options
 
-#### -f, --file \<path or URL>
+#### -f, --file \<path or URL\>
 
-**optional entry**
+**optional**
 Download based on the contents of the specified dim.json.
 Specify `path` to specify a local file.
 Specify `URL` to specify a file on the Internet.
 
-#### -A, asyncInstall
+#### -A, --asyncInstall
 
-**optional entry**
+**optional**
 When downloading multiple files, the default download is a synchronous process.
 `-A` to change to an asynchronous process.
 
 #### -F, --force
 
-**optional entry**
+**optional**
 By default, dim.json and dim-lock.json are compared and the data present only in dim.json is downloaded.
 Specify `-F` if you want to force downloading of all data contained in dim.json.
 In this case, installed data with matching names are overwritten.
