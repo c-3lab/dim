@@ -3,7 +3,7 @@
 ## Overview
 
 Search for data using specified keywords.
-The search uses the [データカタログ横断検索サイト](https://search.ckan.jp) API.
+The search uses the [Data catalogue cross search website](https://search.ckan.jp) API.
 If multiple keywords are used, specify space-separated strings.
 
 ```bash
@@ -55,13 +55,13 @@ Specify post-processing for downloaded files.
 
 ```
 # Search by specifying one keyword.
-dim search "東京"
+dim search "Tokyo"
 
 # Search by specifying two keywords.
-dim search "東京 人口"
+dim search "Tokyo population"
 
 # Show only one retrieved dataset.
-dim search -n 1 "東京"
+dim search -n 1 "Tokyo"
 
 
 # [title]
@@ -88,7 +88,7 @@ dim search -n 1 "東京"
 
 ```
 # Interactively download data from retrieved datasets
-dim search -i "東京"
+dim search -i "Tokyo"
 
 # Specify the number of the data you want to download.
 ? Enter the number of the data to install › 1
