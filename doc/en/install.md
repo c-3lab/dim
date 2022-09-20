@@ -96,7 +96,7 @@ dim install [options]
 #### -f, --file \<path or URL\>
 
 **optional**\
-Download based on the contents of the specified dim.json.\
+Download based on the contents of the specified `dim.json`.\
 Specify `path` to specify a local file.\
 Specify `URL` to specify a file on the Internet.
 
@@ -109,8 +109,8 @@ When downloading multiple files, the default download is a synchronous process.\
 #### -F, --force
 
 **optional**\
-By default, dim.json and dim-lock.json are compared and the data present only in dim.json is downloaded.\
-Specify `-F` if you want to force downloading of all data contained in dim.json.\
+By default, `dim.json` and `dim-lock.json` are compared and the data present only in `dim.json` is downloaded.\
+Specify `-F` if you want to force downloading of all data contained in `dim.json`.\
 In this case, installed data with matching names are overwritten.
 
 ### Examples
