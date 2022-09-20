@@ -12,7 +12,7 @@ dim list [option]
 
 ### -s, --simple
 
-**optional**
+**optional**\
 Specify `-s` if only data is to be output.
 
 ## Examples

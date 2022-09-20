@@ -2,8 +2,8 @@
 
 ## Overview
 
-Search for data using specified keywords.
-The search uses the [Data catalogue cross search website](https://search.ckan.jp) API.
+Search for data using specified keywords.\
+The search uses the [Data catalogue cross search website](https://search.ckan.jp) API.\
 If multiple keywords are used, specify space-separated strings.
 
 ```bash
@@ -14,47 +14,47 @@ dim search [options] <keyword>
 
 ### -n, --number \<num\>
 
-**optional**
-Specifies the maximum data set to be retrieved during a search.
-A number between 1 and 100 can be specified.
+**optional**\
+Specifies the maximum data set to be retrieved during a search.\
+A number between 1 and 100 can be specified.\
 The default value is set at 10.
 
 ### -i, --install
 
-**optional**
-Interactive data download from search results.
-In interactive installations, data retrieval, 
+**optional**\
+Interactive data download from search results.\
+In interactive installations, data retrieval,\
 acquisition and post-processing are specified interactively.
 
 #### Selecting the data to be installed
 
-Select the data you want to download from the search results.
-The data selection uses a number allocated to each search result data.
+Select the data you want to download from the search results.\
+The data selection uses a number allocated to each search result data.\
 The numbers are in the form `1.[Data name]`.
 
 #### Specify name
 
-Specify a unique name to identify the data.
-Used in `update`, `uninstall` commands, etc., to specify the data to be processed.
-Also used as the name of a subdirectory when storing data under the `data_files` directory.
-If unspecified, it is automatically generated from the `xckan_title` of the search result and the `name` in the `resources`.
+Specify a unique name to identify the data.\
+Used in `update`, `uninstall` commands, etc., to specify the data to be processed.\
+Also used as the name of a subdirectory when storing data under the `data_files` directory.\
+If unspecified, it is automatically generated from the `xckan_title` of the search result\
+and the `name` in the `resources`.
 
 #### Specify post-processing
 
-Specify post-processing for downloaded files.
+Specify post-processing for downloaded files.\
 (Multiple designations possible)
 
-| process name    | description                                                                                                                                             |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| unzip           | Unzip the downloaded zip file in the current directory.                                                                                                 |
+| process name    | description                                                                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| unzip           | Unzip the downloaded zip file in the current directory.                                                                                                |
 | encode \<code\> | Change the character encoding of the downloaded file.<br>Corresponding code：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
-| xlsx-to-csv     | Generate downloaded xlsx files converted to csv files under the data_files distribution.                                                                |
-| cmd \<command\> | Execute the command with the path of the downloaded file as an argument.                                                                                |
+| xlsx-to-csv     | Generate downloaded xlsx files converted to csv files under the data_files distribution.                                                               |
+| cmd \<command\> | Execute the command with the path of the downloaded file as an argument.                                                                               |
 
 ### Examples
 
 ```
-# Search by specifying one keyword.
 dim search "Tokyo"
 
 # Search by specifying two keywords.

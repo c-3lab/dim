@@ -6,7 +6,7 @@ Update specified data.
 
 ## Run dim update with URL
 
-Search `dim-lock.json` for data matching the name given in the argument.
+Search `dim-lock.json` for data matching the name given in the argument.\
 If the above data is found, re-download the data and update `dim.json` and `dim-lock.json`.
 
 ```bush
@@ -32,8 +32,8 @@ dim update [option]
 
 #### -A, --asyncInstall
 
-**optional**
-When downloading multiple files, the default download is a synchronous process.
+**optional**\
+When downloading multiple files, the default download is a synchronous process.\
 `-A` to change to an asynchronous process.
 
 ### Example
