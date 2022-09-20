@@ -1,11 +1,11 @@
 # install
 
-## Overview
+## 概要
 
 指定したURL、もしくは`dim.json`に記録されているURLからファイルをダウンロードする。
 ダウンロードされたファイルは`data_files`配下に保存される。
 
-## Run dim install with URL
+## URLを指定して実行
 
 引数に指定されたURLからデータをダウンロードする。
 
@@ -13,7 +13,7 @@
 dim install [options] <URL>
 ```
 
-### Options
+### オプション
 
 #### -n, --name \<name\>
 
@@ -31,7 +31,7 @@ dim では -n オプションで指定された名称が、既存の名称と重
 ダウンロードしたファイルに対する後処理を指定する。
 複数指定可能
 
-| process name    | description                                                                                                                                |
+| 後処理の種類    | 概要                                                                                                                                       |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | unzip           | ダウンロードしたzipファイルをカレントディレクトリ内に解凍する。                                                                            |
 | encode \<code\> | ダウンロードしたファイルの文字コードを変更する。<br>対応コード：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
@@ -51,7 +51,7 @@ dim では -n オプションで指定された名称が、既存の名称と重
 データを強制的にダウンロードしたい場合は`-F`を指定する。
 `-F`を指定して再ダウンロードすると、元のデータは上書きされる。
 
-### Examples
+### 実行例
 
 ```bash
 # URLを指定してダウンロードする
@@ -82,7 +82,7 @@ dim install -n example -F https://example.com/example.txt
 dim install -n example -p "unzip" -H "Authorization: 1234567890abc" -F https://example.com/example.zip
 ```
 
-## Run dim install without URL
+## URLを指定せずに実行
 
 `dim.json`に記録されているURLからファイルのダウンロードを行う。
 `-f`を指定していない場合は、カレントディレクトリに存在する`dim.json`を参照する。
@@ -91,7 +91,7 @@ dim install -n example -p "unzip" -H "Authorization: 1234567890abc" -F https://e
 dim install [options]
 ```
 
-### Option
+### オプション
 
 #### -f, --file \<path or URL\>
 
