@@ -33,9 +33,9 @@ Specify post-processing for downloaded files.\
 
 | process name    | description                                                                                                                                        |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| unzip           | Unzip the downloaded zip file under `data_files`.                                                                                                  |
+| unzip           | Unzip the downloaded zip file under `data_files/<name>`.                                                                                           |
 | encode \<code\> | Change the character encoding of the downloaded file.<br>Supported code：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
-| xlsx-to-csv     | Convert the downloaded xlsx file to a csv file, and Save the under `data_files`.                                                                   |
+| xlsx-to-csv     | Convert the downloaded xlsx file to a csv file, and save the under `data_files/<name>`.                                                            |
 | cmd \<command\> | Execute the command with the path of the downloaded file as an argument.                                                                           |
 
 #### -H, --headers \<header\>
