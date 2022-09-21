@@ -3,7 +3,7 @@
 ## Overview
 
 Search for data using specified keywords.\
-The search uses the [Data catalogue cross search website](https://search.ckan.jp) API.\
+The search uses the [Data Catalog Cross Search System](https://search.ckan.jp) API.\
 If multiple keywords are used, specify space-separated strings.
 
 ```bash
@@ -15,7 +15,7 @@ dim search [options] <keyword>
 ### -n, --number \<num\>
 
 **optional**\
-Specifies the maximum data set to be retrieved during a search.\
+Specify the maximum the data set to be retrieved during a search.\
 A number between 1 and 100 can be specified.\
 The default value is set at 10.
 
@@ -23,8 +23,7 @@ The default value is set at 10.
 
 **optional**\
 Interactive data download from search results.\
-In interactive installations, data retrieval,\
-acquisition and post-processing are specified interactively.
+In interactive installations, data search, retrieval, and post-processing are specified interactively.
 
 #### Selecting the data to be installed
 
@@ -35,26 +34,27 @@ The numbers are in the form `1.[Data name]`.
 #### Specify name
 
 Specify a unique name to identify the data.\
-Used in `update`, `uninstall` commands, etc., to specify the data to be processed.\
+Used in `update`, `uninstall` commands to specify the data to be processed.\
 Also used as the name of a subdirectory when storing data under the `data_files` directory.\
-If unspecified, it is automatically generated from the `xckan_title` of the search result\
-and the `name` in the `resources`.
+If unspecified, it is automatically generated from `xckan_title` and `resource_names`, which are JSON keys obtained from
+[Data Catalog Cross Search System](https://search.ckan.jp).
 
 #### Specify post-processing
 
 Specify post-processing for downloaded files.\
-(Multiple designations possible)
+(can be set multiple times)
 
-| process name    | description                                                                                                                                            |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| unzip           | Unzip the downloaded zip file in the current directory.                                                                                                |
-| encode \<code\> | Change the character encoding of the downloaded file.<br>Corresponding code：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
-| xlsx-to-csv     | Generate downloaded xlsx files converted to csv files under the data_files distribution.                                                               |
-| cmd \<command\> | Execute the command with the path of the downloaded file as an argument.                                                                               |
+| process name    | description                                                                                                                                        |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| unzip           | Unzip the downloaded zip file under `data_files`.                                                                                                  |
+| encode \<code\> | Change the character encoding of the downloaded file.<br>Supported code：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
+| xlsx-to-csv     | Convert the downloaded xlsx file to a csv file, and Save the under `data_files`.                                                                   |
+| cmd \<command\> | Execute the command with the path of the downloaded file as an argument.                                                                           |
 
 ### Examples
 
 ```
+# Search by specifying keyword.
 dim search "Tokyo"
 
 # Search by specifying two keywords.
@@ -96,7 +96,7 @@ dim search -i "Tokyo"
 # Specify a unique name.
 ? Enter the name. Enter blank if want to use CKAN resource name. › example
 
-# Specify of post-processing.
+# Specify post-processing.
 ? Enter the post-processing you want to add. Enter blank if not required. › encode utf-8
 
 # Confirmation of additional post-processing.
