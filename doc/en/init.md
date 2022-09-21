@@ -2,8 +2,8 @@
 
 ## Overview
 
-Initialise the contents of `dim.json` and `dim-lock.json`.\
-Files under `data_files` are not initialized.
+Initialize the contents of `dim.json` and `dim-lock.json`.\
+The `data_files` directory is not initialized.
 
 ```bash
 dim init
@@ -12,6 +12,6 @@ dim init
 ## Examples
 
 ```bash
-# Initialise the dim.
+# Initialize the dim.
 dim init
 ```
