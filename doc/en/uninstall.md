@@ -11,7 +11,7 @@ dim uninstall [name]
 ## Argument
 
 **required**\
-Specify the `name` of the data to be deleted.
+Specify the `name` of the data to delete.
 
 ## Examples
 
