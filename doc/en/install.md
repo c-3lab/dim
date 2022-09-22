@@ -31,12 +31,12 @@ re-downloading is restricted.
 Specify post-processing for downloaded files.\
 (can be set multiple times)
 
-| process name    | description                                                                                                                                        |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| unzip           | Unzip the downloaded zip file under `data_files/<name>`.                                                                                           |
-| encode \<code\> | Change the character encoding of the downloaded file.<br>Supported code：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
-| xlsx-to-csv     | Convert the downloaded xlsx file to a csv file, and save the under `data_files/<name>`.                                                            |
-| cmd \<command\> | Execute the command with the path of the downloaded file as an argument.                                                                           |
+| process name        | description                                                                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| unzip               | Unzip the zip file downloaded on `data_files/<name>`.                                                                                                  |
+| encode \<encoding\> | Change the character encoding of the downloaded file.<br>Supported encoding：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
+| xlsx-to-csv         | Convert the downloaded xlsx file to a csv file, and store in `data_files/<name>`.                                                                      |
+| cmd \<command\>     | Execute the command with the path of the downloaded file as an argument.                                                                               |
 
 #### -H, --headers \<header\>
 
