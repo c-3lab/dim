@@ -33,11 +33,11 @@ The numbers are in the form `1.[Data name]`.
 
 #### Specify name
 
-Specify a unique name to identify the data.\
-Used in `update`, `uninstall` commands to specify the data to be processed.\
-Also used as the name of a subdirectory when storing data under the `data_files` directory.\
-If unspecified, it is automatically generated from `xckan_title` and `resource_names`, which are JSON keys obtained from
-[Data Catalog Cross Search System](https://search.ckan.jp).
+Specify a unique name.\
+This unique name will be used to specify the data in `update` and `uninstall`.\
+Also used as the name of a subdirectory storing data in the `data_files` directory.\
+If unspecified, it is automatically generated from `xckan_title` of the dataset name and `name` of the resource name.\
+The `xckan_title` and `name` are JSON keys obtained from the [Data Catalog Cross Search System](https://search.ckan.jp).
 
 #### Specify post-processing
 

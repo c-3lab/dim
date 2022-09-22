@@ -36,7 +36,7 @@ dim search [options] <keyword>
 データを識別するための一意な名前を指定する。\
 `update`, `uninstall`コマンドなどで、処理対象のデータを指定する際に使用する。\
 `data_files`ディレクトリ配下にデータを保存する際、サブディレクトリの名称としても使われる。\
-未指定の場合は、[データカタログ横断検索システム](https://search.ckan.jp)から取得したJSONのキーである、`xckan_title`及び`resource_names`から自動的に生成される。
+未指定の場合は、[データカタログ横断検索システム](https://search.ckan.jp)から取得したJSONのキーである、`xckan_title`及び`resources`内の`name`から自動的に生成される。
 
 #### 後処理の指定
 
