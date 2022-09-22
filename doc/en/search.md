@@ -22,7 +22,7 @@ The default value is set at 10.
 ### -i, --install
 
 **optional**\
-Interactive data download from search results.\
+Download data from search results interactively.\
 In interactive installations, data search, retrieval, and post-processing are specified interactively.
 
 #### Selecting the data to be installed
