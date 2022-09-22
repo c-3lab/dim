@@ -26,27 +26,12 @@ export class DimFileAccessor {
       JSON.stringify(json, null, 2),
     );
   }
-  async addContent(
-    url: string,
-    name: string,
-    postProcesses: string[],
-    headers: Record<string, string>,
-    catalogUrl: string | null = null,
-    catalogResourceId: string | null = null,
-  ) {
+  async addContent(content: Content) {
     if (this.dimJSON === undefined) {
       return;
     }
-    const content: Content = {
-      url,
-      name,
-      catalogUrl,
-      catalogResourceId,
-      postProcesses,
-      headers,
-    };
     const contents = this.dimJSON.contents;
-    const contentIndex = this.dimJSON.contents.findIndex((c) => c.name === name);
+    const contentIndex = this.dimJSON.contents.findIndex((c) => c.name === content.name);
     if (contentIndex !== -1) {
       // Override the existing content.
       contents.splice(contentIndex, 1, content);

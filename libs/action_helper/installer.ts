@@ -27,17 +27,17 @@ export const installFromURL = async (
     await executePostprocess(postProcesses, result.fullPath);
   }
   const lockContent: LockContent = {
-    name: name,
-    url: url,
+    name,
+    url,
     path: result.fullPath,
-    catalogUrl: catalogUrl,
-    catalogResourceId: catalogResourceId,
+    catalogUrl,
+    catalogResourceId,
     lastModified: null,
     eTag: null,
     lastDownloaded: new Date(),
     integrity: "",
     postProcesses: postProcesses || [],
-    headers: headers,
+    headers,
   };
   const responseHeaders = result.response.headers;
   lockContent.eTag = responseHeaders.get("etag")?.replace(/^"(.*)"$/, "$1") ??
@@ -45,14 +45,15 @@ export const installFromURL = async (
   if (responseHeaders.has("last-modified")) {
     lockContent.lastModified = new Date(responseHeaders.get("last-modified")!);
   }
-  await new DimFileAccessor().addContent(
+  const content: Content = {
     url,
     name,
-    postProcesses || [],
-    headers,
     catalogUrl,
     catalogResourceId,
-  );
+    postProcesses: postProcesses || [],
+    headers,
+  };
+  await new DimFileAccessor().addContent(content);
   await new DimLockFileAccessor().addContent(lockContent);
 
   return result.fullPath;

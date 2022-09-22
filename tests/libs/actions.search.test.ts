@@ -19,7 +19,7 @@ import { Confirm, encoding, Input, ky, Number } from "../../deps.ts";
 import { DimFileAccessor } from "../../libs/accessor.ts";
 import { Downloader } from "../../libs/downloader.ts";
 import { Colors } from "../../deps.ts";
-import { DownlodedResult } from "../../libs/types.ts";
+import { Content, DownlodedResult } from "../../libs/types.ts";
 
 describe("SearchAction", () => {
   let consoleLogStub: Stub;
@@ -1501,12 +1501,15 @@ describe("SearchAction", () => {
     it("exit with error when duplicate names.", async () => {
       const denoExitStub = stub(Deno, "exit");
       createEmptyDimJson();
-      await new DimFileAccessor().addContent(
-        "http://example.com",
-        "name duplication check",
-        [],
-        {},
-      );
+      const content: Content = {
+        url: "http://example.com",
+        name: "name duplication check",
+        headers: {},
+        postProcesses: [],
+        catalogResourceId: null,
+        catalogUrl: null,
+      };
+      await new DimFileAccessor().addContent(content);
       const numberStub = stub(
         Number,
         "prompt",
