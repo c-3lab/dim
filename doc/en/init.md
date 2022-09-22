@@ -15,6 +15,6 @@ dim init
 ## Examples
 
 ```bash
-# Initialize the dim.
+# Initialize the project.
 dim init
 ```
