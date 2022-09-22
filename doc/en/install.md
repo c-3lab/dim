@@ -18,12 +18,13 @@ dim install [options] <URL>
 #### -n, --name \<name\>
 
 **required**\
-Specify a unique name to identify data.\
-The specified name will be used in update and uninstall commands to specify the data to be processed.\
-Also used as the name of a subdirectory when storing data under the `data_files` directory.
+Specify a unique name.\
+This unique name will be used to specify the data in `update` and `uninstall` commands.\
+Also used as the name of a subdirectory storing data in the `data_files` directory.
 
-In dim, if the name specified by the `-n` option duplicates an existing name, it is regarded as the same data, and data
-re-downloading is restricted.
+In dim, if the name specified by the `-n` option duplicates an existing name, it is regarded as the same data, and
+downloading the same data is restricted\
+Use [`-F`](#-f---force) to re-download.
 
 #### -p, --postProcesses \<process name\>
 
