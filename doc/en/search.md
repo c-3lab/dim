@@ -15,7 +15,7 @@ dim search [options] <keyword>
 ### -n, --number \<num\>
 
 **optional**\
-Specify the maximum the data set to be retrieved during a search.\
+Number of items to limit search results to.\
 A number between 1 and 100 can be specified.\
 The default value is set at 10.
 
