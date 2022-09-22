@@ -63,15 +63,15 @@ dim install -n example -p "unzip" https://example.com/example.zip
 # Change the character encoding of the downloaded file to Shift_JIS.
 dim install -n example -p "encode Shift_JIS" https://example.com/example.txt
 
-# Convert downloaded xlsx file to csv file.
+# Convert the downloaded xlsx file to a csv file.
 dim install -n example -p "xlsx-to-csv" https://example.com/example.xlsx
 
 # After downloading the file, run your python program.
 dim install -n example -p "cmd python ./tests/test_custom_command.py" https://example.com/example.xlsx
 
 # After converting the character encoding of the downloaded file to UTF-8, 
-# the search is performed using a proprietary Python program.
-dim install -n example　-p "encode UTF-8" -p "cmd search.py" https://example.com/example.txt
+# the search is performed by a proprietary Python program.
+dim install -n example　-p "encode UTF-8" -p "cmd test_custom_commnad.py" https://example.com/example.txt
 
 # Download by specifying the header.
 dim install -n example -H "Authorization: 1234567890abc" -H "Fiware-Service: example"  https://example.com/example.txt
