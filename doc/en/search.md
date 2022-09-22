@@ -2,7 +2,7 @@
 
 ## Overview
 
-Search for data using specified keywords.\
+Search for data using specific keywords.\
 The search uses the [Data Catalog Cross Search System](https://search.ckan.jp) API.\
 If multiple keywords are used, specify space-separated strings.
 
