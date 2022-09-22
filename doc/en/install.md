@@ -110,7 +110,7 @@ When downloading multiple files, the default download is a synchronous process.\
 #### -F, --force
 
 **optional**\
-By default, `dim.json` and `dim-lock.json` are compared and the data present only in `dim.json` are downloaded.\
+By default, `dim.json` and `dim-lock.json` are compared and the present data only in `dim.json` are downloaded.\
 Specify `-F` if you want to force downloading of all data contained in `dim.json`.\
 In this case, installed data with matching names are overwritten.
 
