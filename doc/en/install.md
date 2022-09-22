@@ -3,7 +3,7 @@
 ## Overview
 
 Download data from specified URL or URL recorded in `dim.json`.\
-Downloaded files are stored under `data_files`.
+Downloaded files are stored in `data_files`.
 
 ## Run dim install with URL
 
