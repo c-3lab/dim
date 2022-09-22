@@ -20,6 +20,6 @@ dim help [command]
 # Display available commands.
 dim help
 
-# Display information about the specified command.
+# Display information on the specified command.
 dim help install
 ```
