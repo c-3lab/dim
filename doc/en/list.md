@@ -13,7 +13,7 @@ dim list [option]
 ### -s, --simple
 
 **optional**\
-Specify `-s` if only data is to be output.
+To output data without formatting, specify `-s`.
 
 ## Examples
 
