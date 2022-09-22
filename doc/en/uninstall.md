@@ -2,7 +2,7 @@
 
 ## Overview
 
-Delete specified data.
+Delete specific data.
 
 ```bush
 dim uninstall [name]
