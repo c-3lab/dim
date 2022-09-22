@@ -8,7 +8,7 @@ Display information on the commands available in the dim.
 
 **optional**\
 Specify the command for dim, Information on each command is displayed.\
-If no arguments are specified, a list of available commands is displayed.
+If no arguments are specified, available commands is displayed.
 
 ```bash
 dim help [command]
