@@ -428,6 +428,36 @@ describe("InstallAction", () => {
             stderr: "piped",
           }],
         });
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "unzip",
+            postProcesses: ["unzip"],
+            url: "https://example.com/dummy.zip",
+          }],
+        });
+
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "unzip",
+            path: "./data_files/unzip/dummy.zip",
+            postProcesses: ["unzip"],
+            url: "https://example.com/dummy.zip",
+          }],
+        });
       } finally {
         denoRunStub.restore();
         kyGetStub.restore();
@@ -490,6 +520,36 @@ describe("InstallAction", () => {
         );
         assertEquals(testData, "a,b\nc,d\ne,f\n");
         assertSpyCall(consoleLogStub, 0, { args: ["Convert xlsx to csv."] });
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "xlsx-to-csv",
+            postProcesses: ["xlsx-to-csv"],
+            url: "https://example.com/dummy.xlsx",
+          }],
+        });
+
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "xlsx-to-csv",
+            path: "./data_files/xlsx-to-csv/dummy.xlsx",
+            postProcesses: ["xlsx-to-csv"],
+            url: "https://example.com/dummy.xlsx",
+          }],
+        });
       } finally {
         kyGetStub.restore();
       }
@@ -542,6 +602,37 @@ describe("InstallAction", () => {
             ["echo"],
             "./data_files/cmdecho/dummy.txt",
           ],
+        });
+
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "cmdecho",
+            postProcesses: ["cmd echo"],
+            url: "https://example.com/dummy.txt",
+          }],
+        });
+
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "cmdecho",
+            path: "./data_files/cmdecho/dummy.txt",
+            postProcesses: ["cmd echo"],
+            url: "https://example.com/dummy.txt",
+          }],
         });
       } finally {
         kyGetStub.restore();
