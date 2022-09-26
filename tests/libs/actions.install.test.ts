@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, it } from "https://deno.land/std@0.152
 import { Colors, encoding } from "../../deps.ts";
 import { InstallAction } from "../../libs/actions.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
+import { getBuild } from "../../libs/postprocess/unzipper.ts";
 import {
   createEmptyDimJson,
   createKyGetStub,
@@ -396,38 +397,69 @@ describe("InstallAction", () => {
       }
     });
 
-    it("check that the command to extract the downloaded file is entered and recorded in dim.json and dim-lock.json.", async () => {
+    it("check that the command for darwin to extract the downloaded file is entered and recorded in dim.json and dim-lock.json.", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
-      const denoRunStub = stub(Deno, "run");
+      const denoRunStub = stub(Deno, "run", () => ({
+        output: () => {},
+        status: () => Promise.resolve({ success: true }),
+        rid: 1,
+      } as Deno.Process));
+      const osStub = stub(getBuild, "getOs", () => {
+        return "darwin";
+      });
       try {
         await new InstallAction().execute(
           { name: "unzip", postProcesses: ["unzip"] },
           "https://example.com/dummy.zip",
         );
         assert(fileExists("data_files/unzip/dummy.zip"));
-        if (Deno.build.os === "darwin") {
-          assertSpyCall(denoRunStub, 0, {
-            args: [{
-              cmd: [
-                "ditto",
-                "-xk",
-                "--sequesterRsrc",
-                "./data_files/unzip/dummy.zip",
-                "./data_files/unzip",
-              ],
-              stdout: "piped",
-              stderr: "piped",
-            }],
-          });
-        } else {
-          assertSpyCall(denoRunStub, 0, {
-            args: [{
-              cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./data_files/unzip"],
-            }],
-          });
-        }
+        assertSpyCall(denoRunStub, 0, {
+          args: [{
+            cmd: [
+              "ditto",
+              "-xk",
+              "--sequesterRsrc",
+              "./data_files/unzip/dummy.zip",
+              "./data_files/unzip",
+            ],
+            stdout: "piped",
+            stderr: "piped",
+          }],
+        });
       } finally {
+        osStub.restore();
+        denoRunStub.restore();
+        kyGetStub.restore();
+      }
+    });
+
+    it("check that the command for linux to extract the downloaded file is entered and recorded in dim.json and dim-lock.json.", async () => {
+      createEmptyDimJson();
+      const kyGetStub = createKyGetStub("dummy");
+      const denoRunStub = stub(Deno, "run", () => ({
+        output: () => {},
+        status: () => Promise.resolve({ success: true }),
+        rid: 1,
+      } as Deno.Process));
+      const denoCloseStub = stub(Deno, "close");
+      const osStub = stub(getBuild, "getOs", () => {
+        return "linux";
+      });
+      try {
+        await new InstallAction().execute(
+          { name: "unzip", postProcesses: ["unzip"] },
+          "https://example.com/dummy.zip",
+        );
+        assert(fileExists("data_files/unzip/dummy.zip"));
+        assertSpyCall(denoRunStub, 0, {
+          args: [{
+            cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./data_files/unzip"],
+          }],
+        });
+      } finally {
+        osStub.restore();
+        denoCloseStub.restore();
         denoRunStub.restore();
         kyGetStub.restore();
       }
