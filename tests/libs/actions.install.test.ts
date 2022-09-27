@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, it } from "https://deno.land/std@0.152
 import { Colors, encoding } from "../../deps.ts";
 import { InstallAction } from "../../libs/actions.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
-import { getBuild } from "../../libs/postprocess/unzipper.ts";
+import DenoWrapper from "../../libs/deno_wrapper.ts";
 import {
   createEmptyDimJson,
   createKyGetStub,
@@ -21,6 +21,7 @@ describe("InstallAction", () => {
   let denoStdoutStub: Stub;
   let fakeTime: FakeTime;
   let originalDirectory: string;
+  let originalOS: "darwin" | "linux" | "windows";
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
@@ -29,6 +30,7 @@ describe("InstallAction", () => {
     denoStdoutStub = stub(Deno.stdout, "write");
     fakeTime = new FakeTime("2022-01-02T03:04:05.678Z");
     originalDirectory = Deno.cwd();
+    originalOS = DenoWrapper.build.os;
     Deno.chdir(temporaryDirectory);
   });
 
@@ -39,6 +41,7 @@ describe("InstallAction", () => {
     denoExitStub.restore();
     consoleErrorStub.restore();
     consoleLogStub.restore();
+    DenoWrapper.build.os = originalOS;
     Deno.chdir(originalDirectory);
   });
 
@@ -405,9 +408,7 @@ describe("InstallAction", () => {
         status: () => Promise.resolve({ success: true }),
         rid: 1,
       } as Deno.Process));
-      const osStub = stub(getBuild, "getOs", () => {
-        return "darwin";
-      });
+      DenoWrapper.build.os = "darwin";
       try {
         await new InstallAction().execute(
           { name: "unzip", postProcesses: ["unzip"] },
@@ -428,7 +429,6 @@ describe("InstallAction", () => {
           }],
         });
       } finally {
-        osStub.restore();
         denoRunStub.restore();
         kyGetStub.restore();
       }
