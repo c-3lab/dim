@@ -2,7 +2,7 @@ import { assert, assertEquals } from "https://deno.land/std@0.152.0/testing/asse
 import { assertSpyCall, Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
 import { FakeTime } from "https://deno.land/std@0.152.0/testing/time.ts";
 import { afterEach, beforeEach, describe, it } from "https://deno.land/std@0.152.0/testing/bdd.ts";
-import { Colors, encoding } from "../../deps.ts";
+import { Colors, encoding, zipWrapper } from "../../deps.ts";
 import { InstallAction } from "../../libs/actions.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
 import DenoWrapper from "../../libs/deno_wrapper.ts";
@@ -437,7 +437,7 @@ describe("InstallAction", () => {
     it("check that the decompress method is called with two arguments when the os is not darwin.", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
-      const decompressStub = stub(DenoWrapper.zip, "decompress");
+      const decompressStub = stub(zipWrapper, "decompress");
       DenoWrapper.build.os = "linux";
       try {
         await new InstallAction().execute(
