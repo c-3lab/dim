@@ -229,7 +229,7 @@ export const interactiveInstall = async (catalogs: Catalog[]): Promise<string> =
   }
 
   const enteredNumber = await Number.prompt({
-    message: "Enter the number of the data to install",
+    message: "Enter the number of data to install",
     min: 1,
     max: catalogResources.length,
   });
