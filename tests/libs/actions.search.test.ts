@@ -1583,7 +1583,7 @@ describe("SearchAction", () => {
         assertSpyCall(numberStub, 0, {
           args: [
             {
-              message: "Enter the number of the data to install",
+              message: "Enter the number of data to install",
               min: 1,
               max: 4,
             },
