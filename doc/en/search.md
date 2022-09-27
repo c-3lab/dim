@@ -90,8 +90,8 @@ dim search -n 1 "Tokyo"
 # Interactively download data from retrieved datasets
 dim search -i "Tokyo"
 
-# Specify the number of the data you want to download.
-? Enter the number of the data to install › 1
+# Specify the number of data you want to download.
+? Enter the number of data to install › 1
 
 # Specify a unique name.
 ? Enter the name. Enter blank if want to use CKAN resource name. › example
