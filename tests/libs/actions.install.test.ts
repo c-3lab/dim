@@ -434,33 +434,22 @@ describe("InstallAction", () => {
       }
     });
 
-    it("check that the command for linux to extract the downloaded file is entered and recorded in dim.json and dim-lock.json.", async () => {
+    it("check that the decompress method is called with two arguments when the os is not darwin.", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
-      const denoRunStub = stub(Deno, "run", () => ({
-        output: () => {},
-        status: () => Promise.resolve({ success: true }),
-        rid: 1,
-      } as Deno.Process));
-      const denoCloseStub = stub(Deno, "close");
-      const osStub = stub(getBuild, "getOs", () => {
-        return "linux";
-      });
+      const decompressStub = stub(DenoWrapper.zip, "decompress");
+      DenoWrapper.build.os = "linux";
       try {
         await new InstallAction().execute(
           { name: "unzip", postProcesses: ["unzip"] },
           "https://example.com/dummy.zip",
         );
         assert(fileExists("data_files/unzip/dummy.zip"));
-        assertSpyCall(denoRunStub, 0, {
-          args: [{
-            cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./data_files/unzip"],
-          }],
+        assertSpyCall(decompressStub, 0, {
+          args: ["./data_files/unzip/dummy.zip", "./data_files/unzip"],
         });
       } finally {
-        osStub.restore();
-        denoCloseStub.restore();
-        denoRunStub.restore();
+        decompressStub.restore();
         kyGetStub.restore();
       }
     });

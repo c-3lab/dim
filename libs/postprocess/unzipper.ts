@@ -1,4 +1,4 @@
-import { Colors, decompress } from "../../deps.ts";
+import { Colors } from "../../deps.ts";
 import { BasePostprocess } from "./base_postprocess.ts";
 import DenoWrapper from "../deno_wrapper.ts";
 
@@ -15,7 +15,7 @@ export class Unzipper extends BasePostprocess {
       const rawOutput = await process.output();
       Deno.stdout.write(rawOutput);
     } else {
-      await decompress(targetPath, targetDir);
+      await DenoWrapper.zip.decompress(targetPath, targetDir);
     }
     return targetDir;
   }
