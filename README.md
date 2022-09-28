@@ -13,6 +13,10 @@ Data Installation Manager: Manage the open data in your project like a package m
 - 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
 - 🔍 Search open-data from CKAN
 
+# Document
+
+For more information about how to use it, please refer to [this document](/doc).
+
 # Quick Start
 
 ## Install the dim
@@ -106,7 +110,7 @@ $ ls ./data_files
 
 # Command Usage
 
-## Init
+## [Init](doc/en/init.md)
 
 Generate `dim.json`, `dim-lock.json` and `data_files/`.
 
@@ -114,7 +118,7 @@ Generate `dim.json`, `dim-lock.json` and `data_files/`.
 $ dim init
 ```
 
-## Install
+## [Install](doc/en/install.md)
 
 ### Install the all data.
 
@@ -196,7 +200,7 @@ Forced install. Overwrite already exist data file.
 $ dim install https://example.com -n "example" -F
 ```
 
-## Uninstall
+## [Uninstall](doc/en/uninstall.md)
 
 Delete data with the specified name from `dim.json`, `dim-lock.json` and `data_files/`.
 
@@ -204,7 +208,7 @@ Delete data with the specified name from `dim.json`, `dim-lock.json` and `data_f
 $ dim uninstall [name]
 ```
 
-## List
+## [List](doc/en/list.md)
 
 Display the information described in `dim-lock.json`.
 
@@ -218,7 +222,7 @@ $ dim list
 $ dim list -s
 ```
 
-## Update
+## [Update](doc/en/update.md)
 
 Update the all data.
 
@@ -232,7 +236,7 @@ Update the specified data.
 $ dim update [name]
 ```
 
-## Search
+## [Search](doc/en/search.md)
 
 Search data from package_search CKAN API.
 
@@ -296,7 +300,7 @@ Convert xlsx to csv.
 Installed to ./data_files/131105_東京都_目黒区_大地震時における地域避難所_大地震時における地域避難所/131105evacuationspace.xlsx
 ```
 
-## Help
+## [Help](doc/en/help.md)
 
 ```
 $ dim help
