@@ -14,9 +14,15 @@ export class DimFileAccessor {
       Deno.statSync(path);
       this.dimJSON = JSON.parse(Deno.readTextFileSync(path));
     } catch {
-      console.log(
-        Colors.red("Not found a dim.json. You should run a 'dim init'. "),
-      );
+      if (path === DEFAULT_DIM_FILE_PATH) {
+        console.log(
+          Colors.red("Not found a dim.json. You should run a 'dim init'. "),
+        );
+      } else {
+        console.log(
+          Colors.red("Selecting other than json."),
+        );
+      }
       Deno.exit(1);
     }
   }
