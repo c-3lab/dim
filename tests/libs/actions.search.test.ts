@@ -448,17 +448,17 @@ describe("SearchAction", () => {
         const numberStub = stub(
           Number,
           "prompt",
-          () => Promise<number>.resolve(4),
+          () => Promise.resolve(4),
         );
         const inputStub = stub(
           Input,
           "prompt",
-          () => Promise<string>.resolve(""),
+          () => Promise.resolve(""),
         );
         const confirmStub = stub(
           Confirm,
           "prompt",
-          () => Promise<boolean>.resolve(false),
+          () => Promise.resolve(false),
         );
 
         const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -516,20 +516,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve("entered name"),
-          Promise<string>.resolve(""),
+          Promise.resolve("entered name"),
+          Promise.resolve(""),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -584,20 +584,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(2),
+        () => Promise.resolve(2),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("unzip"),
+          Promise.resolve(""),
+          Promise.resolve("unzip"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -694,20 +694,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(4),
+        () => Promise.resolve(4),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("xlsx-to-csv"),
+          Promise.resolve(""),
+          Promise.resolve("xlsx-to-csv"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -762,20 +762,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("encode euc-jp"),
+          Promise.resolve(""),
+          Promise.resolve("encode euc-jp"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -842,20 +842,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("encode iso-2022-jp"),
+          Promise.resolve(""),
+          Promise.resolve("encode iso-2022-jp"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -922,20 +922,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("encode shift_jis"),
+          Promise.resolve(""),
+          Promise.resolve("encode shift_jis"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1002,20 +1002,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("encode utf-8"),
+          Promise.resolve(""),
+          Promise.resolve("encode utf-8"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1082,20 +1082,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("encode utf-16"),
+          Promise.resolve(""),
+          Promise.resolve("encode utf-16"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1162,20 +1162,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("encode utf-16be"),
+          Promise.resolve(""),
+          Promise.resolve("encode utf-16be"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1242,20 +1242,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("encode utf-16le"),
+          Promise.resolve(""),
+          Promise.resolve("encode utf-16le"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1322,20 +1322,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("encode unicode"),
+          Promise.resolve(""),
+          Promise.resolve("encode unicode"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1402,20 +1402,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("cmd echo dummy"),
+          Promise.resolve(""),
+          Promise.resolve("cmd echo dummy"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1513,20 +1513,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve("name duplication check"),
-          Promise<string>.resolve(""),
+          Promise.resolve("name duplication check"),
+          Promise.resolve(""),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1558,17 +1558,17 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve(""),
+        () => Promise.resolve(""),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1602,17 +1602,17 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve(""),
+        () => Promise.resolve(""),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1673,20 +1673,20 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve(""),
-          Promise<string>.resolve("encode utf-8"),
+          Promise.resolve(""),
+          Promise.resolve("encode utf-8"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
 
       const data = Deno.readTextFileSync("../test_data/searchData.json");
@@ -1719,23 +1719,23 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
         returnsNext([
-          Promise<string>.resolve("entered name"),
-          Promise<string>.resolve("encode utf-8"),
-          Promise<string>.resolve("encode utf-16"),
+          Promise.resolve("entered name"),
+          Promise.resolve("encode utf-8"),
+          Promise.resolve("encode utf-16"),
         ]),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
         returnsNext([
-          Promise<boolean>.resolve(true),
-          Promise<boolean>.resolve(false),
+          Promise.resolve(true),
+          Promise.resolve(false),
         ]),
       );
 
@@ -1792,17 +1792,17 @@ describe("SearchAction", () => {
       const numberStub = stub(
         Number,
         "prompt",
-        () => Promise<number>.resolve(1),
+        () => Promise.resolve(1),
       );
       const inputStub = stub(
         Input,
         "prompt",
-        () => Promise<string>.resolve(""),
+        () => Promise.resolve(""),
       );
       const confirmStub = stub(
         Confirm,
         "prompt",
-        () => Promise<boolean>.resolve(false),
+        () => Promise.resolve(false),
       );
       const downloaderStub = stub(
         Downloader.prototype,
