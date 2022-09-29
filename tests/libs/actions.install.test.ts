@@ -2,9 +2,10 @@ import { assert, assertEquals } from "https://deno.land/std@0.152.0/testing/asse
 import { assertSpyCall, Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
 import { FakeTime } from "https://deno.land/std@0.152.0/testing/time.ts";
 import { afterEach, beforeEach, describe, it } from "https://deno.land/std@0.152.0/testing/bdd.ts";
-import { Colors, encoding } from "../../deps.ts";
+import { Colors, encoding, zipWrapper } from "../../deps.ts";
 import { InstallAction } from "../../libs/actions.ts";
 import { DimJSON, DimLockJSON } from "../../libs/types.ts";
+import DenoWrapper from "../../libs/deno_wrapper.ts";
 import {
   createEmptyDimJson,
   createKyGetStub,
@@ -20,6 +21,7 @@ describe("InstallAction", () => {
   let denoStdoutStub: Stub;
   let fakeTime: FakeTime;
   let originalDirectory: string;
+  let originalOS: "darwin" | "linux" | "windows";
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
@@ -28,6 +30,7 @@ describe("InstallAction", () => {
     denoStdoutStub = stub(Deno.stdout, "write");
     fakeTime = new FakeTime("2022-01-02T03:04:05.678Z");
     originalDirectory = Deno.cwd();
+    originalOS = DenoWrapper.build.os;
     Deno.chdir(temporaryDirectory);
   });
 
@@ -38,6 +41,7 @@ describe("InstallAction", () => {
     denoExitStub.restore();
     consoleErrorStub.restore();
     consoleLogStub.restore();
+    DenoWrapper.build.os = originalOS;
     Deno.chdir(originalDirectory);
   });
 
@@ -396,39 +400,56 @@ describe("InstallAction", () => {
       }
     });
 
-    it("check that the command to extract the downloaded file is entered and recorded in dim.json and dim-lock.json.", async () => {
+    it("check that the command for darwin to extract the downloaded file is entered and recorded in dim.json and dim-lock.json.", async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
-      const denoRunStub = stub(Deno, "run");
+      const denoRunStub = stub(Deno, "run", () => ({
+        output: () => {},
+        status: () => Promise.resolve({ success: true }),
+        rid: 1,
+      } as Deno.Process));
+      DenoWrapper.build.os = "darwin";
       try {
         await new InstallAction().execute(
           { name: "unzip", postProcesses: ["unzip"] },
           "https://example.com/dummy.zip",
         );
         assert(fileExists("data_files/unzip/dummy.zip"));
-        if (Deno.build.os === "darwin") {
-          assertSpyCall(denoRunStub, 0, {
-            args: [{
-              cmd: [
-                "ditto",
-                "-xk",
-                "--sequesterRsrc",
-                "./data_files/unzip/dummy.zip",
-                "./data_files/unzip",
-              ],
-              stdout: "piped",
-              stderr: "piped",
-            }],
-          });
-        } else {
-          assertSpyCall(denoRunStub, 0, {
-            args: [{
-              cmd: ["unzip", "./data_files/unzip/dummy.zip", "-d", "./data_files/unzip"],
-            }],
-          });
-        }
+        assertSpyCall(denoRunStub, 0, {
+          args: [{
+            cmd: [
+              "ditto",
+              "-xk",
+              "--sequesterRsrc",
+              "./data_files/unzip/dummy.zip",
+              "./data_files/unzip",
+            ],
+            stdout: "piped",
+            stderr: "piped",
+          }],
+        });
       } finally {
         denoRunStub.restore();
+        kyGetStub.restore();
+      }
+    });
+
+    it("check that the decompress method is called with two arguments when the os is not darwin.", async () => {
+      createEmptyDimJson();
+      const kyGetStub = createKyGetStub("dummy");
+      const decompressStub = stub(zipWrapper, "decompress");
+      DenoWrapper.build.os = "linux";
+      try {
+        await new InstallAction().execute(
+          { name: "unzip", postProcesses: ["unzip"] },
+          "https://example.com/dummy.zip",
+        );
+        assert(fileExists("data_files/unzip/dummy.zip"));
+        assertSpyCall(decompressStub, 0, {
+          args: ["./data_files/unzip/dummy.zip", "./data_files/unzip"],
+        });
+      } finally {
+        decompressStub.restore();
         kyGetStub.restore();
       }
     });

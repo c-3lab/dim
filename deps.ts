@@ -14,7 +14,7 @@ export * as Colors from "https://deno.land/std@0.146.0/fmt/colors.ts";
 
 export * as encoding from "https://cdn.skypack.dev/encoding-japanese";
 
-export { decompress } from "https://deno.land/x/zip@v1.2.3/mod.ts";
+import { decompress as _decompress } from "https://deno.land/x/zip@v1.2.3/mod.ts";
 
 export { readXLSX, xlsx } from "https://deno.land/x/flat@0.0.14/mod.ts";
 
@@ -24,3 +24,13 @@ export { ky };
 export type { KyResponse, ResponsePromise } from "https://cdn.skypack.dev/ky@0.31.0?dts";
 
 export { Confirm, Input, Number } from "https://deno.land/x/cliffy@v0.24.2/prompt/mod.ts";
+
+export const zipWrapper = {
+  decompress: _decompress,
+};
+export const decompress = (
+  // deno-lint-ignore no-explicit-any
+  ...args: [filePath: string, destinationPath?: string | null | undefined, options?: any]
+): Promise<string | false> => {
+  return zipWrapper.decompress.apply(zipWrapper.decompress, args);
+};

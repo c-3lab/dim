@@ -1,11 +1,12 @@
 import { Colors, decompress } from "../../deps.ts";
 import { BasePostprocess } from "./base_postprocess.ts";
+import DenoWrapper from "../deno_wrapper.ts";
 
 export class Unzipper extends BasePostprocess {
   async execute(_: string[], targetPath: string): Promise<string> {
     const splitedPath = targetPath.split("/");
     const targetDir = splitedPath.slice(0, splitedPath.length - 1).join("/");
-    if (Deno.build.os === "darwin") {
+    if (DenoWrapper.build.os === "darwin") {
       const process = Deno.run({
         cmd: ["ditto", "-xk", "--sequesterRsrc", targetPath, targetDir],
         stdout: "piped",
