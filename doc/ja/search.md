@@ -90,7 +90,7 @@ dim search -n 1 "東京"
 dim search -i "東京"
 
 # ダウンロードしたいデータの番号を指定
-? Enter the number of the data to install › 1
+? Enter the number of data to install › 1
 
 # 名前の指定
 ? Enter the name. Enter blank if want to use CKAN resource name. › example

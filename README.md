@@ -292,7 +292,7 @@ $ dim search -i "東京 避難所"
       * Created             : 2018-10-30T05:44:46.127915
       * Format              : XLSX
 ...
-? Enter the number of the data to install > 1
+? Enter the number of data to install > 1
 ? Enter the name. Enter blank if want to use CKAN resource name. > 
 ? Enter the post-processing you wish to add. Enter blank if not required. > xlsx-to-csv
 ? Is there a post-processing you would like to add next? (Y/n) > No
