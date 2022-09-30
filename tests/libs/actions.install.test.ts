@@ -794,7 +794,7 @@ describe("InstallAction", () => {
         assertSpyCall(denoExitStub, 0, { args: [1] });
         assertSpyCall(consoleLogStub, 0, {
           args: [
-            Colors.red("Not found a dim.json. You should run a 'dim init'. "),
+            Colors.red("Selecting other than json."),
           ],
         });
       } finally {
