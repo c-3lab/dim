@@ -6,6 +6,10 @@ Data Installation Manager: Manage the open data in your project like a package m
 
 ![8bket-vzuiv](https://user-images.githubusercontent.com/6661165/148486923-a29f6ea5-ecbc-4d69-9f40-66bed34e3f99.gif)
 
+## Join community
+We are looking for members to develop together as an open source community.  
+[Slack](https://join.slack.com/t/c3lab-hq/shared_invite/zt-v6zz66n9-1VYkVXC4zoQViWSMdzMTLg)
+
 # Features
 
 - 📀 Record the source url and post-processing, etc., of downloaded open-data
