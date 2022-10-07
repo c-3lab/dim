@@ -1,6 +1,7 @@
 # dim
 
 [![codecov](https://codecov.io/gh/c-3lab/dim/branch/main/graph/badge.svg?token=2PXVJGUNWP)](https://codecov.io/gh/c-3lab/dim)
+[![Github All Releases](https://img.shields.io/github/downloads/c-3lab/dim/latest/total.svg)](https://github.com/c-3lab/dim/releases/tag/v1.0)
 
 Data Installation Manager: Manage the open data in your project like a package manager.
 
