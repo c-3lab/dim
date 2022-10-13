@@ -28,13 +28,13 @@ describe("ListAction", () => {
     const dimLockData: DimLockJSON = {
       lockFileVersion: "1.1",
       contents: [{
-        catalogResourceId: null,
-        catalogUrl: null,
-        eTag: null,
+        catalogResourceId: "dummycatalogresourceid",
+        catalogUrl: "https://www.example.com",
+        eTag: "dummyetag",
         headers: {},
         integrity: "",
         lastDownloaded: new Date("2022-01-02T03:04:05.678Z"),
-        lastModified: null,
+        lastModified: new Date("2022-01-02T03:04:05.678Z"),
         name: "test1",
         path: "./data_files/test1/dummy.txt",
         postProcesses: ["encoding-utf-8"],
@@ -71,25 +71,25 @@ describe("ListAction", () => {
     assertSpyCall(consoleLogStub, 4, {
       args: [
         "  - Catalog URL       :",
-        Colors.green("null"),
+        Colors.green("https://www.example.com"),
       ],
     });
     assertSpyCall(consoleLogStub, 5, {
       args: [
         "  - Catalog resourceid:",
-        Colors.green("null"),
+        Colors.green("dummycatalogresourceid"),
       ],
     });
     assertSpyCall(consoleLogStub, 6, {
       args: [
         "  - Last modified     :",
-        Colors.green("null"),
+        Colors.green("2022-01-02T03:04:05.678Z"),
       ],
     });
     assertSpyCall(consoleLogStub, 7, {
       args: [
         "  - ETag              :",
-        Colors.green("null"),
+        Colors.green("dummyetag"),
       ],
     });
     assertSpyCall(consoleLogStub, 8, {
