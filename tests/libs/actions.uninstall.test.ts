@@ -135,4 +135,68 @@ describe("UninstallAction", () => {
       ],
     });
   });
+
+  it("runs with a name recorded in dim.json or dim-lock.json but not exist a directory", async () => {
+    const dimData: DimJSON = {
+      fileVersion: "1.1",
+      contents: [
+        {
+          name: "test1",
+          url: "https://example.com/dummy.test",
+          catalogUrl: null,
+          catalogResourceId: null,
+          postProcesses: [],
+          headers: {},
+        },
+      ],
+    };
+    const dimLockData: DimLockJSON = {
+      lockFileVersion: "1.1",
+      contents: [{
+        catalogResourceId: null,
+        catalogUrl: null,
+        eTag: null,
+        headers: {},
+        integrity: "",
+        lastDownloaded: new Date(),
+        lastModified: null,
+        name: "test1",
+        path: "./data_files/test1/dummy.txt",
+        postProcesses: ["encoding-utf-8"],
+        url: "https://example.com/dummy.txt",
+      }],
+    };
+    await Deno.writeTextFile(
+      DEFAULT_DIM_FILE_PATH,
+      JSON.stringify(dimData, null, 2),
+    );
+    await Deno.writeTextFile(
+      DEFAULT_DIM_LOCK_FILE_PATH,
+      JSON.stringify(dimLockData, null, 2),
+    );
+    Deno.mkdirSync("data_files/example", { recursive: true });
+    Deno.writeTextFileSync("./data_files/example/dummy.txt", "dummy");
+
+    await new UninstallAction().execute(undefined as void, "test1");
+
+    assertSpyCall(consoleLogStub, 0, {
+      args: [
+        Colors.green("Removed a content from the dim.json."),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 1, {
+      args: [
+        Colors.green(
+          "Removed a content from the dim-lock.json.",
+        ),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 2, {
+      args: [
+        Colors.red(
+          "Failed to remove a file './data_files/test1/dummy.txt'.",
+        ),
+      ],
+    });
+  }); 
 });
