@@ -100,7 +100,7 @@ export class UninstallAction {
       );
     } else {
       console.log(
-        Colors.red("Faild to remove. Not Found a content in the dim.json."),
+        Colors.red("Failed to remove. Not Found a content in the dim.json."),
       );
     }
     const dimLockFileAccessor = new DimLockFileAccessor();
@@ -113,7 +113,7 @@ export class UninstallAction {
     } else {
       console.log(
         Colors.red(
-          "Faild to remove. Not Found a content in the dim-lock.json.",
+          "Failed to remove. Not Found a content in the dim-lock.json.",
         ),
       );
     }

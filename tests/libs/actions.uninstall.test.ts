@@ -124,18 +124,18 @@ describe("UninstallAction", () => {
 
     assertSpyCall(consoleLogStub, 0, {
       args: [
-        Colors.red("Faild to remove. Not Found a content in the dim.json."),
+        Colors.red("Failed to remove. Not Found a content in the dim.json."),
       ],
     });
     assertSpyCall(consoleLogStub, 1, {
       args: [
         Colors.red(
-          "Faild to remove. Not Found a content in the dim-lock.json.",
+          "Failed to remove. Not Found a content in the dim-lock.json.",
         ),
       ],
     });
   });
-  it("runs with a path not founded in data_files and displays an error message.", async () => {
+  it("runs with a path not found in data_files and displays an error message.", async () => {
     const dimData: DimJSON = {
       fileVersion: "1.1",
       contents: [
