@@ -243,11 +243,13 @@ export class UpdateAction {
           Deno.exit(1);
         },
       );
-      console.log(
-        Colors.green(`Updated ${name}.`),
-        `\nFile path:`,
-        Colors.yellow(fullPath),
-      );
+      if (fullPath !== undefined) {
+        console.log(
+          Colors.green(`Updated ${name}.`),
+          `\nFile path:`,
+          Colors.yellow(fullPath),
+        );
+      }
     } else {
       await installFromDimFile(
         DEFAULT_DIM_FILE_PATH,
