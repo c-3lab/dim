@@ -75,6 +75,7 @@ export class InstallAction {
         console.log(Colors.red("Selecting other than json."));
         Deno.exit(1);
       });
+
       if (lockContentList !== undefined) {
         if (lockContentList.length != 0) {
           console.log(
@@ -100,7 +101,7 @@ export class UninstallAction {
       );
     } else {
       console.log(
-        Colors.red("Faild to remove. Not Found a content in the dim.json."),
+        Colors.red("Failed to remove. Not Found a content in the dim.json."),
       );
     }
     const dimLockFileAccessor = new DimLockFileAccessor();
@@ -113,7 +114,7 @@ export class UninstallAction {
     } else {
       console.log(
         Colors.red(
-          "Faild to remove. Not Found a content in the dim-lock.json.",
+          "Failed to remove. Not Found a content in the dim-lock.json.",
         ),
       );
     }
@@ -243,11 +244,13 @@ export class UpdateAction {
           Deno.exit(1);
         },
       );
-      console.log(
-        Colors.green(`Updated ${name}.`),
-        `\nFile path:`,
-        Colors.yellow(fullPath),
-      );
+      if (fullPath !== undefined) {
+        console.log(
+          Colors.green(`Updated ${name}.`),
+          `\nFile path:`,
+          Colors.yellow(fullPath),
+        );
+      }
     } else {
       await installFromDimFile(
         DEFAULT_DIM_FILE_PATH,

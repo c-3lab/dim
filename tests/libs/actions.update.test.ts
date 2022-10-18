@@ -253,6 +253,45 @@ describe("UpdateAction", () => {
       }
     });
 
+    it("exit with error when if the URL is incorrectly described.", async () => {
+      const kyGetStub = createKyGetStub("dummy", {
+        headers: {
+          "etag": '"12345-1234567890abc"',
+          "last-modified": "Thu, 3 Feb 2022 04:05:06 GMT",
+        },
+      });
+      const dimLockData = {
+        lockFileVersion: "1.1",
+        contents: [{
+          catalogResourceId: null,
+          catalogUrl: null,
+          eTag: "12345-1234567890abc",
+          headers: {},
+          integrity: "",
+          lastDownloaded: "2022-01-02T03:04:05.678Z",
+          lastModified: "2022-02-03T04:05:06.000Z",
+          name: "test1",
+          path: "./data_files/test1/dummy.txt",
+          postProcesses: ["encoding-utf-8"],
+          url: "invalid",
+        }],
+      };
+      try {
+        createEmptyDimJson();
+        await Deno.writeTextFile(
+          "./dim-lock.json",
+          JSON.stringify(dimLockData, null, 2),
+        );
+        await new UpdateAction().execute({ asyncInstall: false }, "test1");
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertSpyCall(consoleErrorStub, 0, {
+          args: [Colors.red("Failed to update."), Colors.red("Invalid URL")],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
     it("check whether the asyncinstall option update successfully", async () => {
       const kyGetStub = createKyGetStub("after", {
         headers: {
