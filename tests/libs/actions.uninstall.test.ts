@@ -9,10 +9,12 @@ import { fileExists, removeTemporaryFiles, temporaryDirectory } from "../helper.
 
 describe("UninstallAction", () => {
   let consoleLogStub: Stub;
+  let denoExitStub: Stub;
   let originalDirectory: string;
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
+    denoExitStub = stub(Deno, "exit");
     originalDirectory = Deno.cwd();
     Deno.chdir(temporaryDirectory);
   });
@@ -20,6 +22,7 @@ describe("UninstallAction", () => {
   afterEach(() => {
     removeTemporaryFiles();
     consoleLogStub.restore();
+    denoExitStub.restore();
     Deno.chdir(originalDirectory);
   });
 
@@ -79,6 +82,33 @@ describe("UninstallAction", () => {
       lockFileVersion: "1.1",
       contents: [],
     });
+  });
+  it("runs with a name when dim-lock.json does not exsist", async () => {
+    const dimData: DimJSON = {
+      fileVersion: "1.1",
+      contents: [
+        {
+          name: "test1",
+          url: "https://example.com/dummy.test",
+          catalogUrl: null,
+          catalogResourceId: null,
+          postProcesses: [],
+          headers: {},
+        },
+      ],
+    };
+    await Deno.writeTextFile(
+      DEFAULT_DIM_FILE_PATH,
+      JSON.stringify(dimData, null, 2),
+    );
+    await new UninstallAction().execute(undefined as void, "test1");
+    assertSpyCall(consoleLogStub, 0, {
+      args: [Colors.green("Removed a content from the dim.json.")],
+    });
+    assertSpyCall(consoleLogStub, 1, {
+      args: ["Not found a dim-lock.json"],
+    });
+    assertSpyCall(denoExitStub, 0, { args: [1] });
   });
 
   it("runs with a name not recorded in dim.json or dim-lock.json and displays an error message.", async () => {
