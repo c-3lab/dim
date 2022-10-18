@@ -946,6 +946,74 @@ describe("InstallAction", () => {
         kyGetStub.restore();
       }
     });
+    it("exits with error when if the URL is incorrectly described. ", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        const dimData: DimJSON = {
+          fileVersion: "1.1",
+          contents: [
+            {
+              name: "test1",
+              url: "invalid",
+              catalogUrl: null,
+              catalogResourceId: null,
+              postProcesses: [],
+              headers: {},
+            },
+          ],
+        };
+        await Deno.writeTextFile(
+          "./dim.json",
+          JSON.stringify(dimData, null, 2),
+        );
+        await new InstallAction().execute({ file: "./dim.json" }, undefined);
+        assertSpyCall(denoExitStub, 0, {
+          args: [1],
+        });
+        assertSpyCall(consoleErrorStub, 0, {
+          args: [
+            Colors.red("Failed to process."),
+            Colors.red("Invalid URL"),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+    it("exits with error when if the URL is incorrectly described and asynchronous installation. ", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        const dimData: DimJSON = {
+          fileVersion: "1.1",
+          contents: [
+            {
+              name: "test1",
+              url: "invalid",
+              catalogUrl: null,
+              catalogResourceId: null,
+              postProcesses: [],
+              headers: {},
+            },
+          ],
+        };
+        await Deno.writeTextFile(
+          "./dim.json",
+          JSON.stringify(dimData, null, 2),
+        );
+        await new InstallAction().execute({ file: "./dim.json", asyncInstall: true }, undefined);
+        assertSpyCall(denoExitStub, 0, {
+          args: [1],
+        });
+        assertSpyCall(consoleErrorStub, 0, {
+          args: [
+            Colors.red("Failed to process."),
+            Colors.red("Invalid URL"),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
 
     it("run with a difference in dim.json and dim-lock.json and check that the missing dim-lock.json is downloaded.", async () => {
       const kyGetStub = createKyGetStub("dummy", {

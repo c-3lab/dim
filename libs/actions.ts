@@ -75,6 +75,7 @@ export class InstallAction {
         console.log(Colors.red("Selecting other than json."));
         Deno.exit(1);
       });
+
       if (lockContentList !== undefined) {
         if (lockContentList.length != 0) {
           console.log(

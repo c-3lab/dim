@@ -168,7 +168,7 @@ export const installFromDimFile = async (
 
   const contentList: Content[] = [];
   if (lockContentList !== undefined) {
-    for (const lockContent of lockContentList) {
+    for (const lockContent of lockContentList.filter((c) => c !== undefined)) {
       contentList.push(
         {
           name: lockContent.name,
