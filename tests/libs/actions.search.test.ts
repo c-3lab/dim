@@ -245,6 +245,81 @@ describe("SearchAction", () => {
       }
     });
 
+    it("null check of xckan_description, license_title, resources.", async () => {
+      const data = Deno.readTextFileSync("../test_data/searchData2.json");
+      const kyStub = createKyGetStub(data);
+      try {
+        await new SearchAction().execute(
+          { number: 10 },
+          "避難所",
+        );
+
+        assertSpyCall(kyStub, 0, {
+          args: [
+            "https://search.ckan.jp/backend/api/package_search",
+            {
+              searchParams: new URLSearchParams(
+                {
+                  fq: `xckan_title:*避難所* OR tags:*避難所* OR x_ckan_description:*避難所*`,
+                  rows: "10",
+                },
+              ),
+            },
+          ],
+        });
+
+        assertSpyCall(consoleLogStub, 0, { args: ["catalog_title1"] });
+        assertSpyCall(consoleLogStub, 1, {
+          args: [
+            "  - Catalog URL        :",
+            Colors.green("https://example.com/catalog1"),
+          ],
+        });
+        assertSpyCall(consoleLogStub, 2, {
+          args: [
+            "  - Catalog Description:",
+            Colors.green(""),
+          ],
+        });
+        assertSpyCall(consoleLogStub, 3, {
+          args: [
+            "  - Catalog License    :",
+            Colors.green(""),
+          ],
+        });
+        assertSpyCall(consoleLogStub, 4, {
+          args: ["    1.", "name1-1"],
+        });
+        assertSpyCall(consoleLogStub, 5, {
+          args: [
+            "      * Resource URL        :",
+            Colors.green(""),
+          ],
+        });
+        assertSpyCall(consoleLogStub, 6, {
+          args: [
+            "      * Resource Description:",
+            Colors.green(""),
+          ],
+        });
+        assertSpyCall(consoleLogStub, 7, {
+          args: [
+            "      * Created             :",
+            Colors.green(""),
+          ],
+        });
+        assertSpyCall(consoleLogStub, 8, {
+          args: [
+            "      * Format              :",
+            Colors.green(""),
+          ],
+        });
+        assertSpyCall(consoleLogStub, 9, { args: [] });
+        } finally {
+        kyStub.restore();
+      }
+    });
+
     it("output results on the standard output when multiple keywords are specified.", async () => {
       const data = Deno.readTextFileSync("../test_data/searchData.json");
       const kyStub = createKyGetStub(data);

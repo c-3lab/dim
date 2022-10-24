@@ -186,7 +186,7 @@ export class ListAction {
         console.log(
           "  - Last modified     :",
           Colors.green(
-            content.lastModified === null ? "null" : content.lastDownloaded.toString(),
+            content.lastModified === null ? "null" : content.lastModified.toString(),
           ),
         );
         console.log(

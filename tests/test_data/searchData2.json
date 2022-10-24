@@ -1,0 +1,19 @@
+{
+  "result": {
+    "results": [{
+      "xckan_id": "catalog1",
+      "xckan_title": "catalog_title1",
+      "xckan_site_url": "https://example.com/catalog1",
+      "xckan_description": null,
+      "license_title": null,
+      "resources": [{
+        "description": null,
+        "created": null,
+        "url": null,
+        "format": null,
+        "name": "name1-1",
+        "id": "resource1-1"
+      }]
+    }]
+  }
+}

@@ -118,6 +118,101 @@ describe("ListAction", () => {
     });
   });
 
+  it("with catalogUrl, catalogResrceId, lastModified and eTag", async () => {
+    createEmptyDimJson();
+    const dimLockData: DimLockJSON = {
+      lockFileVersion: "1.1",
+      contents: [{
+        catalogResourceId: "0001",
+        catalogUrl: "https://example.com",
+        eTag: "12345-1234567890abc",
+        headers: {},
+        integrity: "",
+        lastDownloaded: new Date("2022-01-02T03:04:05.678Z"),
+        lastModified: new Date("2022-02-03T04:05:06.000Z"),
+        name: "test1",
+        path: "./data_files/test1/dummy.txt",
+        postProcesses: ["encoding-utf-8"],
+        url: "https://example.com/dummy.txt",
+      }],
+    };
+    await Deno.writeTextFile(
+      DEFAULT_DIM_LOCK_FILE_PATH,
+      JSON.stringify(dimLockData, null, 2),
+    );
+    await new ListAction().execute({});
+
+    assertSpyCall(consoleLogStub, 0, {
+      args: ["test1"],
+    });
+    assertSpyCall(consoleLogStub, 1, {
+      args: [
+        "  - URL               :",
+        Colors.green("https://example.com/dummy.txt"),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 2, {
+      args: [
+        "  - Name              :",
+        Colors.green("test1"),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 3, {
+      args: [
+        "  - File path         :",
+        Colors.green("./data_files/test1/dummy.txt"),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 4, {
+      args: [
+        "  - Catalog URL       :",
+        Colors.green("https://example.com"),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 5, {
+      args: [
+        "  - Catalog resourceid:",
+        Colors.green("0001"),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 6, {
+      args: [
+        "  - Last modified     :",
+        Colors.green("2022-02-03T04:05:06.000Z"),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 7, {
+      args: [
+        "  - ETag              :",
+        Colors.green("12345-1234567890abc"),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 8, {
+      args: [
+        "  - Last downloaded   :",
+        Colors.green("2022-01-02T03:04:05.678Z"),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 9, {
+      args: [
+        "  - Integrity         :",
+        Colors.green(""),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 10, {
+      args: [
+        "  - Post processes    :",
+        Colors.green("encoding-utf-8"),
+      ],
+    });
+    assertSpyCall(consoleLogStub, 11, {
+      args: [
+        "  - Headers           :",
+        Colors.green("{}"),
+      ],
+    });
+  });
+
   it("displays information on downloaded data without formatting.", async () => {
     createEmptyDimJson();
     const dimLockData: DimLockJSON = {
