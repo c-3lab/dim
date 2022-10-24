@@ -315,7 +315,7 @@ describe("SearchAction", () => {
           ],
         });
         assertSpyCall(consoleLogStub, 9, { args: [] });
-        } finally {
+      } finally {
         kyStub.restore();
       }
     });
