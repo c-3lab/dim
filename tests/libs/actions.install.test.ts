@@ -555,6 +555,56 @@ describe("InstallAction", () => {
       }
     });
 
+    it('convert downloaded file from xls to csv and record in dim.json and dim-lock.json when specify "xlsx-to-csv" as postProcesses', async () => {
+      createEmptyDimJson();
+      const testXlsx = Deno.readFileSync("../test_data/test.xls");
+      const kyGetStub = createKyGetStub(testXlsx);
+      try {
+        await new InstallAction().execute(
+          { name: "xlsx-to-csv", postProcesses: ["xlsx-to-csv"] },
+          "https://example.com/dummy.xls",
+        );
+        assert(fileExists("data_files/xlsx-to-csv/dummy.xls"));
+        const testData = Deno.readTextFileSync(
+          "data_files/xlsx-to-csv/dummy.csv",
+        );
+        assertEquals(testData, "a,b\nc,d\ne,f\n");
+        assertSpyCall(consoleLogStub, 0, { args: ["Convert xlsx to csv."] });
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "xlsx-to-csv",
+            postProcesses: ["xlsx-to-csv"],
+            url: "https://example.com/dummy.xls",
+          }],
+        });
+
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "xlsx-to-csv",
+            path: "./data_files/xlsx-to-csv/dummy.xls",
+            postProcesses: ["xlsx-to-csv"],
+            url: "https://example.com/dummy.xls",
+          }],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
     it('exit with error when specify "xlsx-to-csv a" as postProcesses and download', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
