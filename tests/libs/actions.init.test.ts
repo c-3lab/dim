@@ -36,5 +36,6 @@ describe("InitAction", () => {
       Deno.readTextFileSync("dim-lock.json"),
     );
     assertEquals(dimLockJson, { lockFileVersion: "1.1", contents: [] });
+    Deno.removeSync(temporaryDirectory, { recursive: true });
   });
 });
