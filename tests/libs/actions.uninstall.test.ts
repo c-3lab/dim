@@ -110,7 +110,7 @@ describe("UninstallAction", () => {
     });
     assertSpyCall(denoExitStub, 0, { args: [1] });
   });
-  
+
   it("runs with a name not recorded in dim.json or dim-lock.json and displays an error message.", async () => {
     const dimData: DimJSON = {
       fileVersion: "1.1",
