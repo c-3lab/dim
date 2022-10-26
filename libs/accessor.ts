@@ -8,7 +8,7 @@ import {
 import { Colors } from "../deps.ts";
 
 export class DimFileAccessor {
-  private dimJSON: DimJSON | undefined;
+  private dimJSON: DimJSON;
   constructor(path = DEFAULT_DIM_FILE_PATH) {
     try {
       Deno.statSync(path);
@@ -33,9 +33,6 @@ export class DimFileAccessor {
     );
   }
   async addContent(content: Content) {
-    if (this.dimJSON === undefined) {
-      return;
-    }
     const contents = this.dimJSON.contents;
     const contentIndex = this.dimJSON.contents.findIndex((c) => c.name === content.name);
     if (contentIndex !== -1) {
@@ -50,9 +47,6 @@ export class DimFileAccessor {
     });
   }
   async addContents(contents: Content[]) {
-    if (this.dimJSON === undefined) {
-      return;
-    }
     // Override the existing content.
     const currentContents = this.dimJSON.contents.filter((c) =>
       !contents.map((newContent) => newContent.name).includes(
@@ -89,7 +83,7 @@ export class DimFileAccessor {
 }
 
 export class DimLockFileAccessor {
-  private dimLockJSON: DimLockJSON | undefined;
+  private dimLockJSON: DimLockJSON;
   constructor() {
     try {
       Deno.statSync(DEFAULT_DIM_LOCK_FILE_PATH);
@@ -108,9 +102,6 @@ export class DimLockFileAccessor {
     );
   }
   async addContent(content: LockContent) {
-    if (this.dimLockJSON === undefined) {
-      return;
-    }
     const contents = this.dimLockJSON.contents;
     const contentIndex = this.dimLockJSON.contents.findIndex((c) => c.name === content.name);
     if (contentIndex !== -1) {
@@ -125,9 +116,6 @@ export class DimLockFileAccessor {
     });
   }
   async addContents(contents: LockContent[]) {
-    if (this.dimLockJSON === undefined) {
-      return;
-    }
     // Override the existing content.
     const currentContents = this.dimLockJSON.contents.filter((c) =>
       !contents.map((newContent) => newContent.name).includes(
