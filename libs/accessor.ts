@@ -63,9 +63,6 @@ export class DimFileAccessor {
     });
   }
   async removeContent(name: string) {
-    if (this.dimJSON === undefined) {
-      return;
-    }
     const contents = this.dimJSON.contents.filter((c) => c.name !== name);
     await this.writeToDimFile({
       fileVersion: DIM_FILE_VERSION,

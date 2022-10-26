@@ -110,15 +110,7 @@ describe("UninstallAction", () => {
     });
     assertSpyCall(denoExitStub, 0, { args: [1] });
   });
-
-  it("runs without dim.json and dim-lock.json", async () => {
-    await new UninstallAction().execute(undefined as void, "dummy");
-    assertSpyCall(consoleLogStub, 0, {
-      args: [Colors.red("Not found a dim.json. You should run a 'dim init'. ")],
-    });
-    assertSpyCall(denoExitStub, 0, { args: [1] });
-  });
-
+  
   it("runs with a name not recorded in dim.json or dim-lock.json and displays an error message.", async () => {
     const dimData: DimJSON = {
       fileVersion: "1.1",
