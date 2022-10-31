@@ -23,7 +23,7 @@ export { ky };
 
 export type { KyResponse, ResponsePromise } from "https://cdn.skypack.dev/ky@0.31.0?dts";
 
-export { Confirm, Input, Number } from "https://deno.land/x/cliffy@v0.24.2/prompt/mod.ts";
+export { Confirm, Input, Number } from "https://deno.land/x/cliffy@v0.25.4/prompt/mod.ts";
 
 export const zipWrapper = {
   decompress: _decompress,
