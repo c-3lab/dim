@@ -138,16 +138,14 @@ export class UninstallAction {
 export class CleanAction {
   async execute() {
     try {
-      // Clean
+      // Delete the data_files directory.
       await Deno.removeSync(DEFAULT_DATAFILES_PATH, { recursive: true });
-      console.log(Colors.green("Successfully cleaned."));
-      console.log("Deleted ./data_files");
 
-      // Initialize
+      // Initialize the project.
       await createDataFilesDir();
       await initDimFile();
       await initDimLockFile();
-      console.log(Colors.green("Initialized the project for the dim."));
+      console.log(Colors.green("Successfully cleaned."));
     } catch (error) {
       console.log(Colors.red("Failed to delete ./data_files"));
       console.log(error);
