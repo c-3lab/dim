@@ -1,5 +1,13 @@
 import { Command, CompletionsCommand, GithubProvider, HelpCommand, UpgradeCommand } from "./deps.ts";
-import { InitAction, InstallAction, ListAction, SearchAction, UninstallAction, UpdateAction } from "./libs/actions.ts";
+import {
+  CleanAction,
+  InitAction,
+  InstallAction,
+  ListAction,
+  SearchAction,
+  UninstallAction,
+  UpdateAction,
+} from "./libs/actions.ts";
 import { NAME, VERSION } from "./libs/consts.ts";
 
 await new Command()
@@ -57,6 +65,14 @@ await new Command()
           "Specify the data name.",
       )
       .action(new UninstallAction().execute),
+  )
+  .command(
+    "clean",
+    new Command()
+      .description(
+        "Delete only data_files and init the project.",
+      )
+      .action(new CleanAction().execute),
   )
   .command(
     "list",

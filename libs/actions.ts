@@ -1,5 +1,5 @@
 import { Colors } from "../deps.ts";
-import { DEFAULT_DIM_FILE_PATH } from "./consts.ts";
+import { DEFAULT_DATAFILES_PATH, DEFAULT_DIM_FILE_PATH } from "./consts.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
 import { createDataFilesDir, initDimFile, initDimLockFile } from "./action_helper/initializer.ts";
@@ -131,6 +131,26 @@ export class UninstallAction {
         );
       }
       // TODO: Remove an empty direcotory
+    }
+  }
+}
+
+export class CleanAction {
+  async execute() {
+    try {
+      // Clean
+      await Deno.removeSync(DEFAULT_DATAFILES_PATH, { recursive: true });
+      console.log(Colors.green("Successfully cleaned."));
+      console.log("Deleted ./data_files");
+
+      // Initialize
+      await createDataFilesDir();
+      await initDimFile();
+      await initDimLockFile();
+      console.log(Colors.green("Initialized the project for the dim."));
+    } catch (error) {
+      console.log(Colors.red("Failed to delete ./data_files"));
+      console.log(error);
     }
   }
 }

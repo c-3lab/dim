@@ -3,6 +3,7 @@
 data_files
 dim.json
 dim-lock.json
+deno.lock
 
 # Test results
 tests/coverage
