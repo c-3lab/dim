@@ -244,6 +244,14 @@ Update the specified data.
 $ dim update [name]
 ```
 
+## Clean
+
+Clean the project. Delete the data_files and init the project.
+
+```
+$ dim clean
+```
+
 ## [Search](doc/en/search.md)
 
 Search data from package_search CKAN API.
