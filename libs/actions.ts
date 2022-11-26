@@ -139,7 +139,7 @@ export class CleanAction {
   async execute() {
     try {
       // Delete the data_files directory.
-      await Deno.removeSync(DEFAULT_DATAFILES_PATH, { recursive: true });
+      Deno.removeSync(DEFAULT_DATAFILES_PATH, { recursive: true });
 
       // Initialize the project.
       await createDataFilesDir();
