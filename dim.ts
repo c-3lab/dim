@@ -1,5 +1,13 @@
 import { Command, CompletionsCommand, GithubProvider, HelpCommand, UpgradeCommand } from "./deps.ts";
-import { InitAction, InstallAction, ListAction, SearchAction, UninstallAction, UpdateAction, CleanAction } from "./libs/actions.ts";
+import {
+  CleanAction,
+  InitAction,
+  InstallAction,
+  ListAction,
+  SearchAction,
+  UninstallAction,
+  UpdateAction,
+} from "./libs/actions.ts";
 import { NAME, VERSION } from "./libs/consts.ts";
 
 await new Command()
@@ -44,7 +52,7 @@ await new Command()
       )
       .description(
         "Install the data.\n" +
-        "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",
+          "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",
       )
       .action(new InstallAction().execute),
   )
@@ -54,7 +62,7 @@ await new Command()
       .arguments("<name:string>")
       .description(
         "Uninstall the data.\n" +
-        "Specify the data name.",
+          "Specify the data name.",
       )
       .action(new UninstallAction().execute),
   )
@@ -62,7 +70,7 @@ await new Command()
     "clean",
     new Command()
       .description(
-        "Delete only data_files and init the project."
+        "Delete only data_files and init the project.",
       )
       .action(new CleanAction().execute),
   )

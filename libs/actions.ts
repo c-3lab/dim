@@ -1,5 +1,5 @@
 import { Colors } from "../deps.ts";
-import { DEFAULT_DIM_FILE_PATH, DEFAULT_DATAFILES_PATH } from "./consts.ts";
+import { DEFAULT_DATAFILES_PATH, DEFAULT_DIM_FILE_PATH } from "./consts.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
 import { createDataFilesDir, initDimFile, initDimLockFile } from "./action_helper/initializer.ts";
@@ -148,14 +148,12 @@ export class CleanAction {
       await initDimFile();
       await initDimLockFile();
       console.log(Colors.green("Initialized the project for the dim."));
-
     } catch (error) {
       console.log(Colors.red("Failed to delete ./data_files"));
       console.log(error);
     }
   }
 }
-
 
 export class ListAction {
   execute(
