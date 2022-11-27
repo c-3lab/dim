@@ -25,6 +25,8 @@ export type { KyResponse, ResponsePromise } from "https://cdn.skypack.dev/ky@0.3
 
 export { Confirm, Input, Number } from "https://deno.land/x/cliffy@v0.25.4/prompt/mod.ts";
 
+export { Sha1 } from "https://deno.land/std@0.146.0/hash/sha1.ts";
+
 export const zipWrapper = {
   decompress: _decompress,
 };
