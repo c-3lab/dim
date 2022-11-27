@@ -1,4 +1,4 @@
-import { Colors, Confirm, Input, ky, Number } from "../../deps.ts";
+import { Colors, Confirm, Input, ky, Number, Sha1 } from "../../deps.ts";
 import { DEFAULT_DIM_LOCK_FILE_PATH, ENCODINGS } from "../consts.ts";
 import { Downloader } from "../downloader.ts";
 import { ConsoleAnimation } from "../console_animation.ts";
@@ -35,7 +35,7 @@ export const installFromURL = async (
     lastModified: null,
     eTag: null,
     lastDownloaded: new Date(),
-    integrity: "",
+    integrity: getIntegrity(result.fullPath),
     postProcesses: postProcesses || [],
     headers,
   };
@@ -97,7 +97,7 @@ const getInstallList = (contents: Content[]) => {
             lastModified: lastModified,
             eTag: headers.get("etag")?.replace(/^"(.*)"$/, "$1") ?? null,
             lastDownloaded: new Date(),
-            integrity: "",
+            integrity: getIntegrity(fullPath),
             postProcesses: content.postProcesses,
             headers: content.headers,
           });
@@ -197,6 +197,13 @@ const executePostprocess = async (
     const [type, ...argumentList] = postProcess.split(" ");
     await postprocessDispatcher.dispatch(type, argumentList, targetPath);
   }
+};
+
+const getIntegrity = function (
+  targetPath: string,
+): string {
+  const byteArray = Deno.readFileSync(targetPath);
+  return new Sha1().update(byteArray).toString();
 };
 
 export const parseHeader = function (
