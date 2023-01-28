@@ -6,7 +6,7 @@ export class CsvToJsonConverter extends BasePostprocess {
   async execute(_: string[], targetPath: string): Promise<string> {
     const text = await Deno.readTextFile(targetPath);
     const result = await parse(text, { skipFirstRow: true });
-    await Deno.writeTextFileSync(targetPath.replace(/\.csv?$/, ".json"), JSON.stringify(result));
+    Deno.writeTextFileSync(targetPath.replace(/\.csv?$/, ".json"), JSON.stringify(result));
     return targetPath;
   }
   validate(argumentList: string[]) {
