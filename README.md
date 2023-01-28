@@ -180,6 +180,12 @@ Postprocess xlsx-to-csv
 $ dim install https://example.com -n "example" -p xlsx-to-csv
 ```
 
+Postprocess csv-to-json
+
+```
+$ dim install https://example.com -n "example" -p csv-to-json
+```
+
 Postprocess custom command
 
 You can specify a custom command after **"cmd"**.
