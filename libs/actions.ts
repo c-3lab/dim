@@ -284,7 +284,7 @@ export class UpdateAction {
 
 export class SearchAction {
   async execute(
-    options: { number: number; install?: boolean },
+    options: { number: number; install?: boolean; type?: string },
     keyword: string,
   ) {
     if (options.number <= 0 || options.number > 100) {
@@ -307,6 +307,11 @@ export class SearchAction {
     }
 
     const catalogs = response.result.results;
+
+    if (!options.install && options.type === "json") {
+      console.log(catalogs);
+      return;
+    }
 
     let i = 1;
     for (const catalog of catalogs) {
