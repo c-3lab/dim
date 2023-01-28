@@ -345,22 +345,30 @@ $ git clone https://github.com/c-3lab/dim.git
 $ cd dim
 ```
 
-4. testing
-
-```
-$ deno test -A
-```
-
-5. Run the dim commands
+3. Run the dim commands
 
 ```
 $ deno run -A dim.ts install https://xxxxxx/data.json
 ```
 
-6. Install dim
+4. Install dim
 
 ```
 $ deno install --unstable --allow-read --allow-write --allow-run --allow-net dim.ts
+```
+
+# Run test and display coverage
+
+1. Run test
+
+```
+$ deno test -A --coverage=tests/coverage
+```
+
+2. Display coverage
+
+```
+$ deno coverage ./tests/coverage
 ```
 
 # Upgrade the dim version
