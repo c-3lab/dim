@@ -605,6 +605,31 @@ describe("InstallAction", () => {
       }
     });
 
+    it('exit with error when specify "xlsx-to-csv a" as postProcesses and download', async () => {
+      createEmptyDimJson();
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        await new InstallAction().execute(
+          { name: "xlsx-to-csva", postProcesses: ["xlsx-to-csv a"] },
+          "https://example.com/dummy.xlsx",
+        );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assert(fileExists("data_files/xlsx-to-csva/dummy.xlsx"));
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.red(
+              "error: Too many arguments:",
+            ),
+            Colors.red(
+              "xlsx-to-csv a",
+            ),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
     it('convert downloaded file from csv to json and record in dim.json and dim-lock.json when specify "csv-to-json" as postProcess', async () => {
       createEmptyDimJson();
       const textCsv = Deno.readFileSync("../test_data/valid_csv.csv");
@@ -655,26 +680,22 @@ describe("InstallAction", () => {
       }
     });
 
-    it('exit with error when specify "xlsx-to-csv a" as postProcesses and download', async () => {
+    it('exit with error when specify "csv-to-json a" as postProcess and download', async () => {
       createEmptyDimJson();
       const kyGetStub = createKyGetStub("dummy");
       try {
         await new InstallAction().execute(
-          { name: "xlsx-to-csva", postProcesses: ["xlsx-to-csv a"] },
-          "https://example.com/dummy.xlsx",
+          { name: "csv-to-jsona", postProcesses: ["csv-to-json a"] },
+          "https://example.com/dummy.csv",
         );
         assertSpyCall(denoExitStub, 0, { args: [1] });
-        assert(fileExists("data_files/xlsx-to-csva/dummy.xlsx"));
         assertSpyCall(consoleLogStub, 0, {
           args: [
-            Colors.red(
-              "error: Too many arguments:",
-            ),
-            Colors.red(
-              "xlsx-to-csv a",
-            ),
+            Colors.red("error: Too many arguments:"),
+            Colors.red("csv-to-json a"),
           ],
         });
+        assert(fileExists("data_files/csv-to-jsona/dummy.csv"));
       } finally {
         kyGetStub.restore();
       }
