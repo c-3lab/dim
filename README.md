@@ -322,9 +322,11 @@ Installed to ./data_files/131105_東京都_目黒区_大地震時における地
 $ dim help
 ```
 
-# Build the dim from Deno install
+# Run the dim using Deno
 
 1. Install Deno
+
+* Deno >= 1.27.0
 
 ```
 $ curl -fsSL https://deno.land/install.sh | sh
@@ -343,7 +345,19 @@ $ git clone https://github.com/c-3lab/dim.git
 $ cd dim
 ```
 
-3. Install dim
+4. testing
+
+```
+$ deno test -A
+```
+
+5. Run the dim commands
+
+```
+$ deno run -A dim.ts install https://xxxxxx/data.json
+```
+
+6. Install dim
 
 ```
 $ deno install --unstable --allow-read --allow-write --allow-run --allow-net dim.ts
