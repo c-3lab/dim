@@ -3,16 +3,19 @@ import { Command } from "./command.ts";
 import { Encoder } from "./encoder.ts";
 import { Unzipper } from "./unzipper.ts";
 import { XlsxToCsvConverter } from "./xlsx_to_csv_converter.ts";
+import { CsvToJsonConverter } from "./csv_to_json_converter.ts";
 
 export class PostprocessDispatcher {
   private encoder;
   private unzipper;
   private xlsxToCsvConverter;
+  private csvToJsonConverter;
   private command;
   constructor() {
     this.encoder = new Encoder("encode", ["encoding-to"]);
     this.unzipper = new Unzipper("unzip", []);
     this.xlsxToCsvConverter = new XlsxToCsvConverter("xlsx-to-csv", []);
+    this.csvToJsonConverter = new CsvToJsonConverter("csv-to-json", []);
     this.command = new Command("cmd", ["script"]);
   }
   async dispatch(type: string, argumentList: string[], targetPath: string) {
@@ -35,6 +38,13 @@ export class PostprocessDispatcher {
       if (this.xlsxToCsvConverter.validate(argumentList)) {
         await this.xlsxToCsvConverter.execute([], targetPath);
         console.log(`Convert xlsx to csv.`);
+      } else {
+        Deno.exit(1);
+      }
+    } else if (type === this.csvToJsonConverter.type) {
+      if (this.csvToJsonConverter.validate(argumentList)) {
+        await this.csvToJsonConverter.execute([], targetPath);
+        console.log('Convert csv to json.');
       } else {
         Deno.exit(1);
       }
