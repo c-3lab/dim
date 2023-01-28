@@ -44,7 +44,7 @@ export class PostprocessDispatcher {
     } else if (type === this.csvToJsonConverter.type) {
       if (this.csvToJsonConverter.validate(argumentList)) {
         await this.csvToJsonConverter.execute([], targetPath);
-        console.log('Convert csv to json.');
+        console.log("Convert csv to json.");
       } else {
         Deno.exit(1);
       }
