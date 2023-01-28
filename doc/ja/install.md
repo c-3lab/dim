@@ -35,6 +35,7 @@ dim では -n オプションで指定された名称が、既存の名称と重
 | unzip               | ダウンロードしたzipファイルを`data_files/<name>`配下に解凍する。 エエン                                                                   |
 | encode \<encoding\> | ダウンロードしたファイルの文字コードを変更する。<br>対応エンコーディング：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
 | xlsx-to-csv         | ダウンロードしたxlsxファイルをcsvファイルに変換したファイルを、`data_files/<name>`配下に生成する。                                                    |
+| csv-to-json         | ダウンロードしたcsvファイルをjsonファイルに変換したファイルを、`data_files/<name>`配下に生成する。                                                    |
 | cmd \<command\>     | ダウンロードしたファイルのパスを引数としてコマンドを実行する。                                                                                   |
 
 #### -H, --headers \<header\>
@@ -63,6 +64,9 @@ dim install -n example -p "encode Shift_JIS" https://example.com/example.txt
 
 # ダウンロードしたxlsxファイルをcsvファイルに変換する。
 dim install -n example -p "xlsx-to-csv" https://example.com/example.xlsx
+
+# ダウンロードしたcsvファイルをjsonファイルに変換する。
+dim install -n example -p "csv-to-json" https://example.com/example.csv
 
 # ファイルをダウンロード後に、独自のpythonプログラムを実行する。
 dim install -n example -p "cmd python ./tests/test_custom_command.py" https://example.com/example.xlsx

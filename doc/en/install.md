@@ -37,6 +37,7 @@ Specify post-processing for downloaded files.\
 | unzip               | Unzip the zip file downloaded on `data_files/<name>`.                                                                                                  |
 | encode \<encoding\> | Change the character encoding of the downloaded file.<br>Supported encoding：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
 | xlsx-to-csv         | Convert the downloaded xlsx file to a csv file, and store in `data_files/<name>`.                                                                      |
+| csv-to-json         | Convert the downloaded csv file to a json file, and store in `data_files/<name>`.                                                                      |
 | cmd \<command\>     | Execute the command with the path of the downloaded file as an argument.                                                                               |
 
 #### -H, --headers \<header\>
@@ -65,6 +66,9 @@ dim install -n example -p "encode Shift_JIS" https://example.com/example.txt
 
 # Convert the downloaded xlsx file to a csv file.
 dim install -n example -p "xlsx-to-csv" https://example.com/example.xlsx
+
+# Convert the downloaded csv file to a json file.
+dim install -n example -p "csv-to-json" https://example.com/example.csv
 
 # After downloading the file, run your python program.
 dim install -n example -p "cmd python ./tests/test_custom_command.py" https://example.com/example.xlsx
