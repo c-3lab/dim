@@ -332,7 +332,7 @@ $ dim help
 
 1. Install Deno
 
-- Deno >= 1.27.0
+- Deno == 1.28.2
 
 ```
 $ curl -fsSL https://deno.land/install.sh | sh
