@@ -27,6 +27,8 @@ export { Confirm, Input, Number } from "https://deno.land/x/cliffy@v0.25.4/promp
 
 export { Sha1 } from "https://deno.land/std@0.146.0/hash/sha1.ts";
 
+export { parse } from "https://deno.land/std@0.174.0/encoding/csv.ts";
+
 export const zipWrapper = {
   decompress: _decompress,
 };
