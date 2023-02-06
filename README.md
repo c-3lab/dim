@@ -331,8 +331,8 @@ etc..
 
 
 
-Set APIKey of OpenAI to `OPENAI_API_KEY`.\
-OpenAI URL: https://platform.openai.com/account/api-keys
+Export APIKey of OpenAI to `OPENAI_API_KEY`.\
+Get APIKey URL: https://platform.openai.com/account/api-keys
 
 ```
 $ export OPENAI_API_KEY=xxxxxxxxxxxxxxxxxxxxx
@@ -341,13 +341,43 @@ $ export OPENAI_API_KEY=xxxxxxxxxxxxxxxxxxxxx
 Combine the specified target data and prompt, send it to ChatGPT, output the code, and save it.
 
 ```
-$ dim generate -t "./data.csv" "python code that convert this csv data to geojson"
+$ dim generate -t "./data.csv" "Python code that converts this csv data to geojson"
 ```
 
 Specify the data name managed by dim using `-t`
 
 ```
-$ dim generate -t "shelter" "python code that convert this csv data to geojson"
+$ dim generate -t "shelter" "Python code that converts this csv data to geojson"
+```
+
+### Example prompt List
+
+```
+Python code that converts this csv data to geojson
+```
+
+```
+Python code that remove id column from this csv data
+```
+
+```
+Python code that visualizes this csv data as a map
+```
+
+```
+Python code that visualizes this csv data as a map
+```
+
+```
+Python code that visualizes this csv data as HTML page
+```
+
+```
+Python code that saves this csv data to PostgreSQL
+```
+
+```
+Python code that converts full-width numbers in this csv file to half-width numbers
 ```
 
 ## [Help](doc/en/help.md)
