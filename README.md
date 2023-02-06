@@ -20,7 +20,7 @@ We are looking for members to develop together as an open source community.
 - 🔧 Prepare all open data needed for the project in one command by using the `dim.json` recorded by someone else
 - 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
 - 🔍 Search open-data from CKAN
-- 🧠 Generate code to process data using **ChatGPT**
+- 🧠 Generate code to process data using **GPT-3**
 
 # Document
 
@@ -325,7 +325,7 @@ Installed to ./data_files/131105_東京都_目黒区_大地震時における地
 
 ## [Generate](doc/en/generate.md)
 
-Auto-generate code about target data using **ChatGPT**. For example, conversion processing, visualization processing,
+Auto-generate code about target data using **GPT-3**. For example, conversion processing, visualization processing,
 etc..
 <img src="https://user-images.githubusercontent.com/6661165/216978343-0c1cbedb-e709-4501-8068-deca12e805b0.gif" width=800 />
 
@@ -337,7 +337,7 @@ $ export OPENAI_API_KEY=xxxxxxxxxxxxxxxxxxxxx
 
 You can get APIKey URL: https://platform.openai.com/account/api-keys
 
-Combine the specified target data and prompt, send it to ChatGPT, output the code, and save it.
+Combine the specified target data and prompt, send it to GPT-3 API, output the code, and save it.
 
 ```
 $ dim generate -t "./data.csv" "Python code that converts this csv data to geojson"
