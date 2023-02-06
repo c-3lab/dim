@@ -1,6 +1,7 @@
 import { Command, CompletionsCommand, GithubProvider, HelpCommand, UpgradeCommand } from "./deps.ts";
 import {
   CleanAction,
+  GenerateAction,
   InitAction,
   InstallAction,
   ListAction,
@@ -128,6 +129,23 @@ await new Command()
       .arguments("<keyword:string>")
       .description("Search data from package_search CKAN API")
       .action(new SearchAction().execute),
+  )
+  .command(
+    "generate",
+    new Command()
+      .option(
+        "-t, --target <target:string>",
+        "Specify the target data name or file path to send to ChatGPT.",
+      )
+      .option(
+        "-o, --output <output:string>",
+        "Specify to output file path of generated post-process.",
+      )
+      .arguments("<prompt:string>")
+      .description(
+        "Auto-generate code about target data using ChatGPT. \nFor example, conversion processing, visualization processing, etc.",
+      )
+      .action(new GenerateAction().execute),
   )
   .command("help", new HelpCommand())
   .command("complete", new CompletionsCommand())

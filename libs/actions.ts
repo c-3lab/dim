@@ -1,9 +1,11 @@
-import { Colors } from "../deps.ts";
+import { Colors, Confirm, Input } from "../deps.ts";
 import { DEFAULT_DATAFILES_PATH, DEFAULT_DIM_FILE_PATH } from "./consts.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
 import { createDataFilesDir, initDimFile, initDimLockFile } from "./action_helper/initializer.ts";
 import { installFromDimFile, installFromURL, interactiveInstall, parseHeader } from "./action_helper/installer.ts";
+import { ChatGPTClient } from "./chatgpt_client.ts";
+import { ConsoleAnimation } from "./console_animation.ts";
 
 export class InitAction {
   async execute() {
@@ -361,5 +363,71 @@ export class SearchAction {
     console.log(
       Colors.green(`Installed to ${fullPath}`),
     );
+  }
+}
+
+export class GenerateAction {
+  async execute(
+    options: { target?: string; output?: string },
+    prompt: string,
+  ) {
+    const dimLockFileAccessor = new DimLockFileAccessor();
+    let target = options.target;
+    const dataNameList = dimLockFileAccessor.getContents().map((c) => c.name);
+    if (!target) {
+      target = await Input.prompt({
+        message: "Enter the target data name or file path to send to ChatGPT.",
+        hint: `${dataNameList.join(", ").slice(0, 50)}... or target file path])`,
+        suggestions: dataNameList,
+        validate: (text) => {
+          return text !== "";
+        },
+      });
+    }
+    const content = dimLockFileAccessor.getContents().find((c) => c.name === target);
+    let targetData;
+    try {
+      if (content) {
+        targetData = Deno.readTextFileSync(content.path);
+      } else {
+        targetData = Deno.readTextFileSync(options.target!);
+      }
+    } catch {
+      console.log(
+        Colors.red("Not found a target file."),
+      );
+      Deno.exit(1);
+    }
+    const consoleAnimation = new ConsoleAnimation(
+      ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
+      `Generate a code ...`,
+    );
+    consoleAnimation.start(100);
+    const response = await new ChatGPTClient().request(`${targetData}\n${prompt}`);
+    if (!response) {
+      return;
+    }
+    const code = response.data.choices[0].text;
+    consoleAnimation.stop();
+    console.log(`${code}\n\n`);
+
+    const isHit = await Confirm.prompt({
+      message: "Hit to save the file.",
+      default: true,
+    });
+    if (!isHit) {
+      return;
+    }
+    if (!options.output) {
+      const output = await Input.prompt({
+        message: "Enter a output file path.",
+        validate: (text) => {
+          return text !== "";
+        },
+      });
+      Deno.writeTextFileSync(output, code!);
+    } else {
+      Deno.writeTextFileSync(options.output!, code!);
+    }
   }
 }
