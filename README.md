@@ -329,12 +329,12 @@ Auto-generate code about target data using **ChatGPT**. For example, conversion 
 etc..
 <img src="https://user-images.githubusercontent.com/6661165/216978343-0c1cbedb-e709-4501-8068-deca12e805b0.gif" width=800 />
 
-Export APIKey of OpenAI to `OPENAI_API_KEY`.\
-Get APIKey URL: https://platform.openai.com/account/api-keys
+Export APIKey of OpenAI to `OPENAI_API_KEY`.
 
 ```
 $ export OPENAI_API_KEY=xxxxxxxxxxxxxxxxxxxxx
 ```
+You can get APIKey URL: https://platform.openai.com/account/api-keys
 
 Combine the specified target data and prompt, send it to ChatGPT, output the code, and save it.
 
