@@ -334,6 +334,7 @@ Export APIKey of OpenAI to `OPENAI_API_KEY`.
 ```
 $ export OPENAI_API_KEY=xxxxxxxxxxxxxxxxxxxxx
 ```
+
 You can get APIKey URL: https://platform.openai.com/account/api-keys
 
 Combine the specified target data and prompt, send it to ChatGPT, output the code, and save it.
