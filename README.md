@@ -328,7 +328,7 @@ Installed to ./data_files/131105_東京都_目黒区_大地震時における地
 Auto-generate code about target data using **ChatGPT**. For example, conversion processing, visualization processing,
 etc..
 
-Set APIKey of OpenAI to `OPENAI_API_KEY`.  
+Set APIKey of OpenAI to `OPENAI_API_KEY`.\
 OpenAI URL: https://platform.openai.com/account/api-keys
 
 ```
