@@ -1,7 +1,7 @@
 import { Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
 import { resolve } from "https://deno.land/std@0.152.0/path/mod.ts";
 import { ky } from "../deps.ts";
-import axios, { AxiosResponse } from "npm:axios@0.26";
+import axios, { AxiosError, AxiosResponse } from "npm:axios@0.26";
 
 const currentDirectory = new URL(".", import.meta.url).pathname;
 export const temporaryDirectory = resolve(currentDirectory, "temporary") + "/";
@@ -37,14 +37,23 @@ export const createAxiosStub = () => {
 
 export const createErrorAxiosStub = () => {
   const generatedCode = Deno.readTextFileSync("../test_data/generated_code.py");
-  const response: AxiosResponse = {
-    data: { id: "", object: "", created: 0, model: "", choices: [{ text: generatedCode }] },
-    status: 200,
-    statusText: "",
-    headers: {},
+  const error: AxiosError = {
+    name: "",
+    message: "",
+    response: {
+      data: { error: { message: "" }, id: "", object: "", created: 0, model: "", choices: [{ text: generatedCode }] },
+      status: 400,
+      statusText: "",
+      headers: {},
+      config: {},
+    },
+    isAxiosError: true,
     config: {},
+    toJSON: () => {
+      return [];
+    },
   };
-  return stub(axios.default, "request", () => Promise.reject(response));
+  return stub(axios.default, "request", () => Promise.reject(error));
 };
 
 export const removeTemporaryFiles = () => {
