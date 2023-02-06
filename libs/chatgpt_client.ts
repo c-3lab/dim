@@ -27,7 +27,7 @@ export class ChatGPTClient {
             max_tokens: 1024,
             temperature: 0,
           },
-          timeout: 30000,
+          timeout: false,
         },
       ).json<OpenAICompletionsResponse>();
     } catch (error) {
