@@ -392,9 +392,9 @@ export class GenerateAction {
       } else {
         targetData = Deno.readTextFileSync(target!);
       }
-    } catch {
+    } catch (e) {
       console.log(
-        Colors.red("Not found a target file."),
+        Colors.red(e.message)
       );
       Deno.exit(1);
     }

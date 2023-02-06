@@ -32,8 +32,7 @@ export class ChatGPTClient {
       ).json<OpenAICompletionsResponse>();
     } catch (error) {
       console.error(
-        Colors.red(error.message),
-        Colors.yellow(`\nThe problem may be improved by temporarily reducing the number of target data.`),
+        Colors.red(`\n${error.message}`),
       );
       Deno.exit(1);
     }
