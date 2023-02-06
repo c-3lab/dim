@@ -20,6 +20,7 @@ We are looking for members to develop together as an open source community.
 - 🔧 Prepare all open data needed for the project in one command by using the `dim.json` recorded by someone else
 - 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
 - 🔍 Search open-data from CKAN
+- 🧠 Generate code to process data using **ChatGPT**
 
 # Document
 
@@ -320,6 +321,21 @@ $ dim search -i "東京 避難所"
 ? Is there a post-processing you would like to add next? (Y/n) > No
 Convert xlsx to csv.
 Installed to ./data_files/131105_東京都_目黒区_大地震時における地域避難所_大地震時における地域避難所/131105evacuationspace.xlsx
+```
+
+## [Generate](doc/en/generate.md)
+
+Auto-generate code about target data using **ChatGPT**. For example, conversion processing, visualization processing, etc..
+
+Combine the specified target data and prompt, send it to ChatGPT, output the code, and save it.
+
+```
+$ dim generate -t "./data.csv" "python code that convert this csv data to geojson"
+```
+specify the data name managed by dim for `-t`
+
+```
+$ dim generate -t "shelter" "python code that convert this csv data to geojson"
 ```
 
 ## [Help](doc/en/help.md)
