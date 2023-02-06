@@ -334,7 +334,7 @@ Combine the specified target data and prompt, send it to ChatGPT, output the cod
 $ dim generate -t "./data.csv" "python code that convert this csv data to geojson"
 ```
 
-specify the data name managed by dim for `-t`
+Specify the data name managed by dim using `-t`
 
 ```
 $ dim generate -t "shelter" "python code that convert this csv data to geojson"
