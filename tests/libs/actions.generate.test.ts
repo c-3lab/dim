@@ -52,7 +52,7 @@ describe("GenerateAction", () => {
       "python code that convert this csv data to geojson",
     );
     const code = Deno.readTextFileSync("example.py");
-    assertEquals(code, '\n\nThis is indeed a test');
+    assertEquals(code, "\n\nThis is indeed a test");
     kyPostStub.restore();
     confirmStub.restore();
   });
@@ -106,7 +106,7 @@ describe("GenerateAction", () => {
       "python code that convert this csv data to geojson",
     );
     const code = Deno.readTextFileSync("example.py");
-    assertEquals(code, '\n\nThis is indeed a test');
+    assertEquals(code, "\n\nThis is indeed a test");
     kyPostStub.restore();
     confirmStub.restore();
   });
@@ -168,7 +168,7 @@ describe("GenerateAction", () => {
       "python code that convert this csv data to geojson",
     );
     const code = Deno.readTextFileSync("example.py");
-    assertEquals(code, '\n\nThis is indeed a test');
+    assertEquals(code, "\n\nThis is indeed a test");
     kyPostStub.restore();
     inputStub.restore();
     confirmStub.restore();

@@ -67,7 +67,6 @@ export interface CatalogResource {
 }
 
 export interface OpenAICompletionsResponse {
-
   id: string;
   object: string;
   created: number;
@@ -77,10 +76,10 @@ export interface OpenAICompletionsResponse {
     index: number;
     logprobs?: number | null;
     finish_reason: string;
-  }],
+  }];
   usage: {
     prompt_tokens: number;
     completion_tokens: number;
     total_tokens: number;
-  }
+  };
 }
