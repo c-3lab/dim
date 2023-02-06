@@ -325,13 +325,15 @@ Installed to ./data_files/131105_東京都_目黒区_大地震時における地
 
 ## [Generate](doc/en/generate.md)
 
-Auto-generate code about target data using **ChatGPT**. For example, conversion processing, visualization processing, etc..
+Auto-generate code about target data using **ChatGPT**. For example, conversion processing, visualization processing,
+etc..
 
 Combine the specified target data and prompt, send it to ChatGPT, output the code, and save it.
 
 ```
 $ dim generate -t "./data.csv" "python code that convert this csv data to geojson"
 ```
+
 specify the data name managed by dim for `-t`
 
 ```
