@@ -25,8 +25,7 @@ export class ChatGPTClient {
       return gptResponse;
     } catch (error) {
       console.log(
-        Colors.red(`\n${error}`),
-        //Colors.red(`\n${error.response.data.error.message}`),
+        Colors.red(`\n${error.response.data.error.message}`),
         Colors.yellow(`\nThe problem may be improved by temporarily reducing the number of target data.`),
       );
       Deno.exit(1);
