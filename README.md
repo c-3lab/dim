@@ -385,7 +385,7 @@ $ deno run -A dim.ts install https://xxxxxx/data.json
 4. Install dim
 
 ```
-$ deno install --unstable --allow-read --allow-write --allow-run --allow-net dim.ts
+$ deno install --unstable --allow-read --allow-write --allow-run --allow-net --allow-env dim.ts
 ```
 
 # Run test and display coverage
