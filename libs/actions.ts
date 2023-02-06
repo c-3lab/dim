@@ -390,7 +390,7 @@ export class GenerateAction {
       if (content) {
         targetData = Deno.readTextFileSync(content.path);
       } else {
-        targetData = Deno.readTextFileSync(options.target!);
+        targetData = Deno.readTextFileSync(target!);
       }
     } catch {
       console.log(
