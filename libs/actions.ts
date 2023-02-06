@@ -407,7 +407,7 @@ export class GenerateAction {
     if (!response) {
       return;
     }
-    const code = response.data.choices[0].text;
+    const code = response.choices[0].text;
     consoleAnimation.stop();
     console.log(`${code}\n\n`);
 
