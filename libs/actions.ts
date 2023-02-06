@@ -394,7 +394,7 @@ export class GenerateAction {
       }
     } catch (e) {
       console.log(
-        Colors.red(e.message)
+        Colors.red(e.message),
       );
       Deno.exit(1);
     }
