@@ -37,7 +37,7 @@ jobs:
         run: deno test -A --coverage=tests/coverage
 
       - name: Create coverage report
-        run: deno coverage ./tests/coverage --lcov > tests/coverage.lcov
+        run: deno coverage ./tests/coverage --include="libs/.*\.ts|tests/.*\.ts|dim\.ts" --lcov > tests/coverage.lcov
 
       - name: Upload to codecov
         uses: codecov/codecov-action@v3.1.0
