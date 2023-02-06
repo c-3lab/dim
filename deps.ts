@@ -1,12 +1,12 @@
-export { Command } from "https://deno.land/x/cliffy@v0.24.2/command/mod.ts";
+export { Command } from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts";
 export {
   DenoLandProvider,
   GithubProvider,
   UpgradeCommand,
-} from "https://deno.land/x/cliffy@v0.24.2/command/upgrade/mod.ts";
+} from "https://deno.land/x/cliffy@v0.25.7/command/upgrade/mod.ts";
 
-export { CompletionsCommand } from "https://deno.land/x/cliffy@v0.24.2/command/completions/mod.ts";
-export { HelpCommand } from "https://deno.land/x/cliffy@v0.24.2/command/help/mod.ts";
+export { CompletionsCommand } from "https://deno.land/x/cliffy@v0.25.7/command/completions/mod.ts";
+export { HelpCommand } from "https://deno.land/x/cliffy@v0.25.7/command/help/mod.ts";
 
 export { ensureDir, ensureDirSync, ensureFile } from "https://deno.land/std@0.146.0/fs/mod.ts";
 
