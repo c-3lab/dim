@@ -135,7 +135,7 @@ await new Command()
     new Command()
       .option(
         "-t, --target <target:string>",
-        "Specify the target data name or file path to send to ChatGPT.",
+        "Specify the target data name or file path to send to GPT-3 API.",
       )
       .option(
         "-o, --output <output:string>",
@@ -143,7 +143,7 @@ await new Command()
       )
       .arguments("<prompt:string>")
       .description(
-        "Auto-generate code about target data using ChatGPT. \nFor example, conversion processing, visualization processing, etc.",
+        "Auto-generate code about target data using GPT-3 API. \nFor example, conversion processing, visualization processing, etc.",
       )
       .action(new GenerateAction().execute),
   )

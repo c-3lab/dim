@@ -199,7 +199,7 @@ describe("GenerateAction", () => {
     );
     assertEquals(
       targetInputPromptMessage,
-      "Enter the target data name or file path to send to ChatGPT.",
+      "Enter the target data name or file path to send to GPT-3 API.",
     );
     assert(targetInputPromptValidate("test"));
     assertFalse(targetInputPromptValidate(""));

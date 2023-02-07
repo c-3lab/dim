@@ -4,7 +4,7 @@ import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
 import { createDataFilesDir, initDimFile, initDimLockFile } from "./action_helper/initializer.ts";
 import { installFromDimFile, installFromURL, interactiveInstall, parseHeader } from "./action_helper/installer.ts";
-import { ChatGPTClient } from "./chatgpt_client.ts";
+import { OpenAIClient } from "./openai_client.ts";
 import { ConsoleAnimation } from "./console_animation.ts";
 
 export class InitAction {
@@ -376,7 +376,7 @@ export class GenerateAction {
     const dataNameList = dimLockFileAccessor.getContents().map((c) => c.name);
     if (!target) {
       target = await Input.prompt({
-        message: "Enter the target data name or file path to send to ChatGPT.",
+        message: "Enter the target data name or file path to send to GPT-3 API.",
         hint: `${dataNameList.join(", ").slice(0, 50)}... or target file path])`,
         suggestions: dataNameList,
         validate: (text) => {
@@ -403,7 +403,7 @@ export class GenerateAction {
       `Generate a code ...`,
     );
     consoleAnimation.start(100);
-    const response = await new ChatGPTClient().request(`${targetData}\n${prompt}`);
+    const response = await new OpenAIClient().request(`${targetData}\n${prompt}`);
     if (!response) {
       return;
     }

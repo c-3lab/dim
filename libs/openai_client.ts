@@ -2,7 +2,7 @@ import { Colors, ky } from "../deps.ts";
 import { OPENAPI_COMPLETIONS_ENDPOINT } from "./consts.ts";
 import { OpenAICompletionsResponse } from "./types.ts";
 
-export class ChatGPTClient {
+export class OpenAIClient {
   private apiKey;
 
   constructor() {
