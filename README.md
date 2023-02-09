@@ -16,11 +16,11 @@ We are looking for members to develop together as an open source community.
 
 # Features
 
-- 📀 Record the source url and post-processing, etc., of downloaded open-data
-- 🔧 Prepare all open data needed for the project in one command by using the `dim.json` recorded by someone else
-- 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
-- 🔍 Search open-data from CKAN
-- 🧠 Generate code to process data using **GPT-3**
+- [📀 Record the source url and post-processing, etc., of downloaded open-data](#install)
+- [🔧 Prepare all open data needed for the project in one command by using the `dim.json` recorded by someone else](#install-the-all-data)
+- [🚀 General post-processing, such as unzip, encoding, etc., is available from the start](#specify-the-installation-post-process)
+- [🔍 Search open-data from CKAN](#search)
+- [🧠 Generate code to process data using **GPT-3**](#generate)
 
 # Document
 
