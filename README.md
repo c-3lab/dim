@@ -31,7 +31,7 @@ For more information about how to use it, please refer to [this document](/doc).
 ## Install the dim
 
 [Install the dim from binary files](#install-the-dim-from-binary-files) or
-[Build the dim from Deno install](#build-the-dim-from-deno-install)
+[Run the dim using Deno](#run-the-dim-using-deno)
 
 ### Install the dim from binary files
 
