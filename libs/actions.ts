@@ -297,7 +297,7 @@ export class SearchAction {
       );
       Deno.exit(1);
     }
-    options.type = options.type || 'text';
+    options.type = options.type || "text";
     if (!["text", "json"].includes(options.type)) {
       console.error(
         Colors.red("Invalid search result type."),
