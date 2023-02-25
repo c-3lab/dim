@@ -199,7 +199,7 @@ const executePostprocess = async (
   }
 };
 
-export const getIntegrity = function (
+const getIntegrity = function (
   targetPath: string,
 ): string {
   const byteArray = Deno.readFileSync(targetPath);
