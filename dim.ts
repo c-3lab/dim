@@ -1,6 +1,7 @@
 import { Command, CompletionsCommand, GithubProvider, HelpCommand, UpgradeCommand } from "./deps.ts";
 import {
   CleanAction,
+  GenerateAction,
   InitAction,
   InstallAction,
   ListAction,
@@ -137,6 +138,23 @@ await new Command()
         "Verify the data.\n",
       )
       .action(new VerifyAction().execute),
+  )
+  .command(
+    "generate",
+    new Command()
+      .option(
+        "-t, --target <target:string>",
+        "Specify the target data name or file path to send to GPT-3 API.",
+      )
+      .option(
+        "-o, --output <output:string>",
+        "Specify to output file path of generated post-process.",
+      )
+      .arguments("<prompt:string>")
+      .description(
+        "Auto-generate code about target data using GPT-3 API. \nFor example, conversion processing, visualization processing, etc.",
+      )
+      .action(new GenerateAction().execute),
   )
   .command("help", new HelpCommand())
   .command("complete", new CompletionsCommand())

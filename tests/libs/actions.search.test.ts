@@ -1720,12 +1720,13 @@ describe("SearchAction", () => {
         );
         assertEquals(
           postprocessInputPromptHint,
-          "(ex.: > unzip, xlsx-to-csv, encode utf-8 or cmd [some cli command])",
+          "(ex.: > unzip, xlsx-to-csv, csv-to-json, encode utf-8 or cmd [some cli command])",
         );
         assert(postprocessInputPromptValidate(""));
         assert(postprocessInputPromptValidate("cmd "));
         assert(postprocessInputPromptValidate("unzip"));
         assert(postprocessInputPromptValidate("xlsx-to-csv"));
+        assert(postprocessInputPromptValidate("csv-to-json"));
         assert(postprocessInputPromptValidate("encode euc-jp"));
         assert(postprocessInputPromptValidate("encode iso-2022-jp"));
         assert(postprocessInputPromptValidate("encode shift_jis"));

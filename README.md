@@ -16,10 +16,11 @@ We are looking for members to develop together as an open source community.
 
 # Features
 
-- 📀 Record the source url and post-processing, etc., of downloaded open-data
-- 🔧 Prepare all open data needed for the project in one command by using the `dim.json` recorded by someone else
-- 🚀 General post-processing, such as unzip, encoding, etc., is available from the start
-- 🔍 Search open-data from CKAN
+- [📀 Record the source url and post-processing, etc., of downloaded open-data](#install)
+- [🔧 Prepare all open data needed for the project in one command by using the `dim.json` recorded by someone else](#install-the-all-data)
+- [🚀 General post-processing, such as unzip, encoding, etc., is available from the start](#specify-the-installation-post-process)
+- [🔍 Search open-data from CKAN](#search)
+- [🧠 Generate code to process data using **GPT-3**](#generate)
 
 # Document
 
@@ -30,7 +31,7 @@ For more information about how to use it, please refer to [this document](/doc).
 ## Install the dim
 
 [Install the dim from binary files](#install-the-dim-from-binary-files) or
-[Build the dim from Deno install](#build-the-dim-from-deno-install)
+[Run the dim using Deno](#run-the-dim-using-deno)
 
 ### Install the dim from binary files
 
@@ -180,6 +181,12 @@ Postprocess xlsx-to-csv
 $ dim install https://example.com -n "example" -p xlsx-to-csv
 ```
 
+Postprocess csv-to-json
+
+```
+$ dim install https://example.com -n "example" -p csv-to-json
+```
+
 Postprocess custom command
 
 You can specify a custom command after **"cmd"**.
@@ -316,15 +323,73 @@ Convert xlsx to csv.
 Installed to ./data_files/131105_東京都_目黒区_大地震時における地域避難所_大地震時における地域避難所/131105evacuationspace.xlsx
 ```
 
+## [Generate](doc/en/generate.md)
+
+Auto-generate code about target data using **GPT-3**. For example, conversion processing, visualization processing,
+etc..
+<img src="https://user-images.githubusercontent.com/6661165/216978343-0c1cbedb-e709-4501-8068-deca12e805b0.gif" width=800 />
+
+Export APIKey of OpenAI to `OPENAI_API_KEY`.
+
+```
+$ export OPENAI_API_KEY=xxxxxxxxxxxxxxxxxxxxx
+```
+
+You can get APIKey URL: https://platform.openai.com/account/api-keys
+
+Combine the specified target data and prompt, send it to GPT-3 API, output the code, and save it.
+
+```
+$ dim generate -t "./data.csv" "Python code that converts this csv data to geojson"
+```
+
+Specify the data name managed by dim using `-t`
+
+```
+$ dim generate -t "shelter" "Python code that converts this csv data to geojson"
+```
+
+### Example prompt List
+
+```
+Python code that converts this csv data to geojson
+```
+
+```
+Python code that remove id column from this csv data
+```
+
+```
+Python code that visualizes this csv data as a map
+```
+
+```
+Python code that visualizes this csv data as a map
+```
+
+```
+Python code that visualizes this csv data as HTML page
+```
+
+```
+Python code that saves this csv data to PostgreSQL
+```
+
+```
+Python code that converts full-width numbers in this csv file to half-width numbers
+```
+
 ## [Help](doc/en/help.md)
 
 ```
 $ dim help
 ```
 
-# Build the dim from Deno install
+# Run the dim using Deno
 
 1. Install Deno
+
+- Deno == 1.28.2
 
 ```
 $ curl -fsSL https://deno.land/install.sh | sh
@@ -343,10 +408,30 @@ $ git clone https://github.com/c-3lab/dim.git
 $ cd dim
 ```
 
-3. Install dim
+3. Run the dim commands
 
 ```
-$ deno install --unstable --allow-read --allow-write --allow-run --allow-net dim.ts
+$ deno run -A dim.ts install https://xxxxxx/data.json
+```
+
+4. Install dim
+
+```
+$ deno install --unstable --allow-read --allow-write --allow-run --allow-net --allow-env dim.ts
+```
+
+# Run test and display coverage
+
+1. Run test
+
+```
+$ deno test -A --coverage=tests/coverage
+```
+
+2. Display coverage
+
+```
+$ deno coverage ./tests/coverage
 ```
 
 # Upgrade the dim version

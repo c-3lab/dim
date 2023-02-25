@@ -48,6 +48,7 @@ dim search [options] <keyword>
 | unzip               | ダウンロードしたzipファイルを`data_files/<name>`配下に解凍する。                                                                       |
 | encode \<encoding\> | ダウンロードしたファイルの文字コードを変更する。<br>対応エンコーディング：UTF-16, UTF-16BE, UTF-16LE, UTF-8, ISO-2022-JP, Shift_JIS, EUC-JP, UNICODE |
 | xlsx-to-csv         | ダウンロードしたxlsxファイルをcsvファイルに変換したファイルを、`data_files/<name>`配下に生成する。                                                    |
+| csv-to-json         | ダウンロードしたcsvファイルをjsonファイルに変換したファイルを、`data_files/<name>`配下に生成する。                                                    |
 | cmd \<command\>     | ダウンロードしたファイルのパスを引数としてコマンドを実行する。                                                                                   |
 
 ### 実行例

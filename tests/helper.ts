@@ -22,6 +22,22 @@ export const createKyGetStub = (
 
   return stub(ky, "get", mockedKy.get);
 };
+export const createKyPostStub = (
+  body: BodyInit,
+  options?: ResponseInit,
+): Stub => {
+  const mockedKy = ky.extend({
+    hooks: {
+      beforeRequest: [
+        (_request) => {
+          return new Response(body, options);
+        },
+      ],
+    },
+  });
+
+  return stub(ky, "post", mockedKy.post);
+};
 
 export const removeTemporaryFiles = () => {
   for (const path of Deno.readDirSync(temporaryDirectory)) {

@@ -630,6 +630,77 @@ describe("InstallAction", () => {
       }
     });
 
+    it('convert downloaded file from csv to json and record in dim.json and dim-lock.json when specify "csv-to-json" as postProcess', async () => {
+      createEmptyDimJson();
+      const textCsv = Deno.readFileSync("../test_data/valid_csv.csv");
+      const kyGetStub = createKyGetStub(textCsv);
+      try {
+        await new InstallAction().execute(
+          { name: "csv-to-json", postProcesses: ["csv-to-json"] },
+          "https://example.com/dummy.csv",
+        );
+        assert(fileExists("data_files/csv-to-json/dummy.csv"));
+        const testData = Deno.readTextFileSync(
+          "data_files/csv-to-json/dummy.json",
+        );
+        assertEquals(testData, '[{"aaa":"12","bbb":"34","ccc":"56"},{"aaa":"10","bbb":"20","ccc":"30"}]');
+        assertSpyCall(consoleLogStub, 0, { args: ["Convert csv to json."] });
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "csv-to-json",
+            postProcesses: ["csv-to-json"],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
+
+        const dimLockJson = JSON.parse(Deno.readTextFileSync("dim-lock.json"));
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            eTag: null,
+            headers: {},
+            integrity: "2c294b4e8b9fd5a0e520f712f108451975cbbded",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: null,
+            name: "csv-to-json",
+            path: "./data_files/csv-to-json/dummy.csv",
+            postProcesses: ["csv-to-json"],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it('exit with error when specify "csv-to-json a" as postProcess and download', async () => {
+      createEmptyDimJson();
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        await new InstallAction().execute(
+          { name: "csv-to-jsona", postProcesses: ["csv-to-json a"] },
+          "https://example.com/dummy.csv",
+        );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.red("error: Too many arguments:"),
+            Colors.red("csv-to-json a"),
+          ],
+        });
+        assert(fileExists("data_files/csv-to-jsona/dummy.csv"));
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
     it('download file and execute echo command with downloaded file path as standard output when specify "cmd echo" as postProcesses', async () => {
       const kyGetStub = createKyGetStub("dummy");
       const denoRunStub = stub(Deno, "run");

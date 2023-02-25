@@ -251,13 +251,14 @@ export const interactiveInstall = async (catalogs: Catalog[]): Promise<string> =
   const availablePostProcesses = [
     "unzip",
     "xlsx-to-csv",
+    "csv-to-json",
     ...encodingPostProcesses,
   ];
 
   while (true) {
     const enteredPostProcess = await Input.prompt({
       message: "Enter the post-processing you want to add. Enter blank if not required.",
-      hint: "(ex.: > unzip, xlsx-to-csv, encode utf-8 or cmd [some cli command])",
+      hint: "(ex.: > unzip, xlsx-to-csv, csv-to-json, encode utf-8 or cmd [some cli command])",
       validate: (text) => {
         return text === "" || text.startsWith("cmd ") ||
           availablePostProcesses.includes(text);
