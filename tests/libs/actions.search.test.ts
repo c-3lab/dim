@@ -90,7 +90,7 @@ describe("SearchAction", () => {
           ],
         });
         assertSpyCall(consoleLogStub, 4, {
-          args: ["    1.", "name1-1"],
+          args: [Colors.yellow("    [1]. name1-1")],
         });
         assertSpyCall(consoleLogStub, 5, {
           args: [
@@ -138,7 +138,7 @@ describe("SearchAction", () => {
           ],
         });
         assertSpyCall(consoleLogStub, 14, {
-          args: ["    2.", "name2-1"],
+          args: [Colors.yellow("    [2]. name2-1")],
         });
         assertSpyCall(consoleLogStub, 15, {
           args: [
@@ -165,7 +165,7 @@ describe("SearchAction", () => {
           ],
         });
         assertSpyCall(consoleLogStub, 19, {
-          args: ["    3.", "name2-2"],
+          args: [Colors.yellow("    [3]. name2-2")],
         });
         assertSpyCall(consoleLogStub, 20, {
           args: [
@@ -213,7 +213,7 @@ describe("SearchAction", () => {
           ],
         });
         assertSpyCall(consoleLogStub, 29, {
-          args: ["    4.", "name3-1"],
+          args: [Colors.yellow("    [4]. name3-1")],
         });
         assertSpyCall(consoleLogStub, 30, {
           args: [
@@ -288,7 +288,7 @@ describe("SearchAction", () => {
           ],
         });
         assertSpyCall(consoleLogStub, 4, {
-          args: ["    1.", "name1-1"],
+          args: [Colors.yellow("    [1]. name1-1")],
         });
         assertSpyCall(consoleLogStub, 5, {
           args: [
