@@ -40,8 +40,8 @@ export class InstallAction {
         console.log(Colors.red("The -n option is not specified."));
         Deno.exit(1);
       }
-      const targetLockContent = new DimFileAccessor().getContents().find((c) => c.name === options.name);
-      if (targetLockContent !== undefined && !options.force) {
+      const targetContent = new DimFileAccessor().getContents().find((c) => c.name === options.name);
+      if (targetContent !== undefined && !options.force) {
         console.log(Colors.red("The name already exists."));
         console.log(
           Colors.red(
@@ -106,7 +106,7 @@ export class UninstallAction {
       );
     }
     const dimLockFileAccessor = new DimLockFileAccessor();
-    const targetLockContent = dimLockFileAccessor.getContents().find((c) => c.name === name);
+    const targetContent = dimLockFileAccessor.getContents().find((c) => c.name === name);
     const isRemovedDimLockFile = await dimLockFileAccessor.removeContent(name);
     if (isRemovedDimLockFile) {
       console.log(
@@ -119,16 +119,16 @@ export class UninstallAction {
         ),
       );
     }
-    if (targetLockContent !== undefined) {
+    if (targetContent !== undefined) {
       try {
-        Deno.statSync(targetLockContent.path);
-        await Deno.remove(targetLockContent.path);
+        Deno.statSync(targetContent.path);
+        await Deno.remove(targetContent.path);
         console.log(
-          Colors.green(`Removed a file '${targetLockContent.path}'.`),
+          Colors.green(`Removed a file '${targetContent.path}'.`),
         );
       } catch {
         console.log(
-          Colors.red(`Failed to remove a file '${targetLockContent.path}'.`),
+          Colors.red(`Failed to remove a file '${targetContent.path}'.`),
         );
       }
       // TODO: Remove an empty direcotory
