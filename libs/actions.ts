@@ -367,7 +367,6 @@ export class SearchAction {
   }
 }
 
-
 export class VerifyAction {
   async execute() {
     const targetLockContents = new DimLockFileAccessor().getContents();
@@ -401,7 +400,6 @@ export class VerifyAction {
     }
   }
 }
-
 
 export class GenerateAction {
   async execute(
