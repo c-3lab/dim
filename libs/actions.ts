@@ -287,7 +287,7 @@ export class UpdateAction {
 
 export class SearchAction {
   async execute(
-    options: { number: number; install?: boolean; type: string },
+    options: { number: number; install?: boolean; type?: string },
     keyword: string,
   ) {
     if (options.number <= 0 || options.number > 100) {
@@ -297,6 +297,7 @@ export class SearchAction {
       );
       Deno.exit(1);
     }
+    options.type = options.type || 'text';
     if (!["text", "json"].includes(options.type)) {
       console.error(
         Colors.red("Invalid search result type."),
