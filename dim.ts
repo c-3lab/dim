@@ -126,6 +126,13 @@ await new Command()
         "-i, --install",
         "Interactive installation.",
       )
+      .option(
+        "-t, --type <type:string>",
+        "Specify search result format [text|json].",
+        {
+          default: "text",
+        },
+      )
       .arguments("<keyword:string>")
       .description("Search data from package_search CKAN API")
       .action(new SearchAction().execute),

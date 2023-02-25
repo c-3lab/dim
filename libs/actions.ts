@@ -6,6 +6,7 @@ import { createDataFilesDir, initDimFile, initDimLockFile } from "./action_helpe
 import { installFromDimFile, installFromURL, interactiveInstall, parseHeader } from "./action_helper/installer.ts";
 import { OpenAIClient } from "./openai_client.ts";
 import { ConsoleAnimation } from "./console_animation.ts";
+import { showSearchResult, showSearchResultJson } from "./action_helper/searcher.ts";
 
 export class InitAction {
   async execute() {
@@ -286,13 +287,26 @@ export class UpdateAction {
 
 export class SearchAction {
   async execute(
-    options: { number: number; install?: boolean },
+    options: { number: number; install?: boolean; type: string },
     keyword: string,
   ) {
     if (options.number <= 0 || options.number > 100) {
       console.error(
         Colors.red("Failed to search."),
         Colors.red("Please enter a number between 1 and 100"),
+      );
+      Deno.exit(1);
+    }
+    if (!["text", "json"].includes(options.type)) {
+      console.error(
+        Colors.red("Invalid search result type."),
+        Colors.red("Please select from [text|json]"),
+      );
+      Deno.exit(1);
+    }
+    if (options.install && options.type === "json") {
+      console.error(
+        Colors.red("You can not use 'json' type for interactive installation."),
       );
       Deno.exit(1);
     }
@@ -310,48 +324,10 @@ export class SearchAction {
 
     const catalogs = response.result.results;
 
-    let i = 1;
-    for (const catalog of catalogs) {
-      console.log(catalog.xckan_title);
-      console.log(
-        "  - Catalog URL        :",
-        Colors.green(catalog.xckan_site_url),
-      );
-      console.log(
-        "  - Catalog Description:",
-        Colors.green(
-          catalog.xckan_description == null ? "" : catalog.xckan_description.replace(/\r(?!\n)/g, "\n"),
-        ),
-      );
-      console.log(
-        "  - Catalog License    :",
-        Colors.green(
-          catalog.license_title == null ? "" : catalog.license_title,
-        ),
-      );
-      for (const resource of catalog.resources) {
-        console.log(`    ${i}.`, resource.name);
-        console.log(
-          "      * Resource URL        :",
-          Colors.green(resource.url == null ? "" : resource.url),
-        );
-        console.log(
-          "      * Resource Description:",
-          Colors.green(
-            resource.description == null ? "" : resource.description.replace(/\r(?!\n)/g, "\n"),
-          ),
-        );
-        console.log(
-          "      * Created             :",
-          Colors.green(resource.created == null ? "" : resource.created),
-        );
-        console.log(
-          "      * Format              :",
-          Colors.green(resource.format == null ? "" : resource.format),
-        );
-        i++;
-      }
-      console.log();
+    if (options.type === "text") {
+      showSearchResult(catalogs);
+    } else if (options.type === "json") {
+      showSearchResultJson(catalogs);
     }
 
     if (!options.install) {
