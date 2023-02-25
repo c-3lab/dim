@@ -7,6 +7,7 @@ import {
   SearchAction,
   UninstallAction,
   UpdateAction,
+  VerifyAction,
 } from "./libs/actions.ts";
 import { NAME, VERSION } from "./libs/consts.ts";
 
@@ -128,6 +129,14 @@ await new Command()
       .arguments("<keyword:string>")
       .description("Search data from package_search CKAN API")
       .action(new SearchAction().execute),
+  )
+  .command(
+    "verify",
+    new Command()
+      .description(
+        "Verify the data.\n",
+      )
+      .action(new VerifyAction().execute),
   )
   .command("help", new HelpCommand())
   .command("complete", new CompletionsCommand())

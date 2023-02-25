@@ -1,6 +1,7 @@
 import { Colors } from "../deps.ts";
 import { DEFAULT_DATAFILES_PATH, DEFAULT_DIM_FILE_PATH } from "./consts.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
+import { ky, Sha1 } from "../deps.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
 import { createDataFilesDir, initDimFile, initDimLockFile } from "./action_helper/initializer.ts";
 import { installFromDimFile, installFromURL, interactiveInstall, parseHeader } from "./action_helper/installer.ts";
@@ -39,8 +40,8 @@ export class InstallAction {
         console.log(Colors.red("The -n option is not specified."));
         Deno.exit(1);
       }
-      const targetContent = new DimFileAccessor().getContents().find((c) => c.name === options.name);
-      if (targetContent !== undefined && !options.force) {
+      const targetLockContent = new DimFileAccessor().getContents().find((c) => c.name === options.name);
+      if (targetLockContent !== undefined && !options.force) {
         console.log(Colors.red("The name already exists."));
         console.log(
           Colors.red(
@@ -105,7 +106,7 @@ export class UninstallAction {
       );
     }
     const dimLockFileAccessor = new DimLockFileAccessor();
-    const targetContent = dimLockFileAccessor.getContents().find((c) => c.name === name);
+    const targetLockContent = dimLockFileAccessor.getContents().find((c) => c.name === name);
     const isRemovedDimLockFile = await dimLockFileAccessor.removeContent(name);
     if (isRemovedDimLockFile) {
       console.log(
@@ -118,16 +119,16 @@ export class UninstallAction {
         ),
       );
     }
-    if (targetContent !== undefined) {
+    if (targetLockContent !== undefined) {
       try {
-        Deno.statSync(targetContent.path);
-        await Deno.remove(targetContent.path);
+        Deno.statSync(targetLockContent.path);
+        await Deno.remove(targetLockContent.path);
         console.log(
-          Colors.green(`Removed a file '${targetContent.path}'.`),
+          Colors.green(`Removed a file '${targetLockContent.path}'.`),
         );
       } catch {
         console.log(
-          Colors.red(`Failed to remove a file '${targetContent.path}'.`),
+          Colors.red(`Failed to remove a file '${targetLockContent.path}'.`),
         );
       }
       // TODO: Remove an empty direcotory
@@ -361,5 +362,39 @@ export class SearchAction {
     console.log(
       Colors.green(`Installed to ${fullPath}`),
     );
+  }
+}
+
+export class VerifyAction {
+  async execute() {
+    const targetLockContents = new DimLockFileAccessor().getContents();
+    const targetContents = new DimLockFileAccessor().getContents();
+    let result = true;
+
+    if (targetContents.length !== targetLockContents.length) {
+      console.error(
+        Colors.red(`the numbers of dim.json and dim-lock.json don't match`),
+      );
+      Deno.exit(1);
+    }
+
+    for (const targetLockContent of targetLockContents) {
+      await ky.get(targetLockContent.url, targetLockContent.headers)
+        .then((response) => response.arrayBuffer())
+        .then((arrayBuffer) => {
+          const integrity = new Sha1().update(arrayBuffer).toString();
+          if (integrity !== targetLockContent.integrity) {
+            result = false;
+            console.log(
+              Colors.red(`${targetLockContent.name} : verification failed`),
+            );
+          }
+        });
+    }
+    if (result) {
+      console.log(
+        Colors.green(`verification success`),
+      );
+    }
   }
 }
