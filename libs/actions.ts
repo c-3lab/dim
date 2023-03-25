@@ -372,22 +372,24 @@ export class SearchAction {
 export class VerifyAction {
   async execute() {
     const targetLockContents = new DimLockFileAccessor().getContents();
+    const result = true;
 
     for (const targetLockContent of targetLockContents) {
       await ky.get(targetLockContent.url, targetLockContent.headers)
         .then((response) => response.arrayBuffer())
         .then((arrayBuffer) => {
           const integrity = new Sha1().update(arrayBuffer).toString();
-          if (integrity === targetLockContent.integrity) {
-            console.log(
-              Colors.green(`${targetLockContent.name}: verification success`),
-            );
-          } else {
+          if (integrity !== targetLockContent.integrity) {
             console.log(
               Colors.red(`${targetLockContent.name}: verification failed`),
             );
           }
         });
+    }
+    if (result) {
+      console.log(
+        Colors.green(`verification success`),
+      );
     }
   }
 }
