@@ -37,7 +37,7 @@ describe("VerifyAction", () => {
   });
 
   it("run verify command with no change.", async () => {
-    const kyGetStub = createKyGetStub("unchanged");
+    const kyGetStub = createKyGetStub("dummy");
     try {
       Deno.copyFileSync(
         "../test_data/installed-dim-lock.json",
