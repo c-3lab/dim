@@ -22,7 +22,6 @@ describe("VerifyAction", () => {
     denoStdoutStub = stub(Deno.stdout, "write");
     fakeTime = new FakeTime("2022-01-02T03:04:05.678Z");
     originalDirectory = Deno.cwd();
-    //      originalOS = DenoWrapper.build.os;
     Deno.chdir(temporaryDirectory);
   });
 
@@ -37,8 +36,8 @@ describe("VerifyAction", () => {
     Deno.chdir(originalDirectory);
   });
 
-  it("download from locally existing all data installed dim.json and check that it is recorded in dim.json and dim-lock.json.", async () => {
-    const kyGetStub = createKyGetStub("dummy");
+  it("run verify command with no change.", async () => {
+    const kyGetStub = createKyGetStub("unchanged");
     try {
       Deno.copyFileSync(
         "../test_data/installed-dim-lock.json",
@@ -48,6 +47,28 @@ describe("VerifyAction", () => {
       assertSpyCall(consoleLogStub, 0, {
         args: [
           Colors.green(`verification success`),
+        ],
+      });
+    } finally {
+      kyGetStub.restore();
+    }
+  });
+
+  it("run verify command with data updated.", async () => {
+    const kyGetStub = createKyGetStub("updated", {
+      headers: {
+        "integrity": "testintegrity",
+      },
+    });
+    try {
+      Deno.copyFileSync(
+        "../test_data/installed-dim-lock.json",
+        "dim-lock.json",
+      );
+      await new VerifyAction().execute();
+      assertSpyCall(consoleLogStub, 0, {
+        args: [
+          Colors.red(`test1: verification failed`),
         ],
       });
     } finally {
