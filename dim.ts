@@ -135,7 +135,7 @@ await new Command()
     "verify",
     new Command()
       .description(
-        "Verify the data.\n",
+        "Verify if the data is changed, to compare the integrities.\n",
       )
       .action(new VerifyAction().execute),
   )
