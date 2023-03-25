@@ -237,6 +237,14 @@ $ dim list
 $ dim list -s
 ```
 
+## [Verify](doc/en/verify.md)
+
+Verify the data
+
+```
+$ dim verify
+```
+
 ## [Update](doc/en/update.md)
 
 Update the all data.

@@ -8,29 +8,17 @@ import { createKyGetStub, removeTemporaryFiles, temporaryDirectory } from "../he
 
 describe("VerifyAction", () => {
   let consoleLogStub: Stub;
-  let consoleErrorStub: Stub;
-  let denoExitStub: Stub;
-  let denoStdoutStub: Stub;
-  let fakeTime: FakeTime;
   let originalDirectory: string;
   let originalOS: "darwin" | "linux" | "windows";
 
   beforeEach(() => {
     consoleLogStub = stub(console, "log");
-    consoleErrorStub = stub(console, "error");
-    denoExitStub = stub(Deno, "exit");
-    denoStdoutStub = stub(Deno.stdout, "write");
-    fakeTime = new FakeTime("2022-01-02T03:04:05.678Z");
     originalDirectory = Deno.cwd();
     Deno.chdir(temporaryDirectory);
   });
 
   afterEach(() => {
     removeTemporaryFiles();
-    fakeTime.restore();
-    denoStdoutStub.restore();
-    denoExitStub.restore();
-    consoleErrorStub.restore();
     consoleLogStub.restore();
     DenoWrapper.build.os = originalOS;
     Deno.chdir(originalDirectory);
