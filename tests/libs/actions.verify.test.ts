@@ -4,11 +4,7 @@ import { afterEach, beforeEach, describe, it } from "https://deno.land/std@0.152
 import { Colors } from "../../deps.ts";
 import { VerifyAction } from "../../libs/actions.ts";
 import DenoWrapper from "../../libs/deno_wrapper.ts";
-import {
-  createKyGetStub,
-  removeTemporaryFiles,
-  temporaryDirectory,
-} from "../helper.ts";
+import { createKyGetStub, removeTemporaryFiles, temporaryDirectory } from "../helper.ts";
 
 describe("VerifyAction", () => {
   let consoleLogStub: Stub;
