@@ -370,33 +370,22 @@ export class SearchAction {
 export class VerifyAction {
   async execute() {
     const targetLockContents = new DimLockFileAccessor().getContents();
-    const targetContents = new DimLockFileAccessor().getContents();
-    let result = true;
-
-    if (targetContents.length !== targetLockContents.length) {
-      console.error(
-        Colors.red(`the numbers of dim.json and dim-lock.json don't match`),
-      );
-      Deno.exit(1);
-    }
 
     for (const targetLockContent of targetLockContents) {
       await ky.get(targetLockContent.url, targetLockContent.headers)
         .then((response) => response.arrayBuffer())
         .then((arrayBuffer) => {
           const integrity = new Sha1().update(arrayBuffer).toString();
-          if (integrity !== targetLockContent.integrity) {
-            result = false;
+          if (integrity === targetLockContent.integrity) {
             console.log(
-              Colors.red(`${targetLockContent.name} : verification failed`),
+              Colors.green(`${targetLockContent.name}: verification success`),
+            );
+          } else {
+            console.log(
+              Colors.red(`${targetLockContent.name}: verification failed`),
             );
           }
         });
-    }
-    if (result) {
-      console.log(
-        Colors.green(`verification success`),
-      );
     }
   }
 }
