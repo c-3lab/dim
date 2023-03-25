@@ -372,7 +372,7 @@ export class SearchAction {
 export class VerifyAction {
   async execute() {
     const targetLockContents = new DimLockFileAccessor().getContents();
-    const result = true;
+    let result = true;
 
     for (const targetLockContent of targetLockContents) {
       await ky.get(targetLockContent.url, targetLockContent.headers)
@@ -380,6 +380,7 @@ export class VerifyAction {
         .then((arrayBuffer) => {
           const integrity = new Sha1().update(arrayBuffer).toString();
           if (integrity !== targetLockContent.integrity) {
+            result = false;
             console.log(
               Colors.red(`${targetLockContent.name}: verification failed`),
             );
