@@ -1,4 +1,4 @@
-import { Colors, Confirm, Input } from "../deps.ts";
+import { Colors, Confirm, Input, DOMParser } from "../deps.ts";
 import { DEFAULT_DATAFILES_PATH, DEFAULT_DIM_FILE_PATH } from "./consts.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
@@ -25,9 +25,37 @@ export class InstallAction {
       file?: string;
       force?: boolean;
       asyncInstall?: boolean;
+      pageInstall?: string;
+      expression?: string;
     },
     url: string | undefined,
   ) {
+    if (options.pageInstall !== undefined) {
+      try {
+        const getResult = await fetch(options.pageInstall);
+        if (!getResult.ok) throw new Error("Fetch response error");
+        const html = await getResult.text();
+        const document = new DOMParser().parseFromString(html, "text/html");
+        const linklist = document.getElementsByTagName("a");
+        linklist.forEach((link) => {
+          const re = new RegExp(options.expression, "ig");
+          let href = link.getAttribute("href");
+          if (re.test(href)) {
+            if (!href.startsWith("http")) {
+              href =
+                options.pageInstall.slice(
+                  0,
+                  options.pageInstall.lastIndexOf("/") + 1
+                ) + href;
+            }
+            console.log(href);
+          }
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     if (url && options.file) {
       console.log(
         Colors.red("Cannot use -f option and URL at the same time."),

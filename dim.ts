@@ -51,6 +51,14 @@ await new Command()
         "-A, --asyncInstall",
         "Execute asyncronous install.",
       )
+      .option(
+        "-P, --pageInstall <pageInstall:string>",
+        "Execute install from links in specified page."
+      )
+      .option(
+        "-e, --expression <expression:string>",
+        "Filter PageInstall result by regular expression."
+      )
       .description(
         "Install the data.\n" +
           "Specify the url of data. If you dont't specify argument, install all data which is not installed dependency.",
