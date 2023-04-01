@@ -30,6 +30,13 @@ export class InstallAction {
     },
     url: string | undefined,
   ) {
+    if (url && options.file) {
+      console.log(Colors.red("Cannot use -f option and URL at the same time."));
+      Deno.exit(1);
+    }
+
+    const parsedHeaders: Record<string, string> = parseHeader(options.headers);
+
     if (options.pageInstall !== undefined) {
       try {
         const getResult = await fetch(options.pageInstall);
@@ -37,33 +44,33 @@ export class InstallAction {
         const html = await getResult.text();
         const document = new DOMParser().parseFromString(html, "text/html");
         const linklist = document.getElementsByTagName("a");
-        linklist.forEach((link) => {
+        for (const link of linklist) {
           const re = new RegExp(options.expression, "ig");
-          let href = link.getAttribute("href");
+          let href = new URL(
+            link.getAttribute("href"),
+            options.pageInstall
+          ).toString();
           if (re.test(href)) {
-            if (!href.startsWith("http")) {
-              href =
-                options.pageInstall.slice(
-                  0,
-                  options.pageInstall.lastIndexOf("/") + 1
-                ) + href;
-            }
-            console.log(href);
+            console.log(href, link.textContent);
+            const fullPath = await installFromURL(
+              href,
+              link.textContent,
+              options.postProcesses,
+              parsedHeaders
+            ).catch((error) => {
+              console.error(
+                Colors.red("Failed to install."),
+                Colors.red(error.message)
+              );
+              Deno.exit(1);
+            });
           }
-        });
+        }
       } catch (error) {
         console.error(error);
       }
     }
 
-    if (url && options.file) {
-      console.log(
-        Colors.red("Cannot use -f option and URL at the same time."),
-      );
-      Deno.exit(1);
-    }
-
-    const parsedHeaders: Record<string, string> = parseHeader(options.headers);
     if (url !== undefined) {
       if (options.name === undefined) {
         console.log(Colors.red("The -n option is not specified."));
