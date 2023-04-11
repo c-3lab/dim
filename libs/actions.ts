@@ -390,7 +390,7 @@ export class VerifyAction {
             count += 1;
           } else {
             console.log(
-              Colors.red(`outdated`),
+              Colors.red("outdated"),
             );
             console.log(`  you can use update command "dim update ${targetLockContent.name}"`);
           }
