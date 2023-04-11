@@ -33,7 +33,12 @@ describe("VerifyAction", () => {
       await new VerifyAction().execute();
       assertSpyCall(consoleLogStub, 0, {
         args: [
-          Colors.green(`verification success`),
+          "test1: "
+        ],
+      });
+      assertSpyCall(consoleLogStub, 1, {
+        args: [
+          Colors.green(`latest`)
         ],
       });
     } finally {
@@ -55,7 +60,8 @@ describe("VerifyAction", () => {
       await new VerifyAction().execute();
       assertSpyCall(consoleLogStub, 0, {
         args: [
-          Colors.red(`test1: verification failed`),
+          "test1: ",
+          Colors.red("outdated"),
         ],
       });
     } finally {
