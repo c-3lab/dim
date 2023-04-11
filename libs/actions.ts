@@ -372,26 +372,32 @@ export class SearchAction {
 export class VerifyAction {
   async execute() {
     const targetLockContents = new DimLockFileAccessor().getContents();
-    let result = true;
-
+    let count = 0;
     for (const targetLockContent of targetLockContents) {
+      const consoleAnimation = new ConsoleAnimation(
+        ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
+        `${targetLockContent.name}: `,
+      );
+      consoleAnimation.start(100);
       await ky.get(targetLockContent.url, targetLockContent.headers)
         .then((response) => response.arrayBuffer())
         .then((arrayBuffer) => {
           const integrity = new Sha1().update(arrayBuffer).toString();
-          if (integrity !== targetLockContent.integrity) {
-            result = false;
+          if (integrity === targetLockContent.integrity) {
             console.log(
-              Colors.red(`${targetLockContent.name}: verification failed`),
+              Colors.green("latest"),
             );
+            count += 1;
+          } else {
+            console.log(
+              Colors.red(`outdated`),
+            );
+            console.log(`  you can use update command "dim update ${targetLockContent.name}"`);
           }
         });
+      consoleAnimation.stop();
     }
-    if (result) {
-      console.log(
-        Colors.green(`verification success`),
-      );
-    }
+    console.log(`All verification: done (${count}/${targetLockContents.length} is latest)`);
   }
 }
 
