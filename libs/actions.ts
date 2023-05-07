@@ -31,7 +31,9 @@ export class InstallAction {
     url: string | undefined,
   ) {
     if (url && options.file) {
-      console.log(Colors.red("Cannot use -f option and URL at the same time."));
+      console.log(
+        Colors.red("Cannot use -f option and URL at the same time."),
+      );
       Deno.exit(1);
     }
 
@@ -101,11 +103,11 @@ export class InstallAction {
         parsedHeaders,
       ).catch(
         (error) => {
-        console.error(
-          Colors.red("Failed to install."),
+          console.error(
+            Colors.red("Failed to install."),
             Colors.red(error.message),
-        );
-        Deno.exit(1);
+          );
+          Deno.exit(1);
         },
       );
       console.log(
@@ -300,11 +302,11 @@ export class UpdateAction {
         content.headers,
       ).catch(
         (error) => {
-        console.error(
-          Colors.red("Failed to update."),
+          console.error(
+            Colors.red("Failed to update."),
             Colors.red(error.message),
-        );
-        Deno.exit(1);
+          );
+          Deno.exit(1);
         },
       );
       if (fullPath !== undefined) {
