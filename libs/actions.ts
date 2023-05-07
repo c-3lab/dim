@@ -44,6 +44,7 @@ export class InstallAction {
         const html = await getResult.text();
         const document = new DOMParser().parseFromString(html, "text/html");
         const linklist = document.getElementsByTagName("a");
+        let idx = 0;
         for (const link of linklist) {
           const re = new RegExp(options.expression, "ig");
           let href = new URL(
@@ -51,10 +52,17 @@ export class InstallAction {
             options.pageInstall
           ).toString();
           if (re.test(href)) {
-            console.log(href, link.textContent);
+            idx += 1;
+            let dataName = "";
+            if (options.name !== undefined) {
+              dataName =
+                options.name + "/" + idx.toString() + "_" + link.textContent;
+            } else {
+              dataName = idx.toString() + "_" + link.textContent;
+            }
             const fullPath = await installFromURL(
               href,
-              link.textContent,
+              dataName,
               options.postProcesses,
               parsedHeaders
             ).catch((error) => {
@@ -93,11 +101,11 @@ export class InstallAction {
         parsedHeaders,
       ).catch(
         (error) => {
-          console.error(
-            Colors.red("Failed to install."),
+        console.error(
+          Colors.red("Failed to install."),
             Colors.red(error.message),
-          );
-          Deno.exit(1);
+        );
+        Deno.exit(1);
         },
       );
       console.log(
@@ -292,11 +300,11 @@ export class UpdateAction {
         content.headers,
       ).catch(
         (error) => {
-          console.error(
-            Colors.red("Failed to update."),
+        console.error(
+          Colors.red("Failed to update."),
             Colors.red(error.message),
-          );
-          Deno.exit(1);
+        );
+        Deno.exit(1);
         },
       );
       if (fullPath !== undefined) {
