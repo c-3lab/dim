@@ -53,11 +53,11 @@ await new Command()
       )
       .option(
         "-P, --pageInstall <pageInstall:string>",
-        "Execute install from links in specified page."
+        "Execute install from links in specified page.",
       )
       .option(
         "-e, --expression <expression:string>",
-        "Filter PageInstall result by regular expression."
+        "Filter PageInstall result by regular expression.",
       )
       .description(
         "Install the data.\n" +

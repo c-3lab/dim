@@ -1,4 +1,4 @@
-import { Colors, Confirm, Input, DOMParser } from "../deps.ts";
+import { Colors, Confirm, DOMParser, Input } from "../deps.ts";
 import { DEFAULT_DATAFILES_PATH, DEFAULT_DIM_FILE_PATH } from "./consts.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
@@ -51,14 +51,13 @@ export class InstallAction {
           const re = new RegExp(options.expression, "ig");
           let href = new URL(
             link.getAttribute("href"),
-            options.pageInstall
+            options.pageInstall,
           ).toString();
           if (re.test(href)) {
             idx += 1;
             let dataName = "";
             if (options.name !== undefined) {
-              dataName =
-                options.name + "/" + idx.toString() + "_" + link.textContent;
+              dataName = options.name + "/" + idx.toString() + "_" + link.textContent;
             } else {
               dataName = idx.toString() + "_" + link.textContent;
             }
@@ -66,11 +65,11 @@ export class InstallAction {
               href,
               dataName,
               options.postProcesses,
-              parsedHeaders
+              parsedHeaders,
             ).catch((error) => {
               console.error(
                 Colors.red("Failed to install."),
-                Colors.red(error.message)
+                Colors.red(error.message),
               );
               Deno.exit(1);
             });
