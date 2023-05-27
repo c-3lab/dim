@@ -411,6 +411,7 @@ $ cd dim
 3. Run the dim commands
 
 ```
+$ deno run -A dim.ts init
 $ deno run -A dim.ts install https://xxxxxx/data.json -n 'data_name'
 ```
 
