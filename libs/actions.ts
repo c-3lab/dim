@@ -255,6 +255,8 @@ export class UpdateAction {
         name,
         content.postProcesses,
         content.headers,
+        content.catalogUrl,
+        content.catalogResourceId,
       ).catch(
         (error) => {
           console.error(
