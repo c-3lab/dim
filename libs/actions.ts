@@ -1,6 +1,7 @@
 import { Colors, Confirm, Input } from "../deps.ts";
 import { DEFAULT_DATAFILES_PATH, DEFAULT_DIM_FILE_PATH } from "./consts.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
+import { ky, Sha1 } from "../deps.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
 import { createDataFilesDir, initDimFile, initDimLockFile } from "./action_helper/initializer.ts";
 import { installFromDimFile, installFromURL, interactiveInstall, parseHeader } from "./action_helper/installer.ts";
@@ -367,6 +368,38 @@ export class SearchAction {
     console.log(
       Colors.green(`Installed to ${fullPath}`),
     );
+  }
+}
+
+export class VerifyAction {
+  async execute() {
+    const targetLockContents = new DimLockFileAccessor().getContents();
+    let count = 0;
+    for (const targetLockContent of targetLockContents) {
+      const consoleAnimation = new ConsoleAnimation(
+        ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
+        `${targetLockContent.name}: `,
+      );
+      consoleAnimation.start(100);
+      await ky.get(targetLockContent.url, targetLockContent.headers)
+        .then((response) => response.arrayBuffer())
+        .then((arrayBuffer) => {
+          const integrity = new Sha1().update(arrayBuffer).toString();
+          if (integrity === targetLockContent.integrity) {
+            console.log(
+              Colors.green("latest"),
+            );
+            count += 1;
+          } else {
+            console.log(
+              Colors.red("outdated"),
+            );
+            console.log(`  you can use update command "dim update ${targetLockContent.name}"`);
+          }
+        });
+      consoleAnimation.stop();
+    }
+    console.log(`All verification: done (${count}/${targetLockContents.length} is latest)`);
   }
 }
 
