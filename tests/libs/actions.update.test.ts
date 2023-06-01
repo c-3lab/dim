@@ -139,6 +139,112 @@ describe("UpdateAction", () => {
       }
     });
 
+    it("check if catalogResourceId and catalogResourceUrl in dim.json and dim-lock.json are not updated when they have been already set", async () => {
+      const dimData: DimJSON = {
+        fileVersion: "1.1",
+        contents: [
+          {
+            name: "example",
+            url: "dummy",
+            catalogUrl: "https://example.com",
+            catalogResourceId: "00000000-0000-0000-0000-000000000000",
+            postProcesses: [],
+            headers: {},
+          },
+        ],
+      };
+      const dimLockData: DimLockJSON = {
+        lockFileVersion: "1.1",
+        contents: [{
+          catalogUrl: "https://example.com",
+          catalogResourceId: "00000000-0000-0000-0000-000000000000",
+          eTag: null,
+          headers: {},
+          integrity: "405906c9d5be6ae5393ca65fb0e7c38e0d585ecb",
+          lastDownloaded: new Date("2020-01-02T03:04:05.678Z"),
+          lastModified: null,
+          name: "example",
+          path: "./data_files/example/dummy.csv",
+          postProcesses: [],
+          url: "https://example.com/dummy.csv",
+        }],
+      };
+      await Deno.writeTextFile(
+        "./dim.json",
+        JSON.stringify(dimData, null, 2),
+      );
+      await Deno.writeTextFile(
+        "./dim-lock.json",
+        JSON.stringify(dimLockData, null, 2),
+      );
+      Deno.mkdirSync("data_files/example", { recursive: true });
+      Deno.writeTextFileSync("data_files/example/dummy.csv", "before");
+
+      const kyGetStub = createKyGetStub("after", {
+        headers: {
+          "etag": '"12345-1234567890abc"',
+          "last-modified": "Thu, 3 Feb 2022 04:05:06 GMT",
+        },
+      });
+      try {
+        await new UpdateAction().execute({}, "example");
+
+        const fileContent = Deno.readTextFileSync(
+          "data_files/example/dummy.csv",
+        );
+        assertEquals(fileContent, "after");
+
+        const dimJson = JSON.parse(
+          Deno.readTextFileSync("./dim.json"),
+        );
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogUrl: "https://example.com",
+            catalogResourceId: "00000000-0000-0000-0000-000000000000",
+            headers: {},
+            name: "example",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
+
+        const dimLockJson = JSON.parse(
+          Deno.readTextFileSync("./dim-lock.json"),
+        );
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogUrl: "https://example.com",
+            catalogResourceId: "00000000-0000-0000-0000-000000000000",
+            eTag: "12345-1234567890abc",
+            headers: {},
+            integrity: "405906c9d5be6ae5393ca65fb0e7c38e0d585ecb",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: "2022-02-03T04:05:06.000Z",
+            name: "example",
+            path: "./data_files/example/dummy.csv",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }],
+        });
+
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.green(
+              "Updated example.",
+            ),
+            "\nFile path:",
+            Colors.yellow(
+              "./data_files/example/dummy.csv",
+            ),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
     it('exit with error when run with "name" not listed in dim-lock.json', async () => {
       createEmptyDimJson();
       await new UpdateAction().execute({}, "example2").catch(() => {
@@ -248,6 +354,135 @@ describe("UpdateAction", () => {
           "data_files/test1/dummy.txt",
         );
         assertEquals(fileContent, "after");
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("check if catalogResourceId and catalogResourceUrl in dim.json and dim-lock.json are not updated when they have been already set", async () => {
+      const kyGetStub = createKyGetStub("after", {
+        headers: {
+          "etag": '"12345-1234567890abc"',
+          "last-modified": "Thu, 3 Feb 2022 04:05:06 GMT",
+        },
+      });
+      try {
+        Deno.mkdirSync("data_files/test1", { recursive: true });
+        Deno.writeTextFileSync("data_files/test1/dummy.txt", "before");
+        const dimData: DimJSON = {
+          "fileVersion": "1.1",
+          "contents": [
+            {
+              name: "test1",
+              url: "https://example.com/dummy.txt",
+              catalogUrl: "https://example.com/test1",
+              catalogResourceId: "00000000-0000-0000-0000-000000000001",
+              postProcesses: [
+                "encoding-utf-8",
+              ],
+              headers: {},
+            },
+            {
+              name: "test2",
+              url: "https://example.com/dummy.csv",
+              catalogUrl: "https://example.com/test2",
+              catalogResourceId: "00000000-0000-0000-0000-000000000002",
+              postProcesses: [],
+              headers: {},
+            },
+            {
+              url: "https://example.com/dummy.zip",
+              name: "test3",
+              catalogUrl: "https://example.com/test3",
+              catalogResourceId: "00000000-0000-0000-0000-000000000003",
+              postProcesses: [],
+              headers: {},
+            },
+          ],
+        };
+        await Deno.writeTextFile(
+          "./dim.json",
+          JSON.stringify(dimData, null, 2),
+        );
+        await new UpdateAction().execute({}, undefined);
+        const dimLockJson = JSON.parse(
+          Deno.readTextFileSync("./dim-lock.json"),
+        );
+        assertEquals(dimLockJson, {
+          lockFileVersion: "1.1",
+          contents: [{
+            catalogResourceId: "00000000-0000-0000-0000-000000000001",
+            catalogUrl: "https://example.com/test1",
+            eTag: "12345-1234567890abc",
+            headers: {},
+            integrity: "405906c9d5be6ae5393ca65fb0e7c38e0d585ecb",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: "2022-02-03T04:05:06.000Z",
+            name: "test1",
+            path: "./data_files/test1/dummy.txt",
+            postProcesses: ["encoding-utf-8"],
+            url: "https://example.com/dummy.txt",
+          }, {
+            catalogResourceId: "00000000-0000-0000-0000-000000000002",
+            catalogUrl: "https://example.com/test2",
+            eTag: "12345-1234567890abc",
+            headers: {},
+            integrity: "405906c9d5be6ae5393ca65fb0e7c38e0d585ecb",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: "2022-02-03T04:05:06.000Z",
+            name: "test2",
+            path: "./data_files/test2/dummy.csv",
+            postProcesses: [],
+            url: "https://example.com/dummy.csv",
+          }, {
+            catalogResourceId: "00000000-0000-0000-0000-000000000003",
+            catalogUrl: "https://example.com/test3",
+            eTag: "12345-1234567890abc",
+            headers: {},
+            integrity: "405906c9d5be6ae5393ca65fb0e7c38e0d585ecb",
+            lastDownloaded: "2022-01-02T03:04:05.678Z",
+            lastModified: "2022-02-03T04:05:06.000Z",
+            name: "test3",
+            path: "./data_files/test3/dummy.zip",
+            postProcesses: [],
+            url: "https://example.com/dummy.zip",
+          }],
+        });
+
+        const dimJson = JSON.parse(
+          Deno.readTextFileSync("./dim.json"),
+        );
+        assertEquals(dimJson, {
+          "fileVersion": "1.1",
+          "contents": [
+            {
+              name: "test1",
+              url: "https://example.com/dummy.txt",
+              catalogUrl: "https://example.com/test1",
+              catalogResourceId: "00000000-0000-0000-0000-000000000001",
+              postProcesses: [
+                "encoding-utf-8",
+              ],
+              headers: {},
+            },
+            {
+              name: "test2",
+              url: "https://example.com/dummy.csv",
+              catalogUrl: "https://example.com/test2",
+              catalogResourceId: "00000000-0000-0000-0000-000000000002",
+              postProcesses: [],
+              headers: {},
+            },
+            {
+              url: "https://example.com/dummy.zip",
+              name: "test3",
+              catalogUrl: "https://example.com/test3",
+              catalogResourceId: "00000000-0000-0000-0000-000000000003",
+              postProcesses: [],
+              headers: {},
+            },
+          ],
+        });
       } finally {
         kyGetStub.restore();
       }
