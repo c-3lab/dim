@@ -40,7 +40,41 @@ export class InstallAction {
 
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
 
-    if (options.pageInstall !== undefined) {
+    if (url !== undefined) {
+      if (options.name === undefined) {
+        console.log(Colors.red("The -n option is not specified."));
+        Deno.exit(1);
+      }
+      const targetContent = new DimFileAccessor()
+        .getContents()
+        .find((c) => c.name === options.name);
+      if (targetContent !== undefined && !options.force) {
+        console.log(Colors.red("The name already exists."));
+        console.log(
+          Colors.red(
+            "Use the -F option to force installation and overwrite existing files."
+          )
+        );
+        Deno.exit(1);
+      }
+      const fullPath = await installFromURL(
+        url,
+        options.name,
+        options.postProcesses,
+        parsedHeaders
+      ).catch((error) => {
+        console.error(
+          Colors.red("Failed to install."),
+          Colors.red(error.message)
+        );
+        Deno.exit(1);
+      });
+      console.log(Colors.green(`Installed to ${fullPath}`));
+    } else if (options.pageInstall !== undefined) {
+      if (options.name === undefined) {
+        console.log(Colors.red("The -n option is not specified."));
+        Deno.exit(1);
+      }
       try {
         const getResult = await fetch(options.pageInstall);
         if (!getResult.ok) throw new Error("Fetch response error");
@@ -56,12 +90,7 @@ export class InstallAction {
           ).toString();
           if (re.test(href)) {
             idx += 1;
-            let dataName = "";
-            if (options.name !== undefined) {
-              dataName = options.name + "/" + idx.toString() + "_" + link.textContent;
-            } else {
-              dataName = idx.toString() + "_" + link.textContent;
-            }
+            const dataName = `${options.name}_${idx}`;
             const fullPath = await installFromURL(
               href,
               dataName,
@@ -69,55 +98,23 @@ export class InstallAction {
               parsedHeaders,
             ).catch((error) => {
               console.error(
-                Colors.red("Failed to install."),
-                Colors.red(error.message),
+                Colors.red("Failed to pageInstall."),
+                Colors.red(error.message)
               );
               Deno.exit(1);
             });
           }
         }
       } catch (error) {
-        console.error(error);
-      }
-    }
-
-    if (url !== undefined) {
-      if (options.name === undefined) {
-        console.log(Colors.red("The -n option is not specified."));
+        console.log(Colors.red("Failed to pageInstall"));
+        console.log(error);
         Deno.exit(1);
       }
-      const targetContent = new DimFileAccessor().getContents().find((c) => c.name === options.name);
-      if (targetContent !== undefined && !options.force) {
-        console.log(Colors.red("The name already exists."));
-        console.log(
-          Colors.red(
-            "Use the -F option to force installation and overwrite existing files.",
-          ),
-        );
-        Deno.exit(1);
-      }
-      const fullPath = await installFromURL(
-        url,
-        options.name,
-        options.postProcesses,
-        parsedHeaders,
-      ).catch(
-        (error) => {
-          console.error(
-            Colors.red("Failed to install."),
-            Colors.red(error.message),
-          );
-          Deno.exit(1);
-        },
-      );
-      console.log(
-        Colors.green(`Installed to ${fullPath}`),
-      );
     } else {
       const lockContentList = await installFromDimFile(
         options.file || DEFAULT_DIM_FILE_PATH,
         options.asyncInstall,
-        options.force,
+        options.force
       ).catch(() => {
         console.log(Colors.red("Selecting other than json."));
         Deno.exit(1);
@@ -125,13 +122,11 @@ export class InstallAction {
 
       if (lockContentList !== undefined) {
         if (lockContentList.length != 0) {
-          console.log(
-            Colors.green(`Successfully installed.`),
-          );
+          console.log(Colors.green(`Successfully installed.`));
         } else {
           console.log("All contents have already been installed.");
           console.log(
-            "Use the -F option to force installation and overwrite existing files.",
+            "Use the -F option to force installation and overwrite existing files."
           );
         }
       }
