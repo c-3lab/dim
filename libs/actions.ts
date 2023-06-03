@@ -37,6 +37,16 @@ export class InstallAction {
       );
       Deno.exit(1);
     }
+    if (url && options.pageInstall) {
+      console.log(Colors.red("Cannot use -P option and URL at the same time."));
+      Deno.exit(1);
+    }
+    if (options.file && options.pageInstall) {
+      console.log(
+        Colors.red("Cannot use -f option and -P option at the same time.")
+      );
+      Deno.exit(1);
+    }
 
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
 
@@ -97,11 +107,8 @@ export class InstallAction {
               options.postProcesses,
               parsedHeaders,
             ).catch((error) => {
-              console.error(
-                Colors.red("Failed to pageInstall."),
-                Colors.red(error.message)
-              );
-              Deno.exit(1);
+              console.log("Failed to pageInstall.");
+              console.log("target:" + href);
             });
           }
         }
