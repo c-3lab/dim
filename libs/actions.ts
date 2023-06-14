@@ -43,7 +43,7 @@ export class InstallAction {
     }
     if (options.file && options.pageInstall) {
       console.log(
-        Colors.red("Cannot use -f option and -P option at the same time.")
+        Colors.red("Cannot use -f option and -P option at the same time."),
       );
       Deno.exit(1);
     }
@@ -62,7 +62,7 @@ export class InstallAction {
         console.log(Colors.red("The name already exists."));
         console.log(
           Colors.red(
-            "Use the -F option to force installation and overwrite existing files."
+            "Use the -F option to force installation and overwrite existing files.",
           )
         );
         Deno.exit(1);
@@ -71,11 +71,11 @@ export class InstallAction {
         url,
         options.name,
         options.postProcesses,
-        parsedHeaders
+        parsedHeaders,
       ).catch((error) => {
         console.error(
           Colors.red("Failed to install."),
-          Colors.red(error.message)
+          Colors.red(error.message),
         );
         Deno.exit(1);
       });
@@ -121,7 +121,7 @@ export class InstallAction {
       const lockContentList = await installFromDimFile(
         options.file || DEFAULT_DIM_FILE_PATH,
         options.asyncInstall,
-        options.force
+        options.force,
       ).catch(() => {
         console.log(Colors.red("Selecting other than json."));
         Deno.exit(1);
@@ -133,7 +133,7 @@ export class InstallAction {
         } else {
           console.log("All contents have already been installed.");
           console.log(
-            "Use the -F option to force installation and overwrite existing files."
+            "Use the -F option to force installation and overwrite existing files.",
           );
         }
       }
