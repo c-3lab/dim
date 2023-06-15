@@ -63,7 +63,7 @@ export class InstallAction {
         console.log(
           Colors.red(
             "Use the -F option to force installation and overwrite existing files.",
-          )
+          ),
         );
         Deno.exit(1);
       }
