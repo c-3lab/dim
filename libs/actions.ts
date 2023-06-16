@@ -47,6 +47,11 @@ export class InstallAction {
       );
       Deno.exit(1);
     }
+    if (
+      options.pageInstall && !options.expression) {
+      console.log(Colors.red("Cannot use -P option without -e option."));
+      Deno.exit(1);
+    }
 
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
 
@@ -90,12 +95,16 @@ export class InstallAction {
         if (!getResult.ok) throw new Error("Fetch response error");
         const html = await getResult.text();
         const document = new DOMParser().parseFromString(html, "text/html");
+        if (document === null) {
+          console.log(Colors.red("Can't read html."));
+          Deno.exit(1);
+        }
         const linklist = document.getElementsByTagName("a");
         let idx = 0;
         for (const link of linklist) {
-          const re = new RegExp(options.expression, "ig");
+          const re = new RegExp(options.expression as string, "g");
           let href = new URL(
-            link.getAttribute("href"),
+            link.getAttribute("href") as string,
             options.pageInstall,
           ).toString();
           if (re.test(href)) {
