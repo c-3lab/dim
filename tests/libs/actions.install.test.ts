@@ -1467,4 +1467,24 @@ describe("InstallAction", () => {
       }
     });
   });
+
+  describe("with pageInstall", () => {
+    it("exit with error when name is not specified", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: "https://example.com/dummy.txt", expression: "test" },
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("The -n option is not specified.")],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+  });
 });
