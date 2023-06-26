@@ -47,7 +47,8 @@ export class InstallAction {
       );
       Deno.exit(1);
     }
-    if (options.pageInstall && !options.expression) {
+    if (options.pageInstall && !options.expression
+    ) {
       console.log(Colors.red("Can not use -P option without -e option."));
       Deno.exit(1);
     }
