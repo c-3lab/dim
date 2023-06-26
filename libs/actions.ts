@@ -33,7 +33,7 @@ export class InstallAction {
   ) {
     if (url && options.file) {
       console.log(
-        Colors.red("Cannot use -f option and URL at the same time."),
+        Colors.red("Can not use -f option and URL at the same time.")
       );
       Deno.exit(1);
     }
@@ -43,13 +43,12 @@ export class InstallAction {
     }
     if (options.file && options.pageInstall) {
       console.log(
-        Colors.red("Cannot use -f option and -P option at the same time."),
+        Colors.red("Can not use -f option and -P option at the same time.")
       );
       Deno.exit(1);
     }
-    if (
-      options.pageInstall && !options.expression) {
-      console.log(Colors.red("Cannot use -P option without -e option."));
+    if (options.pageInstall && !options.expression) {
+      console.log(Colors.red("Can not use -P option without -e option."));
       Deno.exit(1);
     }
 
@@ -67,8 +66,8 @@ export class InstallAction {
         console.log(Colors.red("The name already exists."));
         console.log(
           Colors.red(
-            "Use the -F option to force installation and overwrite existing files.",
-          ),
+            "Use the -F option to force installation and overwrite existing files."
+          )
         );
         Deno.exit(1);
       }
@@ -76,11 +75,11 @@ export class InstallAction {
         url,
         options.name,
         options.postProcesses,
-        parsedHeaders,
+        parsedHeaders
       ).catch((error) => {
         console.error(
           Colors.red("Failed to install."),
-          Colors.red(error.message),
+          Colors.red(error.message)
         );
         Deno.exit(1);
       });
@@ -105,7 +104,7 @@ export class InstallAction {
           const re = new RegExp(options.expression as string, "g");
           let href = new URL(
             link.getAttribute("href") as string,
-            options.pageInstall,
+            options.pageInstall
           ).toString();
           if (re.test(href)) {
             idx += 1;
@@ -114,11 +113,13 @@ export class InstallAction {
               href,
               dataName,
               options.postProcesses,
-              parsedHeaders,
+              parsedHeaders
             ).catch((error) => {
-              console.log("Failed to pageInstall.");
+              console.log(Colors.red("Failed to pageInstall"));
               console.log("target:" + href);
+              console.log(error);
             });
+            console.log(Colors.green(`Installed to ${fullPath}`));
           }
         }
       } catch (error) {
@@ -126,11 +127,12 @@ export class InstallAction {
         console.log(error);
         Deno.exit(1);
       }
+      console.log(Colors.green("Completed page install."));
     } else {
       const lockContentList = await installFromDimFile(
         options.file || DEFAULT_DIM_FILE_PATH,
         options.asyncInstall,
-        options.force,
+        options.force
       ).catch(() => {
         console.log(Colors.red("Selecting other than json."));
         Deno.exit(1);
@@ -142,7 +144,7 @@ export class InstallAction {
         } else {
           console.log("All contents have already been installed.");
           console.log(
-            "Use the -F option to force installation and overwrite existing files.",
+            "Use the -F option to force installation and overwrite existing files."
           );
         }
       }

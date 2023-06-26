@@ -903,7 +903,7 @@ describe("InstallAction", () => {
         );
         assertSpyCall(denoExitStub, 0, { args: [1] });
         assertSpyCall(consoleLogStub, 0, {
-          args: [Colors.red("Cannot use -f option and URL at the same time.")],
+          args: [Colors.red("Can not use -f option and URL at the same time.")],
         });
       } finally {
         kyGetStub.restore();
