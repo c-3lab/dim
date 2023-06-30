@@ -1,10 +1,16 @@
-import { Colors, Confirm, DOMParser, Input } from "../deps.ts";
+import { Colors, Confirm, Input } from "../deps.ts";
 import { DEFAULT_DATAFILES_PATH, DEFAULT_DIM_FILE_PATH } from "./consts.ts";
 import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { ky, Sha1 } from "../deps.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
 import { createDataFilesDir, initDimFile, initDimLockFile } from "./action_helper/initializer.ts";
-import { installFromDimFile, installFromURL, interactiveInstall, parseHeader } from "./action_helper/installer.ts";
+import {
+  installFromDimFile,
+  installFromPage,
+  installFromURL,
+  interactiveInstall,
+  parseHeader,
+} from "./action_helper/installer.ts";
 import { OpenAIClient } from "./openai_client.ts";
 import { ConsoleAnimation } from "./console_animation.ts";
 
@@ -47,8 +53,7 @@ export class InstallAction {
       );
       Deno.exit(1);
     }
-    if (options.pageInstall && !options.expression
-    ) {
+    if (options.pageInstall && !options.expression) {
       console.log(Colors.red("Can not use -P option without -e option."));
       Deno.exit(1);
     }
@@ -90,45 +95,18 @@ export class InstallAction {
         console.log(Colors.red("The -n option is not specified."));
         Deno.exit(1);
       }
-      try {
-        const getResult = await fetch(options.pageInstall);
-        if (!getResult.ok) throw new Error("Fetch response error");
-        const html = await getResult.text();
-        const document = new DOMParser().parseFromString(html, "text/html");
-        if (document === null) {
-          console.log(Colors.red("Can't read html."));
-          Deno.exit(1);
-        }
-        const linklist = document.getElementsByTagName("a");
-        let idx = 0;
-        for (const link of linklist) {
-          const re = new RegExp(options.expression as string, "g");
-          let href = new URL(
-            link.getAttribute("href") as string,
-            options.pageInstall,
-          ).toString();
-          if (re.test(href)) {
-            idx += 1;
-            const dataName = `${options.name}_${idx}`;
-            const fullPath = await installFromURL(
-              href,
-              dataName,
-              options.postProcesses,
-              parsedHeaders,
-            ).catch((error) => {
-              console.log(Colors.red("Failed to pageInstall"));
-              console.log("target:" + href);
-              console.log(error);
-            });
-            console.log(Colors.green(`Installed to ${fullPath}`));
-          }
-        }
-      } catch (error) {
+      const installed = await installFromPage(
+        options.pageInstall,
+        options.expression,
+        options.postProcesses,
+        parsedHeaders,
+        options.name,
+      ).catch((error) => {
         console.log(Colors.red("Failed to pageInstall"));
-        console.log(error);
+        console.log(Colors.red(error.message));
         Deno.exit(1);
-      }
-      console.log(Colors.green("Completed page install."));
+      });
+      console.log(Colors.green(`Completed page install ${installed} files.`));
     } else {
       const lockContentList = await installFromDimFile(
         options.file || DEFAULT_DIM_FILE_PATH,

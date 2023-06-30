@@ -1,4 +1,4 @@
-import { Colors, Confirm, Input, ky, Number, Sha1 } from "../../deps.ts";
+import { Colors, Confirm, DOMParser, Input, ky, Number, Sha1 } from "../../deps.ts";
 import { DEFAULT_DIM_LOCK_FILE_PATH, ENCODINGS } from "../consts.ts";
 import { Downloader } from "../downloader.ts";
 import { ConsoleAnimation } from "../console_animation.ts";
@@ -309,4 +309,46 @@ export const interactiveInstall = async (catalogs: Catalog[]): Promise<string> =
   );
 
   return fullPath;
+};
+
+export const installFromPage = async (
+  pageInstallUrl: string,
+  expression: string | undefined,
+  postProcesses: string[] | undefined,
+  headers: Record<string, string> = {},
+  name?: string,
+) => {
+  const getResult = await fetch(pageInstallUrl);
+  if (!getResult.ok) throw new Error("Fetch response error");
+  const html = await getResult.text();
+  const document = new DOMParser().parseFromString(html, "text/html");
+  if (document === null) {
+    console.log(Colors.red("Can't read html."));
+    Deno.exit(1);
+  }
+  const linklist = document.getElementsByTagName("a");
+  let idx = 0;
+  for (const link of linklist) {
+    const re = new RegExp(expression as string, "g");
+    let href = new URL(
+      link.getAttribute("href") as string,
+      pageInstallUrl,
+    ).toString();
+    if (re.test(href)) {
+      idx += 1;
+      const dataName = `${name}_${idx}`;
+      const fullPath = await installFromURL(
+        href,
+        dataName,
+        postProcesses,
+        headers,
+      ).catch((error) => {
+        console.log(Colors.red("Failed to pageInstall"));
+        console.log(Colors.red("target:" + href));
+        console.log(Colors.red(error.message));
+      });
+      console.log(Colors.green(`Installed to ${fullPath}`));
+    }
+  }
+  return idx;
 };
