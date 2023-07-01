@@ -327,7 +327,7 @@ export const installFromPage = async (
     Deno.exit(1);
   }
   const linklist = document.getElementsByTagName("a");
-  let idx = 0;
+  let idx = 1;
   for (const link of linklist) {
     const re = new RegExp(expression as string, "g");
     let href = new URL(
@@ -335,20 +335,21 @@ export const installFromPage = async (
       pageInstallUrl,
     ).toString();
     if (re.test(href)) {
-      idx += 1;
       const dataName = `${name}_${idx}`;
       const fullPath = await installFromURL(
         href,
         dataName,
         postProcesses,
         headers,
-      ).catch((error) => {
+      ).then((fullPath) => {
+        console.log(Colors.green(`Installed to ${fullPath}`));
+        idx += 1;
+      }).catch((error) => {
         console.log(Colors.red("Failed to pageInstall"));
         console.log(Colors.red("target:" + href));
         console.log(Colors.red(error.message));
       });
-      console.log(Colors.green(`Installed to ${fullPath}`));
     }
   }
-  return idx;
+  return idx - 1;
 };

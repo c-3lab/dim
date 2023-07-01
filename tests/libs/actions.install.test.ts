@@ -1469,6 +1469,60 @@ describe("InstallAction", () => {
   });
 
   describe("with pageInstall", () => {
+    it("download all link in specified page.", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.html", import.meta.url).toString();
+      try {
+        createEmptyDimJson();
+        await new InstallAction().execute(
+          { pageInstall: testPage, expression: "l", name: "pageInstallTest" },
+          undefined,
+        );
+
+        assert(fileExists("data_files/pageInstallTest_1/index.html"));
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "pageInstallTest_1",
+            postProcesses: [],
+            url: "https://example.com/index.html",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "pageInstallTest_2",
+            postProcesses: [],
+            url: "https://example.net/index.html",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "pageInstallTest_3",
+            postProcesses: [],
+            url: "https://example.invalid/index.html",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "pageInstallTest_4",
+            postProcesses: [],
+            url: "https://example.org/index.html",
+          }],
+        });
+
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.green("Installed to ./data_files/pageInstallTest_1/index.html"),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
     it("exit with error when name is not specified", async () => {
       const kyGetStub = createKyGetStub("dummy");
       try {
