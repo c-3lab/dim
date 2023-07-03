@@ -330,13 +330,13 @@ export const installFromPage = async (
   let idx = 1;
   for (const link of linklist) {
     const re = new RegExp(expression as string, "g");
-    let href = new URL(
+    const href = new URL(
       link.getAttribute("href") as string,
       pageInstallUrl,
     ).toString();
     if (re.test(href)) {
       const dataName = `${name}_${idx}`;
-      const fullPath = await installFromURL(
+      await installFromURL(
         href,
         dataName,
         postProcesses,
