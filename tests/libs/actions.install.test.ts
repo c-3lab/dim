@@ -1523,5 +1523,86 @@ describe("InstallAction", () => {
         kyGetStub.restore();
       }
     });
+
+    it("exit with error when file is specified", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.html", import.meta.url).toString();
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage, file: "l" },
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("Can not use -f option and -P option at the same time.")],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when expression is not specified", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.html", import.meta.url).toString();
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage },
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("Can not use -P option without -e option.")],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when name is not specified", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.html", import.meta.url).toString();
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage, expression: "l" },
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("The -n option is not specified.")],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when page invalid", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.invalid", import.meta.url).toString();
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage, expression: "l", name: "pageInstallTest" },
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("Failed to pageInstall")],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
   });
 });
