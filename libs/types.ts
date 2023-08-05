@@ -83,13 +83,3 @@ export interface OpenAICompletionsResponse {
     total_tokens: number;
   };
 }
-
-export interface OpenAIErrorResponse {
-  error: {
-    message: string;
-    type: string;
-    param?: string | null;
-    code: string;
-  };
-}
-  
