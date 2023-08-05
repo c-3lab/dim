@@ -1,7 +1,6 @@
 import { Colors, ky } from "../deps.ts";
 import { OPENAPI_COMPLETIONS_ENDPOINT } from "./consts.ts";
 import { OpenAICompletionsResponse, OpenAIErrorResponse } from "./types.ts";
-import * as mod from "https://deno.land/x/oak@v10.6.0/httpError.ts";
 
 export class OpenAIClient {
   private apiKey;
@@ -32,14 +31,16 @@ export class OpenAIClient {
         },
       ).json<OpenAICompletionsResponse>();
     } catch (error) {
-      const errorJson = await error.response.json<OpenAIErrorResponse>();
-      console.error(
-        '\nerror message by ky client:',
-        Colors.red(`\n${error.message}`),
-      );
-      console.error(
-        '\nerror response by openai:\n', JSON.stringify(errorJson,null,2)
-      );
+      if ( error.response ) {
+        const errorJson = await error.response.json();
+        console.error(
+          '\nerror message by ky client:',
+          Colors.red(`\n${error.message}`),
+        );
+        console.error(
+          '\nerror response by openai:\n', JSON.stringify(errorJson,null,2)
+        );
+      }
       Deno.exit(1);
     }
     return response;
