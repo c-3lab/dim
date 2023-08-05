@@ -32,16 +32,14 @@ export class OpenAIClient {
         },
       ).json<OpenAICompletionsResponse>();
     } catch (error) {
-      if (error instanceof ky.HTTPError ) {
-        const errorJson = await error.response.json<OpenAIErrorResponse>();
-        console.error(
-          '\nerror message by ky client:',
-          Colors.red(`\n${error.message}`),
-        );
-        console.error(
-          '\nerror response by openai:\n', JSON.stringify(errorJson,null,2)
-        );  
-      }
+      const errorJson = await error.response.json<OpenAIErrorResponse>();
+      console.error(
+        '\nerror message by ky client:',
+        Colors.red(`\n${error.message}`),
+      );
+      console.error(
+        '\nerror response by openai:\n', JSON.stringify(errorJson,null,2)
+      );
       Deno.exit(1);
     }
     return response;
