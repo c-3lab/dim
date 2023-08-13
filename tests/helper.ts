@@ -1,6 +1,7 @@
 import { Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
 import { resolve } from "https://deno.land/std@0.152.0/path/mod.ts";
 import { HTTPError, ky, NormalizedOptions } from "../deps.ts";
+import { OpenAIErrorResponse } from "../libs/types.ts";
 
 const currentDirectory = new URL(".", import.meta.url).pathname;
 export const temporaryDirectory = resolve(currentDirectory, "temporary") + "/";
@@ -42,7 +43,7 @@ export const createKyPostStub = (
 export const createKyPostStubForError = (
   statusCode: number,
   statusText: string,
-  errorResponse: any,
+  errorResponse: OpenAIErrorResponse,
 ): Stub => {
   const mockedKy = ky.extend({
     hooks: {

@@ -21,7 +21,7 @@ export { readXLSX, xlsx } from "https://deno.land/x/flat@0.0.14/mod.ts";
 import ky from "https://cdn.skypack.dev/ky@0.31.0?dts";
 export { ky };
 
-import { HTTPError, NormalizedOptions } from "https://cdn.skypack.dev/ky@0.31.0?dts";
+import { HTTPError } from "https://cdn.skypack.dev/ky@0.31.0?dts";
 export { HTTPError };
 export type { KyResponse, NormalizedOptions, ResponsePromise } from "https://cdn.skypack.dev/ky@0.31.0?dts";
 
