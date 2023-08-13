@@ -31,7 +31,6 @@ export class OpenAIClient {
         },
       ).json<OpenAICompletionsResponse>();
     } catch (error) {
-
       if (error.response) {
         const errorJson = await error.response.json();
         console.error(
