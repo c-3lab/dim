@@ -240,17 +240,17 @@ describe("GenerateAction", () => {
 
     assert(
       errorSpy.calls.some((call) =>
-        call.args.includes("\nerror message by ky client:") &&
+        call.args.includes("\nError message by ky client:") &&
         call.args.includes(Colors.red("\nRequest failed with status code 401 Unauthorized"))
       ),
       "Expected ky client error message was not logged",
     );
     assert(
       errorSpy.calls.some((call) =>
-        call.args.includes("\nerror response by openai:\n") &&
+        call.args.includes("\nError response by openai:\n") &&
         call.args.includes(JSON.stringify(errorResponse, null, 2))
       ),
-      "Expected openai error response was not logged",
+      "Expected openai Error response was not logged",
     );
 
     kyPostStub.restore();

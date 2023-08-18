@@ -34,11 +34,11 @@ export class OpenAIClient {
       if (error.response) {
         const errorJson = await error.response.json();
         console.error(
-          "\nerror message by ky client:",
+          "\nError message by ky client:",
           Colors.red(`\n${error.message}`),
         );
         console.error(
-          "\nerror response by openai:\n",
+          "\nError response by openai:\n",
           JSON.stringify(errorJson, null, 2),
         );
       }
