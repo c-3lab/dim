@@ -1,10 +1,10 @@
 import { assert, assertEquals, assertFalse } from "https://deno.land/std@0.152.0/testing/asserts.ts";
-import { returnsNext, Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
+import { returnsNext, spy, Stub, stub } from "https://deno.land/std@0.152.0/testing/mock.ts";
 import { afterEach, beforeEach, describe, it } from "https://deno.land/std@0.152.0/testing/bdd.ts";
 import { FakeTime } from "https://deno.land/std@0.152.0/testing/time.ts";
 import { GenerateAction } from "../../libs/actions.ts";
-import { createKyPostStub, removeTemporaryFiles, temporaryDirectory } from "../helper.ts";
-import { Confirm, Input, ky } from "../../deps.ts";
+import { createKyPostStub, createKyPostStubForError, removeTemporaryFiles, temporaryDirectory } from "../helper.ts";
+import { Colors, Confirm, Input, ky } from "../../deps.ts";
 import { DimLockJSON } from "../../libs/types.ts";
 import { DEFAULT_DIM_LOCK_FILE_PATH } from "../../libs/consts.ts";
 
@@ -216,5 +216,45 @@ describe("GenerateAction", () => {
     kyPostStub.restore();
     inputStub.restore();
     confirmStub.restore();
+  });
+  it("handles error when OpenAI API returns an error", async () => {
+    const statusCode = 401;
+    const statusText = "Unauthorized";
+    const errorResponse = {
+      "error": {
+        "message":
+          "Incorrect API key provided: xxx. You can find your API key at https://platform.openai.com/account/api-keys.",
+        "type": "invalid_request_error",
+        "param": null,
+        "code": "invalid_api_key",
+      },
+    };
+    const kyPostStub = createKyPostStubForError(statusCode, statusText, errorResponse);
+    consoleErrorStub.restore();
+    const errorSpy = spy(console, "error");
+
+    await new GenerateAction().execute(
+      { target: "../test_data/valid_csv.csv", output: "example.py" },
+      "python code that convert this csv data to geojson",
+    );
+
+    assert(
+      errorSpy.calls.some((call) =>
+        call.args.includes("\nError message by ky client:") &&
+        call.args.includes(Colors.red("\nRequest failed with status code 401 Unauthorized"))
+      ),
+      "Expected ky client error message was not logged",
+    );
+    assert(
+      errorSpy.calls.some((call) =>
+        call.args.includes("\nError response by openai:\n") &&
+        call.args.includes(JSON.stringify(errorResponse, null, 2))
+      ),
+      "Expected openai Error response was not logged",
+    );
+
+    kyPostStub.restore();
+    errorSpy.restore();
+    consoleErrorStub = stub(console, "error");
   });
 });
