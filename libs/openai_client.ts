@@ -31,9 +31,17 @@ export class OpenAIClient {
         },
       ).json<OpenAICompletionsResponse>();
     } catch (error) {
-      console.error(
-        Colors.red(`\n${error.message}`),
-      );
+      if (error.response) {
+        const errorJson = await error.response.json();
+        console.error(
+          "\nError message by ky client:",
+          Colors.red(`\n${error.message}`),
+        );
+        console.error(
+          "\nError response by openai:\n",
+          JSON.stringify(errorJson, null, 2),
+        );
+      }
       Deno.exit(1);
     }
     return response;
