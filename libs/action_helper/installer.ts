@@ -321,12 +321,8 @@ export const installFromPage = async (
   const getResult = await fetch(pageInstallUrl);
   if (!getResult.ok) throw new Error("Fetch response error");
   const html = await getResult.text();
-  const document = new DOMParser().parseFromString(html, "text/html");
-  if (document === null) {
-    console.log(Colors.red("Can't read html."));
-    Deno.exit(1);
-  }
-  const linklist = document.getElementsByTagName("a");
+  const document = new DOMParser().parseFromString(html, "text/html")!;
+  const linklist = document.getElementsByTagName("a")!;
   let idx = 1;
   for (const link of linklist) {
     const re = new RegExp(expression as string, "g");
@@ -345,9 +341,11 @@ export const installFromPage = async (
         console.log(Colors.green(`Installed to ${fullPath}`));
         idx += 1;
       }).catch((error) => {
-        console.log(Colors.red("Failed to pageInstall"));
-        console.log(Colors.red("target:" + href));
-        console.log(Colors.red(error.message));
+        console.error(
+          Colors.red("Failed to pageInstall."),
+          Colors.red("target:" + href),
+          Colors.red(error.message),
+        );
       });
     }
   }

@@ -102,8 +102,10 @@ export class InstallAction {
         parsedHeaders,
         options.name,
       ).catch((error) => {
-        console.log(Colors.red("Failed to pageInstall"));
-        console.log(Colors.red(error.message));
+        console.error(
+          Colors.red("Failed to pageInstall."),
+          Colors.red(error.message),
+        );
         Deno.exit(1);
       });
       console.log(Colors.green(`Completed page install ${installed} files.`));
