@@ -319,7 +319,6 @@ export const installFromPage = async (
   name?: string,
 ) => {
   const getResult = await fetch(pageInstallUrl);
-  if (!getResult.ok) throw new Error("Fetch response error");
   const html = await getResult.text();
   const document = new DOMParser().parseFromString(html, "text/html")!;
   const linklist = document.getElementsByTagName("a")!;
