@@ -207,6 +207,14 @@ Command to be executed during postprocessing.
 $ python ./tests/test_custom_command.py ./data_files/***/***.xx
 ```
 
+#### Install by specifying the HTML page
+
+Install data by specifying regular expressions for links within a specified page.
+
+```
+$ dim install -P https://example.com -e ".pdf" -n "example"
+```
+
 #### Forced execution
 
 Forced install. Overwrite already exist data file.
