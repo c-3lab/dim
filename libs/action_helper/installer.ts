@@ -1,4 +1,4 @@
-import { Colors, Confirm, Input, ky, Number, Sha1 } from "../../deps.ts";
+import { Colors, Confirm, DOMParser, Input, ky, Number, Sha1 } from "../../deps.ts";
 import { DEFAULT_DIM_LOCK_FILE_PATH, ENCODINGS } from "../consts.ts";
 import { Downloader } from "../downloader.ts";
 import { ConsoleAnimation } from "../console_animation.ts";
@@ -309,4 +309,44 @@ export const interactiveInstall = async (catalogs: Catalog[]): Promise<string> =
   );
 
   return fullPath;
+};
+
+export const installFromPage = async (
+  pageInstallUrl: string,
+  expression: string | undefined,
+  postProcesses: string[] | undefined,
+  headers: Record<string, string> = {},
+  name?: string,
+) => {
+  const getResult = await fetch(pageInstallUrl);
+  const html = await getResult.text();
+  const document = new DOMParser().parseFromString(html, "text/html")!;
+  const linklist = document.getElementsByTagName("a")!;
+  let idx = 1;
+  for (const link of linklist) {
+    const re = new RegExp(expression as string, "g");
+    const href = new URL(
+      link.getAttribute("href") as string,
+      pageInstallUrl,
+    ).toString();
+    if (re.test(href)) {
+      const dataName = `${name}_${idx}`;
+      await installFromURL(
+        href,
+        dataName,
+        postProcesses,
+        headers,
+      ).then((fullPath) => {
+        console.log(Colors.green(`Installed to ${fullPath}`));
+        idx += 1;
+      }).catch((error) => {
+        console.error(
+          Colors.red("Failed to pageInstall."),
+          Colors.red("target:" + href),
+          Colors.red(error.message),
+        );
+      });
+    }
+  }
+  return idx - 1;
 };

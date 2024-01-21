@@ -903,7 +903,24 @@ describe("InstallAction", () => {
         );
         assertSpyCall(denoExitStub, 0, { args: [1] });
         assertSpyCall(consoleLogStub, 0, {
-          args: [Colors.red("Cannot use -f option and URL at the same time.")],
+          args: [Colors.red("Can not use -f option and URL at the same time.")],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when execute with URL and PageInsall option", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.html", import.meta.url).toString();
+      try {
+        await new InstallAction().execute(
+          { pageInstall: testPage },
+          "https://example.com/dummy.txt",
+        );
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("Cannot use -P option and URL at the same time.")],
         });
       } finally {
         kyGetStub.restore();
@@ -1462,6 +1479,227 @@ describe("InstallAction", () => {
           new TextDecoder().decode(result),
           "No contents.\nYou should run a 'dim install <data url>'. \n",
         );
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+  });
+
+  describe("with pageInstall", () => {
+    it("download all link in specified page.", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.html", import.meta.url).toString();
+      try {
+        createEmptyDimJson();
+        await new InstallAction().execute(
+          { pageInstall: testPage, expression: "l", name: "pageInstallTest" },
+          undefined,
+        );
+
+        assert(fileExists("data_files/pageInstallTest_1/index.html"));
+        const dimJson = JSON.parse(Deno.readTextFileSync("dim.json"));
+        assertEquals(dimJson, {
+          fileVersion: "1.1",
+          contents: [{
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "pageInstallTest_1",
+            postProcesses: [],
+            url: "https://example.com/index.html",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "pageInstallTest_2",
+            postProcesses: [],
+            url: "https://example.net/index.html",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "pageInstallTest_3",
+            postProcesses: [],
+            url: "https://example.invalid/index.html",
+          }, {
+            catalogResourceId: null,
+            catalogUrl: null,
+            headers: {},
+            name: "pageInstallTest_4",
+            postProcesses: [],
+            url: "https://example.org/index.html",
+          }],
+        });
+
+        assertSpyCall(consoleLogStub, 0, {
+          args: [
+            Colors.green("Installed to ./data_files/pageInstallTest_1/index.html"),
+          ],
+        });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when file is specified", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.html", import.meta.url).toString();
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage, file: "l" },
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("Can not use -f option and -P option at the same time.")],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when expression is not specified", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.html", import.meta.url).toString();
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage },
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("Can not use -P option without -e option.")],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when name is not specified", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.html", import.meta.url).toString();
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage, expression: "l" },
+          undefined,
+        );
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.red("The -n option is not specified.")],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when expression is invalid", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.html", import.meta.url).toString();
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage, expression: "(", name: "pageInstallTest" },
+          undefined,
+        );
+        assertSpyCall(consoleErrorStub, 0, {
+          args: [
+            Colors.red(
+              "Failed to pageInstall.",
+            ),
+            Colors.red(
+              "Invalid regular expression: /(/: Unterminated group",
+            ),
+          ],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when can't read html", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-empty.html", import.meta.url).toString();
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage, expression: "l", name: "pageInstallTest" },
+          undefined,
+        );
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when fetch response", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-install.notfound", import.meta.url).toString();
+      console.log(testPage);
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage, expression: "l", name: "pageInstallTest" },
+          undefined,
+        );
+        assertSpyCall(consoleErrorStub, 0, {
+          args: [
+            Colors.red(
+              "Failed to pageInstall.",
+            ),
+            Colors.red(
+              "NetworkError when attempting to fetch resource.",
+            ),
+          ],
+        });
+        assertSpyCall(denoExitStub, 0, { args: [1] });
+      } finally {
+        kyGetStub.restore();
+      }
+    });
+
+    it("exit with error when page invalid", async () => {
+      const kyGetStub = createKyGetStub("dummy");
+      const testPage = new URL("../test_data/test-page-invalid.html", import.meta.url).toString();
+      const errorHref = new URL("../test_data/l///", import.meta.url).toString();
+
+      try {
+        createEmptyDimJson();
+
+        await new InstallAction().execute(
+          { pageInstall: testPage, expression: "l", name: "pageInstallTest" },
+          undefined,
+        );
+        assertSpyCall(consoleErrorStub, 0, {
+          args: [
+            Colors.red(
+              "Failed to pageInstall.",
+            ),
+            Colors.red(
+              "target:" + errorHref,
+            ),
+            Colors.red(
+              "Is a directory (os error 21), open './data_files/pageInstallTest_1/'",
+            ),
+          ],
+        });
+        assertSpyCall(consoleLogStub, 0, {
+          args: [Colors.green("Completed page install 0 files.")],
+        });
       } finally {
         kyGetStub.restore();
       }

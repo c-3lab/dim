@@ -4,7 +4,13 @@ import { DimFileAccessor, DimLockFileAccessor } from "./accessor.ts";
 import { ky, Sha1 } from "../deps.ts";
 import { CkanApiClient } from "./ckan_api_client.ts";
 import { createDataFilesDir, initDimFile, initDimLockFile } from "./action_helper/initializer.ts";
-import { installFromDimFile, installFromURL, interactiveInstall, parseHeader } from "./action_helper/installer.ts";
+import {
+  installFromDimFile,
+  installFromPage,
+  installFromURL,
+  interactiveInstall,
+  parseHeader,
+} from "./action_helper/installer.ts";
 import { OpenAIClient } from "./openai_client.ts";
 import { ConsoleAnimation } from "./console_animation.ts";
 
@@ -26,23 +32,42 @@ export class InstallAction {
       file?: string;
       force?: boolean;
       asyncInstall?: boolean;
+      pageInstall?: string;
+      expression?: string;
     },
     url: string | undefined,
   ) {
     if (url && options.file) {
       console.log(
-        Colors.red("Cannot use -f option and URL at the same time."),
+        Colors.red("Can not use -f option and URL at the same time."),
       );
+      Deno.exit(1);
+    }
+    if (url && options.pageInstall) {
+      console.log(Colors.red("Cannot use -P option and URL at the same time."));
+      Deno.exit(1);
+    }
+    if (options.file && options.pageInstall) {
+      console.log(
+        Colors.red("Can not use -f option and -P option at the same time."),
+      );
+      Deno.exit(1);
+    }
+    if (options.pageInstall && !options.expression) {
+      console.log(Colors.red("Can not use -P option without -e option."));
       Deno.exit(1);
     }
 
     const parsedHeaders: Record<string, string> = parseHeader(options.headers);
+
     if (url !== undefined) {
       if (options.name === undefined) {
         console.log(Colors.red("The -n option is not specified."));
         Deno.exit(1);
       }
-      const targetContent = new DimFileAccessor().getContents().find((c) => c.name === options.name);
+      const targetContent = new DimFileAccessor()
+        .getContents()
+        .find((c) => c.name === options.name);
       if (targetContent !== undefined && !options.force) {
         console.log(Colors.red("The name already exists."));
         console.log(
@@ -57,18 +82,33 @@ export class InstallAction {
         options.name,
         options.postProcesses,
         parsedHeaders,
-      ).catch(
-        (error) => {
-          console.error(
-            Colors.red("Failed to install."),
-            Colors.red(error.message),
-          );
-          Deno.exit(1);
-        },
-      );
-      console.log(
-        Colors.green(`Installed to ${fullPath}`),
-      );
+      ).catch((error) => {
+        console.error(
+          Colors.red("Failed to install."),
+          Colors.red(error.message),
+        );
+        Deno.exit(1);
+      });
+      console.log(Colors.green(`Installed to ${fullPath}`));
+    } else if (options.pageInstall !== undefined) {
+      if (options.name === undefined) {
+        console.log(Colors.red("The -n option is not specified."));
+        Deno.exit(1);
+      }
+      const installed = await installFromPage(
+        options.pageInstall,
+        options.expression,
+        options.postProcesses,
+        parsedHeaders,
+        options.name,
+      ).catch((error) => {
+        console.error(
+          Colors.red("Failed to pageInstall."),
+          Colors.red(error.message),
+        );
+        Deno.exit(1);
+      });
+      console.log(Colors.green(`Completed page install ${installed} files.`));
     } else {
       const lockContentList = await installFromDimFile(
         options.file || DEFAULT_DIM_FILE_PATH,
@@ -81,9 +121,7 @@ export class InstallAction {
 
       if (lockContentList !== undefined) {
         if (lockContentList.length != 0) {
-          console.log(
-            Colors.green(`Successfully installed.`),
-          );
+          console.log(Colors.green(`Successfully installed.`));
         } else {
           console.log("All contents have already been installed.");
           console.log(

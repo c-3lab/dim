@@ -31,6 +31,8 @@ export { Sha1 } from "https://deno.land/std@0.146.0/hash/sha1.ts";
 
 export { parse } from "https://deno.land/std@0.174.0/encoding/csv.ts";
 
+export { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+
 export const zipWrapper = {
   decompress: _decompress,
 };
