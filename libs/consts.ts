@@ -1,5 +1,5 @@
 export const NAME = "dim";
-export const VERSION = "v1.1";
+export const VERSION = "v1.2";
 export const DEFAULT_DATAFILES_PATH = "./data_files";
 export const DEFAULT_DIM_FILE_PATH = "./dim.json";
 export const DEFAULT_DIM_LOCK_FILE_PATH = "./dim-lock.json";
